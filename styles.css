@@ -1659,6 +1659,275 @@ textarea:focus {
   box-shadow: 34px 18px 0 rgba(255, 255, 255, 0.7), -28px 36px 0 rgba(255, 255, 255, 0.65);
 }
 
+/* =========================================
+   NEW: Entity Status Bars (Hunger/Thirst)
+   ========================================= */
+.entity-status {
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 44px;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 6px;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.large-pet:hover .entity-status,
+.large-plant:hover .entity-status {
+  opacity: 1;
+}
+
+.entity-status-fill {
+  height: 100%;
+  background: #61d4d0;
+  border-radius: 6px;
+  transition: width 0.4s ease, background-color 0.4s ease;
+}
+
+.entity-status-fill.satiety {
+  background: #ffd36e;
+}
+
+.entity-status-fill.warning {
+  background: #ffb042;
+}
+
+.entity-status-fill.danger {
+  background: #f25f4c;
+}
+
+/* =========================================
+   NEW: Pet Sad & Plant Withered States
+   ========================================= */
+.large-island[data-pet="sad"] .large-pet {
+  background: #e3dcc4;
+  transform: translateY(4px) scale(0.86);
+}
+
+.large-island[data-pet="sad"] .pet-eye {
+  height: 4px;
+  border-radius: 2px;
+  transform: translateY(2px) rotate(5deg);
+  background: #7a6855;
+}
+
+.large-island[data-pet="sad"] .eye-left {
+  transform: translateY(2px) rotate(-5deg);
+}
+
+.large-island[data-pet="sad"] .pet-mouth {
+  border-radius: 50% 50% 0 0;
+  border-bottom: none;
+  border-top: 3px solid #8a5b47;
+  transform: translateX(-50%) scaleX(0.55) translateY(4px);
+}
+
+.large-island[data-pet="sad"] .pet-tail {
+  transform: rotate(-45deg);
+  background: #cbb483;
+}
+
+/* Withered Plants */
+.large-island[data-hydration="dry"] .large-plant {
+  filter: grayscale(0.6) sepia(0.3) hue-rotate(-20deg);
+  transform-origin: bottom center;
+  transform: scaleY(0.85) scaleX(0.95);
+}
+
+.large-island[data-hydration="dry"] .large-land {
+  background: #e6ce93;
+  box-shadow: inset 0 -20px 0 #ccb06a;
+}
+
+/* =========================================
+   NEW: Fullscreen Auth Shell
+   ========================================= */
+.auth-shell {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+  background: var(--surface);
+}
+
+.auth-visual {
+  background: radial-gradient(circle at 50% 50%, rgba(255, 211, 110, 0.4), transparent 60%), linear-gradient(160deg, #e5fbff 0%, #e7f7dc 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  text-align: center;
+  border-right: 1px solid var(--line);
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+}
+
+.auth-form {
+  width: 100%;
+  max-width: 400px;
+}
+
+.auth-form h2 {
+  font-size: 32px;
+  margin: 0 0 8px;
+}
+
+@media (max-width: 760px) {
+  .auth-shell {
+    grid-template-columns: 1fr;
+  }
+  .auth-visual {
+    display: none;
+  }
+}
+
+/* =========================================
+   NEW: Social & Boss UI
+   ========================================= */
+.boss-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 120px;
+  gap: 16px;
+  padding: 20px;
+  background: linear-gradient(135deg, #2d7f9f 0%, #227981 100%);
+  border-radius: 12px;
+  color: white;
+  margin-bottom: 24px;
+}
+
+.boss-info h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+
+.boss-info p {
+  margin: 0 0 16px;
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+.boss-progress-bar {
+  height: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.boss-progress-fill {
+  height: 100%;
+  background: var(--sun);
+  transition: width 0.4s ease;
+}
+
+.boss-monster {
+  width: 100%;
+  height: 100%;
+  background: #1c4951;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.boss-monster::after {
+  content: '👾';
+  font-size: 64px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.chat-panel {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 160px);
+  position: sticky;
+  top: 28px;
+}
+
+.chat-header {
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 16px;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-right: 8px;
+}
+
+.chat-msg {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.chat-msg.sent {
+  flex-direction: row-reverse;
+}
+
+.chat-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--leaf);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.chat-bubble {
+  max-width: 80%;
+  padding: 10px 14px;
+  border-radius: 12px 12px 12px 2px;
+  background: #f1f8f6;
+  font-size: 14px;
+}
+
+.chat-msg.sent .chat-bubble {
+  border-radius: 12px 12px 2px 12px;
+  background: var(--sea);
+  color: white;
+}
+
+.chat-input-area {
+  display: flex;
+  gap: 8px;
+}
+
+.chat-input-area input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  outline: none;
+}
+
+.chat-input-area input:focus {
+  border-color: var(--sea);
+}
+
 .status-message {
   margin: 12px 0 0;
   color: var(--sea-dark);

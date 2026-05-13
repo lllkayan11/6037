@@ -145,7 +145,17 @@ const PomolandCore = (() => {
       decorateDone: '贝壳灯已放到码头旁。',
       needSeeds: '种子不足，先完成 Focus Mode 获得 Bonus。',
       needWater: '水滴不足，先完成 Focus Mode 获得 Bonus。',
-      needCoins: '金币不足，先完成 Focus Mode 获得 Bonus。'
+      needCoins: '金币不足，先完成 Focus Mode 获得 Bonus。',
+      buyProtectionBtn: '购买保护卡 (30金币)',
+      streakWarningTitle: '连胜即将中断！',
+      streakWarningDesc: '今天还没有专注哦，再不打卡就会失去你的连胜记录。是否消耗 1 张保护卡？',
+      useProtection: '使用保护卡',
+      acceptBreak: '断签',
+      login: '登录 / 注册',
+      loginTitle: '登录 / 注册',
+      loginDesc: '输入手机号接收验证码以登录 Pomoland。',
+      addFriend: '添加好友 (ID)',
+      teamBossTitle: '小队 Boss 战 (Beta)'
     },
     'zh-HK': {
       languageName: '繁體中文',
@@ -290,7 +300,17 @@ const PomolandCore = (() => {
       decorateDone: '貝殼燈已放到碼頭旁。',
       needSeeds: '種子不足，先完成 Focus Mode 獲得 Bonus。',
       needWater: '水滴不足，先完成 Focus Mode 獲得 Bonus。',
-      needCoins: '金幣不足，先完成 Focus Mode 獲得 Bonus。'
+      needCoins: '金幣不足，先完成 Focus Mode 獲得 Bonus。',
+      buyProtectionBtn: '購買保護卡 (30金幣)',
+      streakWarningTitle: '連勝即將中斷！',
+      streakWarningDesc: '今天還沒有專注哦，再不打卡就會失去你的連勝記錄。是否消耗 1 張保護卡？',
+      useProtection: '使用保護卡',
+      acceptBreak: '斷簽',
+      login: '登入 / 註冊',
+      loginTitle: '登入 / 註冊',
+      loginDesc: '輸入手機號接收驗證碼以登入 Pomoland。',
+      addFriend: '加入好友 (ID)',
+      teamBossTitle: '小隊 Boss 戰 (Beta)'
     },
     en: {
       languageName: 'English',
@@ -435,7 +455,17 @@ const PomolandCore = (() => {
       decorateDone: 'The shell lamp is now beside the dock.',
       needSeeds: 'Not enough seeds. Finish Focus Mode to earn a Bonus.',
       needWater: 'Not enough water. Finish Focus Mode to earn a Bonus.',
-      needCoins: 'Not enough coins. Finish Focus Mode to earn a Bonus.'
+      needCoins: 'Not enough coins. Finish Focus Mode to earn a Bonus.',
+      buyProtectionBtn: 'Buy Protection (30 Coins)',
+      streakWarningTitle: 'Streak at risk!',
+      streakWarningDesc: 'You haven\'t focused today. You will lose your streak if you don\'t check in. Use 1 Protection Card?',
+      useProtection: 'Use Protection Card',
+      acceptBreak: 'Accept Break',
+      login: 'Log in / Sign up',
+      loginTitle: 'Log in / Sign up',
+      loginDesc: 'Enter your phone number to receive a verification code.',
+      addFriend: 'Add Friend (ID)',
+      teamBossTitle: 'Team Boss Battle (Beta)'
     }
   };
 
@@ -485,6 +515,8 @@ const PomolandCore = (() => {
     return {
       language: 'zh-CN',
       currentView: 'today',
+      userProfile: null, // { phone, nickname, avatar }
+      teamProgress: 100, // Boss battle
       goal: COPY['zh-CN'].defaultGoal,
       tasks: [],
       selectedTask: null,
@@ -499,6 +531,10 @@ const PomolandCore = (() => {
       cropStage: 1,
       islandHydration: 0,
       petMood: 'sleepy',
+      petSatiety: 100, // New: 0-100
+      plantHydrationValue: 100, // New: 0-100
+      protectionCards: 1, // New
+      lastActiveDate: todayIso(), // New: to track decay
       streak: 5,
       checkIns: [],
       focusCompleted: false,
@@ -612,6 +648,7 @@ const PomolandCore = (() => {
       if (next.resources.water <= 0) return withMessage(next, 'needWater');
       next.resources.water -= 1;
       next.islandHydration = Math.min(next.islandHydration + 1, 3);
+      next.plantHydrationValue = Math.min(100, next.plantHydrationValue + 40); // Restore hydration
       return withMessage(next, 'waterDone');
     }
 
@@ -619,6 +656,7 @@ const PomolandCore = (() => {
       if (next.resources.coins < 20) return withMessage(next, 'needCoins');
       next.resources.coins -= 20;
       next.petMood = 'happy';
+      next.petSatiety = Math.min(100, next.petSatiety + 50); // Restore satiety
       next.islandLevel = Math.min(next.islandLevel + 1, 5);
       return withMessage(next, 'feedDone');
     }
@@ -639,7 +677,16 @@ const PomolandCore = (() => {
   function getIslandVisualState(state) {
     const level = Math.max(1, Math.min(state.islandLevel, 5));
     const cropStage = Math.max(1, Math.min(state.cropStage || 1, 4));
-    const hydration = Math.max(0, Math.min(state.islandHydration, 3));
+    
+    // Determine actual hydration and pet mood based on decay values
+    const actualHydration = state.plantHydrationValue <= 20 ? 0 : state.islandHydration;
+    const hydrationStage = state.plantHydrationValue <= 20 ? 'dry' : 
+                           (actualHydration >= 3 ? 'sparkling' : (actualHydration >= 1 ? 'fresh' : 'dry'));
+    
+    let currentPetMood = state.petMood || 'sleepy';
+    if (state.petSatiety <= 20) currentPetMood = 'sad';
+    else if (currentPetMood === 'sad') currentPetMood = 'sleepy';
+
     const visibleDecorations = [...state.decorations];
     const decorationTokens = visibleDecorations.map(getDecorationToken);
     const cropVisual = CROP_VISUALS[cropStage - 1] || 'seedling';
@@ -650,11 +697,6 @@ const PomolandCore = (() => {
         : cropStage >= 2
           ? 'growing'
           : 'starter';
-    const hydrationStage = hydration >= 3
-      ? 'sparkling'
-      : hydration >= 1
-        ? 'fresh'
-        : 'dry';
 
     return {
       level,
@@ -662,12 +704,14 @@ const PomolandCore = (() => {
       cropVisual,
       plantCount: cropStage,
       hydrationStage,
-      petMood: state.petMood || 'sleepy',
-      petActivity: state.petMood === 'happy' ? 'celebrating' : 'resting',
+      petMood: currentPetMood,
+      petActivity: currentPetMood === 'happy' ? 'celebrating' : 'resting',
       decorationStage: getDecorationStage(visibleDecorations),
       visibleDecorations,
       decorationTokens,
-      hasDock: visibleDecorations.length > 0
+      hasDock: visibleDecorations.length > 0,
+      petSatiety: state.petSatiety,
+      plantHydrationValue: state.plantHydrationValue
     };
   }
 
@@ -722,7 +766,49 @@ const PomolandCore = (() => {
     if (!next.checkIns.includes(isoDate)) {
       next.checkIns.push(isoDate);
       next.streak += 1;
+      next.lastActiveDate = isoDate;
     }
+    return next;
+  }
+
+  function simulateTimeDecay(state) {
+    const next = copyState(state);
+    next.petSatiety = Math.max(0, next.petSatiety - 30);
+    next.plantHydrationValue = Math.max(0, next.plantHydrationValue - 30);
+    
+    // Determine streak break
+    const today = todayIso();
+    if (!next.checkIns.includes(today)) {
+      next.streakAtRisk = true;
+    }
+    return next;
+  }
+
+  function buyProtectionCard(state) {
+    const next = copyState(state);
+    if (next.resources.coins >= 30) {
+      next.resources.coins -= 30;
+      next.protectionCards += 1;
+      return next;
+    }
+    return state; // not enough coins
+  }
+
+  function useProtectionCard(state) {
+    const next = copyState(state);
+    if (next.protectionCards > 0 && next.streakAtRisk) {
+      next.protectionCards -= 1;
+      next.streakAtRisk = false;
+      // Mark today as virtually checked in to protect streak
+      next.checkIns.push(todayIso());
+    }
+    return next;
+  }
+
+  function acceptStreakBreak(state) {
+    const next = copyState(state);
+    next.streak = 0;
+    next.streakAtRisk = false;
     return next;
   }
 
@@ -821,6 +907,55 @@ const PomolandCore = (() => {
     return new Date(date.getTime() - offset * 60000).toISOString().slice(0, 10);
   }
 
+  function saveState(state) {
+    if (state.userProfile && state.userProfile.phone) {
+      localStorage.setItem(`pomoland_state_${state.userProfile.phone}`, JSON.stringify(state));
+    }
+  }
+
+  function loadUserState(phone) {
+    const savedState = localStorage.getItem(`pomoland_state_${phone}`);
+    if (savedState) {
+      try {
+        return JSON.parse(savedState);
+      } catch (e) {
+        console.error('Failed to parse saved state', e);
+      }
+    }
+    return null;
+  }
+
+  function login(state, phone, nickname) {
+    const next = copyState(state);
+    next.userProfile = {
+      phone,
+      nickname,
+      avatar: nickname.charAt(0).toUpperCase()
+    };
+    return next;
+  }
+
+  function addFriendAction(state, friendId) {
+    const next = copyState(state);
+    // Dummy add friend
+    alert(`Friend ID ${friendId} request sent!`);
+    return next;
+  }
+
+  function contributeToTeam(state, minutes) {
+    const next = copyState(state);
+    next.teamProgress = Math.min(500, next.teamProgress + minutes);
+    if (next.teamProgress >= 500 && !next.decorations.includes('Magic Fountain')) {
+      next.decorations.push('Magic Fountain');
+      next.lastMessage = {
+        'zh-CN': '小队目标达成！获得稀有装饰【魔法喷泉】！',
+        'zh-HK': '小隊目標達成！獲得稀有裝飾【魔法噴泉】！',
+        en: 'Team goal reached! You got the Magic Fountain!'
+      };
+    }
+    return next;
+  }
+
   return {
     COPY,
     FRIENDS,
@@ -838,10 +973,19 @@ const PomolandCore = (() => {
     getIslandVisualState,
     getIslandActions,
     recordCheckIn,
+    simulateTimeDecay,
+    buyProtectionCard,
+    useProtectionCard,
+    acceptStreakBreak,
     performFriendAction,
     getFriendVisitDetails,
     buildReport,
-    todayIso
+    todayIso,
+    saveState,
+    loadUserState,
+    login,
+    addFriendAction,
+    contributeToTeam
   };
 })();
 
@@ -886,6 +1030,10 @@ if (typeof document !== 'undefined') {
       islandScene: document.querySelector('#islandScene'),
       islandMessage: document.querySelector('#islandMessage'),
       checkInGrid: document.querySelector('#checkInGrid'),
+      protectionCards: document.querySelector('#protectionCards'),
+      streakModal: document.querySelector('#streakModal'),
+      petStatusBar: document.querySelector('#petStatusBar'),
+      plantStatusBar: document.querySelector('#plantStatusBar'),
       friendGrid: document.querySelector('#friendGrid'),
       reportBars: document.querySelector('#reportBars'),
       reportSummary: document.querySelector('#reportSummary'),
@@ -895,7 +1043,26 @@ if (typeof document !== 'undefined') {
       visitFocus: document.querySelector('#visitFocus'),
       visitMood: document.querySelector('#visitMood'),
       visitResources: document.querySelector('#visitResources'),
-      visitNote: document.querySelector('#visitNote')
+      visitNote: document.querySelector('#visitNote'),
+      authShell: document.querySelector('#authShell'),
+      homeShell: document.querySelector('#homeShell'),
+      workspaceShell: document.querySelector('.workspace-shell'),
+      loginBtnTrigger: document.querySelector('#loginBtnTrigger'),
+      userProfile: document.querySelector('#userProfile'),
+      userAvatarDisplay: document.querySelector('#userAvatarDisplay'),
+      userNameDisplay: document.querySelector('#userNameDisplay'),
+      logoutBtn: document.querySelector('#logoutBtn'),
+      loginStep1: document.querySelector('#loginStep1'),
+      loginStep2: document.querySelector('#loginStep2'),
+      phoneInput: document.querySelector('#phoneInput'),
+      codeInput: document.querySelector('#codeInput'),
+      nicknameInput: document.querySelector('#nicknameInput'),
+      sendCodeBtn: document.querySelector('#sendCodeBtn'),
+      confirmLoginBtn: document.querySelector('#confirmLoginBtn'),
+      teamProgressFill: document.querySelector('#teamProgressFill'),
+      teamProgressText: document.querySelector('#teamProgressText'),
+      chatMessages: document.querySelector('#chatMessages'),
+      chatInput: document.querySelector('#chatInput')
     };
 
     function setLanguage(nextLanguage) {
@@ -947,6 +1114,7 @@ if (typeof document !== 'undefined') {
     }
 
     function renderAll() {
+      renderProfile();
       renderResources();
       renderTasks();
       renderSelectedTask();
@@ -956,6 +1124,28 @@ if (typeof document !== 'undefined') {
       renderFriends();
       renderReport();
       renderAgentIdle();
+      renderTeamBoss();
+      core.saveState(state); // Persist state on every render
+    }
+
+    function renderProfile() {
+      if (!elements.userProfile) return;
+      if (state.userProfile) {
+        if (elements.loginBtnTrigger) elements.loginBtnTrigger.style.display = 'none';
+        elements.userProfile.style.display = 'flex';
+        if (elements.userAvatarDisplay) elements.userAvatarDisplay.textContent = state.userProfile.avatar;
+        if (elements.userNameDisplay) elements.userNameDisplay.textContent = state.userProfile.nickname;
+      } else {
+        if (elements.loginBtnTrigger) elements.loginBtnTrigger.style.display = 'block';
+        elements.userProfile.style.display = 'none';
+      }
+    }
+
+    function renderTeamBoss() {
+      if (!elements.teamProgressFill) return;
+      const progressPercent = Math.min(100, (state.teamProgress / 500) * 100);
+      elements.teamProgressFill.style.width = `${progressPercent}%`;
+      elements.teamProgressText.textContent = `${state.teamProgress} / 500 分钟`;
     }
 
     function renderResources() {
@@ -1052,6 +1242,17 @@ if (typeof document !== 'undefined') {
       elements.islandScene.dataset.decorItems = visual.decorationTokens.join(' ');
       elements.islandScene.classList.toggle('has-dock', visual.hasDock);
       elements.islandMessage.textContent = state.lastMessage[language] || state.lastMessage.en;
+      
+      // Update Status Bars
+      if (elements.petStatusBar) {
+        elements.petStatusBar.style.width = `${visual.petSatiety}%`;
+        elements.petStatusBar.className = `entity-status-fill satiety ${visual.petSatiety <= 20 ? 'danger' : visual.petSatiety <= 50 ? 'warning' : ''}`;
+      }
+      if (elements.plantStatusBar) {
+        elements.plantStatusBar.style.width = `${visual.plantHydrationValue}%`;
+        elements.plantStatusBar.className = `entity-status-fill ${visual.plantHydrationValue <= 20 ? 'danger' : visual.plantHydrationValue <= 50 ? 'warning' : ''}`;
+      }
+
       const decorationNode = document.querySelector('#decorations');
       if (decorationNode) {
         decorationNode.innerHTML = state.decorations.length
@@ -1078,6 +1279,7 @@ if (typeof document !== 'undefined') {
       }).join('');
       const streakNode = document.querySelector('#streakValue');
       if (streakNode) streakNode.textContent = state.streak;
+      if (elements.protectionCards) elements.protectionCards.textContent = state.protectionCards;
     }
 
     function renderFriends() {
@@ -1281,6 +1483,164 @@ if (typeof document !== 'undefined') {
       if (target.id === 'closeBonus') elements.bonusModal.hidden = true;
       if (target.id === 'closeVisit' || target.id === 'closeVisitAction') closeVisitModal();
 
+      // Social & Multiplayer Actions
+      if (target.id === 'loginBtnTrigger') {
+        if (elements.loginModal) elements.loginModal.hidden = false;
+        elements.loginStep1.hidden = false;
+        elements.loginStep2.hidden = true;
+      }
+      if (target.id === 'closeLoginModal') {
+        if (elements.loginModal) elements.loginModal.hidden = true;
+      }
+      if (target.id === 'logoutBtn') {
+        localStorage.removeItem('pomoland_active_user');
+        location.reload();
+      }
+      if (target.id === 'sendCodeBtn') {
+        const phone = elements.phoneInput.value.trim();
+        // Regex for basic international and Chinese mobile numbers
+        const phoneRegex = /^1[3-9]\d{9}$/; 
+        
+        if (!phone) return alert('请输入手机号');
+        if (!phoneRegex.test(phone)) return alert('请输入有效的 11 位手机号码 (例如: 13800000000)');
+        
+        elements.sendCodeBtn.textContent = '发送中...';
+        elements.sendCodeBtn.disabled = true;
+
+        // 发送真实的网络请求给后端
+        fetch('http://localhost:3000/api/send-sms', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone })
+        })
+        .then(res => res.json())
+        .then(data => {
+          elements.sendCodeBtn.textContent = '发送验证码';
+          elements.sendCodeBtn.disabled = false;
+
+          if (data.success) {
+            elements.loginStep1.hidden = true;
+            elements.loginStep2.hidden = false;
+            
+            // 仅供演示：把后端返回的验证码弹窗显示出来
+            alert(`【后端接口模拟】\n验证码：${data.demo_code}\n(这说明前后端已经连通)`);
+          } else {
+            alert(data.message || '发送失败');
+          }
+        })
+        .catch(err => {
+          elements.sendCodeBtn.textContent = '发送验证码';
+          elements.sendCodeBtn.disabled = false;
+          alert('后端服务器未启动或请求失败！请确保 server/app.py 正在运行。');
+          console.error(err);
+        });
+      }
+      
+      if (target.id === 'confirmLoginBtn') {
+        const phone = elements.phoneInput.value.trim();
+        const code = elements.codeInput.value.trim();
+        const nickname = elements.nicknameInput.value.trim();
+        
+        if (!code || !nickname) return alert('请输入验证码和昵称');
+        
+        // 将手机号和验证码发给后端进行比对
+        fetch('http://localhost:3000/api/verify-code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone, code })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            // 后端验证通过，执行本地状态加载
+            const existingState = core.loadUserState(phone);
+            if (existingState) {
+              state = existingState;
+              state.userProfile.nickname = nickname; // update nickname if changed
+              state.userProfile.avatar = nickname.charAt(0).toUpperCase();
+            } else {
+              state = core.createInitialState();
+              state = core.login(state, phone, nickname);
+            }
+            
+            localStorage.setItem('pomoland_active_user', phone);
+            core.saveState(state);
+            
+            if (elements.authShell) elements.authShell.hidden = true;
+            openWorkspace();
+            renderAll();
+          } else {
+            // 后端返回验证码错误
+            alert(data.message || '验证码错误，请重新输入！');
+          }
+        })
+        .catch(err => {
+          alert('后端验证请求失败！');
+          console.error(err);
+        });
+      }
+      if (target.id === 'addFriendBtn') {
+        const friendId = prompt('请输入好友的 ID 号码：');
+        if (friendId) {
+          state = core.addFriendAction(state, friendId);
+          renderAll();
+        }
+      }
+      if (target.id === 'teamContributeBtn') {
+        if (totalSeconds > 0 && remainingSeconds <= 0 && state.focusCompleted) {
+            state = core.contributeToTeam(state, Math.round(totalSeconds / 60));
+            alert(`成功贡献了 ${Math.round(totalSeconds / 60)} 分钟！`);
+            renderAll();
+        } else {
+            alert('请先完成一次 Focus Mode 再来贡献时长！');
+        }
+      }
+      if (target.id === 'sendChatBtn') {
+        const text = elements.chatInput.value.trim();
+        if (text) {
+          const newMsg = document.createElement('div');
+          newMsg.className = 'chat-msg sent';
+          newMsg.innerHTML = `<div class="chat-bubble">${escapeHtml(text)}</div>`;
+          elements.chatMessages.appendChild(newMsg);
+          elements.chatInput.value = '';
+          elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
+          
+          // Auto reply
+          setTimeout(() => {
+            const replyMsg = document.createElement('div');
+            replyMsg.className = 'chat-msg received';
+            replyMsg.innerHTML = `<div class="chat-avatar">N</div><div class="chat-bubble">收到！我们一起加油！</div>`;
+            elements.chatMessages.appendChild(replyMsg);
+            elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
+          }, 1500);
+        }
+      }
+
+      if (target.id === 'demoNextDay') {
+        state = core.simulateTimeDecay(state);
+        renderAll();
+        if (state.streakAtRisk && elements.streakModal) {
+          elements.streakModal.hidden = false;
+        }
+      }
+
+      if (target.id === 'buyProtection') {
+        state = core.buyProtectionCard(state);
+        renderAll();
+      }
+
+      if (target.id === 'useProtectionBtn') {
+        state = core.useProtectionCard(state);
+        elements.streakModal.hidden = true;
+        renderAll();
+      }
+
+      if (target.id === 'acceptBreakBtn' || target.id === 'closeStreakModal') {
+        state = core.acceptStreakBreak(state);
+        elements.streakModal.hidden = true;
+        renderAll();
+      }
+
       if (target.matches('[data-island-action]')) {
         state = core.applyIslandAction(state, target.dataset.islandAction);
         renderAll();
@@ -1299,6 +1659,28 @@ if (typeof document !== 'undefined') {
       elements.goalInput.addEventListener('input', () => {
         elements.goalInput.dataset.changed = 'true';
       });
+    }
+
+    // --- Initialization ---
+    
+    // Auth Check
+    const activePhone = localStorage.getItem('pomoland_active_user');
+    if (activePhone) {
+      const saved = core.loadUserState(activePhone);
+      if (saved) {
+        state = saved;
+        language = state.language || 'zh-CN';
+      } else {
+        state = core.createInitialState();
+      }
+      if (elements.authShell) elements.authShell.hidden = true;
+      if (elements.homeShell) elements.homeShell.hidden = true;
+      if (elements.workspaceShell) elements.workspaceShell.hidden = false;
+    } else {
+      state = core.createInitialState();
+      if (elements.authShell) elements.authShell.hidden = false;
+      if (elements.homeShell) elements.homeShell.hidden = true;
+      if (elements.workspaceShell) elements.workspaceShell.hidden = true;
     }
 
     setLanguage(language);

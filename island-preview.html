@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pomoland 岛屿进化展示</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: #1b2e25;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #fff;
+  padding: 40px 20px;
+}
+.header {
+  max-width: 1100px;
+  margin: 0 auto 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.header h1 { font-size: 26px; font-weight: 700; letter-spacing: 1px; }
+.header p { color: rgba(255,255,255,0.6); font-size: 14px; }
+.gallery {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.island-card {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  background: #263d32;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.2s;
+}
+@media (max-width: 780px) {
+  .island-card { grid-template-columns: 1fr; }
+}
+.island-visual {
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.island-visual svg { width: 100%; height: auto; display: block; }
+.island-detail {
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.level-badge {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  width: fit-content;
+  margin-bottom: 8px;
+}
+.island-detail h2 {
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+.island-detail p {
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.65);
+  margin-bottom: 16px;
+}
+.spec-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.spec-item {
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.85);
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>🏝️ Pomoland 岛屿进化之路</h1>
+    <p>每一次专注，都在建设自己的世界</p>
+  </div>
+</div>
+
+<div class="gallery">
+  <!-- ==================== LV1 ==================== -->
+  <div class="island-card">
+    <div class="island-visual" style="background:linear-gradient(160deg,#b3d9e8 0%,#d4e9c8 100%)">
+      <svg viewBox="0 0 480 300" xmlns="http://www.w3.org/2000/svg">
+        <rect width="480" height="300" fill="#b3d9e8"/>
+        <ellipse cx="120" cy="50" rx="45" ry="14" fill="#fff" opacity="0.5"/>
+        <ellipse cx="360" cy="40" rx="35" ry="10" fill="#fff" opacity="0.4"/>
+        <circle cx="410" cy="48" r="30" fill="#fdd835" opacity="0.7"/>
+        <rect x="0" y="195" width="480" height="105" fill="#5fa8a0"/>
+        <ellipse cx="240" cy="210" rx="200" ry="45" fill="#d9b682"/>
+        <ellipse cx="240" cy="202" rx="190" ry="38" fill="#f0d487"/>
+        <ellipse cx="240" cy="192" rx="175" ry="28" fill="#b8d9a8"/>
+        <rect x="210" y="150" width="50" height="40" fill="#8d6e63" rx="2"/>
+        <polygon points="205,152 235,130 265,152" fill="#d4764a"/>
+        <rect x="228" y="166" width="12" height="24" fill="#5D4037"/>
+        <ellipse cx="148" cy="188" rx="10" ry="5" fill="#6d4c41"/>
+        <ellipse cx="148" cy="180" rx="6" ry="10" fill="#ff7043"/>
+        <ellipse cx="148" cy="176" rx="3" ry="6" fill="#ffd54f"/>
+        <path d="M145,168 Q142,164 144,160" stroke="#ff7043" stroke-width="1.5" fill="none" opacity="0.6"/>
+        <path d="M151,170 Q154,166 152,162" stroke="#ff7043" stroke-width="1.5" fill="none" opacity="0.6"/>
+        <g transform="translate(285, 168)">
+          <rect x="-2" y="0" width="4" height="20" fill="#6d4c41"/>
+          <polygon points="0,-28 -10,-8 10,-8" fill="#4caf50"/>
+          <polygon points="0,-38 -8,-18 8,-18" fill="#66bb6a"/>
+          <polygon points="0,-44 -6,-28 6,-28" fill="#81c784"/>
+        </g>
+        <g transform="translate(178, 186)">
+          <ellipse cx="0" cy="4" rx="9" ry="7" fill="#fff9c4"/>
+          <circle cx="-4" cy="-3" r="7" fill="#fff9c4"/>
+          <circle cx="-6" cy="-5" r="1.5" fill="#333"/>
+          <polygon points="1,-1 8,-3 4,3" fill="#ff8a65"/>
+          <ellipse cx="6" cy="4" rx="5" ry="3" fill="#fff176"/>
+          <line x1="-2" y1="10" x2="-4" y2="14" stroke="#ff8a65" stroke-width="1.5"/>
+          <line x1="2" y1="10" x2="4" y2="14" stroke="#ff8a65" stroke-width="1.5"/>
+        </g>
+        <rect x="120" y="184" width="2" height="14" fill="#8d6e63"/>
+        <rect x="128" y="184" width="2" height="14" fill="#8d6e63"/>
+        <rect x="136" y="184" width="2" height="14" fill="#8d6e63"/>
+        <rect x="120" y="186" width="18" height="2" fill="#8d6e63"/>
+      </svg>
+    </div>
+    <div class="island-detail">
+      <span class="level-badge" style="background:#af8c5e;">Lv.1 — Lv.5</span>
+      <h2>🏖️ 初心沙滩</h2>
+      <p>一座刚被发现的荒芜小岛。你用简易木料搭起了第一间小木屋，生起篝火取暖。种下一棵小松树苗，养了一只怯生生的小鸡崽——这就是你Pomoland冒险的起点。</p>
+      <div class="spec-list">
+        <span class="spec-item">🏠 小木屋</span>
+        <span class="spec-item">🔥 篝火</span>
+        <span class="spec-item">🐤 小鸡崽</span>
+        <span class="spec-item">🌲 松树苗 ×1</span>
+        <span class="spec-item">🪵 累计 0-5 棵</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== LV2 ==================== -->
+  <div class="island-card">
+    <div class="island-visual" style="background:linear-gradient(160deg,#bce3d6 0%,#d9eccd 100%)">
+      <svg viewBox="0 0 480 300" xmlns="http://www.w3.org/2000/svg">
+        <rect width="480" height="300" fill="#bce3d6"/>
+        <ellipse cx="130" cy="45" rx="50" ry="15" fill="#fff" opacity="0.5"/>
+        <ellipse cx="370" cy="35" rx="38" ry="12" fill="#fff" opacity="0.4"/>
+        <circle cx="420" cy="42" r="32" fill="#fdd835" opacity="0.65"/>
+        <rect x="0" y="195" width="480" height="105" fill="#54a8a0"/>
+        <ellipse cx="240" cy="212" rx="215" ry="48" fill="#d9b682"/>
+        <ellipse cx="240" cy="204" rx="205" ry="40" fill="#f0d487"/>
+        <ellipse cx="240" cy="194" rx="190" ry="30" fill="#b8d9a8"/>
+        <ellipse cx="240" cy="186" rx="170" ry="20" fill="#8fcc7a"/>
+        <rect x="200" y="132" width="60" height="50" fill="#a0714e" rx="3"/>
+        <rect x="190" y="140" width="14" height="42" fill="#8d6e63" rx="2"/>
+        <polygon points="188,134 230,104 272,134" fill="#d4764a"/>
+        <rect x="250" y="102" width="8" height="30" fill="#6d4c41"/>
+        <rect x="248" y="100" width="12" height="4" fill="#8d6e63" rx="1"/>
+        <circle cx="252" cy="92" r="5" fill="#ccc" opacity="0.3"/>
+        <rect x="213" y="144" width="12" height="12" fill="#ffe082" rx="1"/>
+        <rect x="237" y="144" width="12" height="12" fill="#ffe082" rx="1"/>
+        <rect x="225" y="158" width="12" height="24" fill="#5D4037" rx="1"/>
+        <rect x="162" y="152" width="2" height="34" fill="#8d6e63"/>
+        <rect x="172" y="152" width="2" height="34" fill="#8d6e63"/>
+        <rect x="182" y="152" width="2" height="34" fill="#8d6e63"/>
+        <rect x="162" y="154" width="22" height="2" fill="#8d6e63"/>
+        <circle cx="167" cy="166" r="3.5" fill="#f48fb1"/>
+        <circle cx="175" cy="170" r="3.5" fill="#ffab40"/>
+        <circle cx="183" cy="166" r="3.5" fill="#f48fb1"/>
+        <g transform="translate(55, 148)"><rect x="-2" y="0" width="4" height="24" fill="#6d4c41"/><circle cx="0" cy="-12" r="14" fill="#43a047"/><circle cx="-4" cy="-14" r="9" fill="#66bb6a"/><circle cx="4" cy="-16" r="3.5" fill="#e53935"/><circle cx="-5" cy="-16" r="3" fill="#e53935"/><circle cx="2" cy="-10" r="3" fill="#e53935"/></g>
+        <g transform="translate(85, 152)"><rect x="-2" y="0" width="4" height="22" fill="#6d4c41"/><circle cx="0" cy="-14" r="14" fill="#43a047"/><circle cx="-2" cy="-16" r="9" fill="#66bb6a"/><circle cx="5" cy="-12" r="3.5" fill="#fdd835"/><circle cx="-4" cy="-12" r="3" fill="#ff9800"/></g>
+        <g transform="translate(115, 146)"><rect x="-2" y="0" width="4" height="26" fill="#6d4c41"/><circle cx="0" cy="-12" r="15" fill="#43a047"/><circle cx="-3" cy="-14" r="10" fill="#66bb6a"/><circle cx="5" cy="-18" r="3" fill="#e53935"/><circle cx="-6" cy="-10" r="3" fill="#e53935"/></g>
+        <g transform="translate(310, 150)"><rect x="-2" y="0" width="4" height="24" fill="#6d4c41"/><circle cx="0" cy="-12" r="14" fill="#43a047"/><circle cx="4" cy="-14" r="9" fill="#66bb6a"/><circle cx="-3" cy="-18" r="3" fill="#fdd835"/><circle cx="3" cy="-8" r="3" fill="#e53935"/></g>
+        <g transform="translate(345, 154)"><rect x="-2" y="0" width="4" height="22" fill="#6d4c41"/><circle cx="0" cy="-14" r="13" fill="#43a047"/><circle cx="-4" cy="-16" r="8" fill="#66bb6a"/><circle cx="2" cy="-12" r="3.5" fill="#fdd835"/></g>
+        <g transform="translate(280, 186)">
+          <ellipse cx="0" cy="4" rx="10" ry="7" fill="#ffb74d"/>
+          <circle cx="-5" cy="-3" r="8" fill="#ffb74d"/>
+          <ellipse cx="-10" cy="-6" rx="4" ry="3" fill="#ffb74d"/>
+          <ellipse cx="2" cy="-6" rx="4" ry="3" fill="#ffb74d"/>
+          <circle cx="-7" cy="-5" r="1.8" fill="#333"/>
+          <circle cx="-3" cy="-5" r="1.8" fill="#333"/>
+          <circle cx="-5" cy="-3" r="1" fill="#fff"/>
+          <circle cx="-3" cy="-3" r="1" fill="#fff"/>
+          <ellipse cx="-5" cy="2" rx="3" ry="1.5" fill="#f48fb1"/>
+          <line x1="-8" y1="3" x2="8" y2="3" stroke="#f57c00" stroke-width="1.5" opacity="0.5"/>
+          <line x1="-6" y1="6" x2="6" y2="6" stroke="#f57c00" stroke-width="1.5" opacity="0.5"/>
+          <path d="M8,4 Q14,2 16,-3 Q18,-8 14,-10" stroke="#ffb74d" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <line x1="-3" y1="10" x2="-4" y2="14" stroke="#ffb74d" stroke-width="2.5"/>
+          <line x1="4" y1="10" x2="5" y2="14" stroke="#ffb74d" stroke-width="2.5"/>
+        </g>
+        <ellipse cx="240" cy="196" rx="6" ry="3" fill="#9e9e9e" opacity="0.5"/>
+        <ellipse cx="226" cy="192" rx="5" ry="2.5" fill="#9e9e9e" opacity="0.5"/>
+        <ellipse cx="254" cy="192" rx="5" ry="2.5" fill="#9e9e9e" opacity="0.5"/>
+      </svg>
+    </div>
+    <div class="island-detail">
+      <span class="level-badge" style="background:#4a7c59;">Lv.6 — Lv.10</span>
+      <h2>🌾 田园木屋</h2>
+      <p>小岛渐渐有了生活气息。木屋加上了烟囱和玻璃窗，屋前的花园开满了小花。你种下的5棵苹果树已经挂果，一只花猫在院子里慵懒地晒太阳。</p>
+      <div class="spec-list">
+        <span class="spec-item">🏠 木屋+烟囱</span>
+        <span class="spec-item">🌸 花园栅栏</span>
+        <span class="spec-item">🐱 花猫</span>
+        <span class="spec-item">🍎 苹果树 ×5</span>
+        <span class="spec-item">🪵 累计 5-20 棵</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== LV3 ==================== -->
+  <div class="island-card">
+    <div class="island-visual" style="background:linear-gradient(160deg,#c8e0d8 0%,#dff0d0 100%)">
+      <svg viewBox="0 0 480 300" xmlns="http://www.w3.org/2000/svg">
+        <rect width="480" height="300" fill="#c8e0d8"/>
+        <ellipse cx="140" cy="38" rx="55" ry="17" fill="#fff" opacity="0.5"/>
+        <ellipse cx="380" cy="28" rx="42" ry="13" fill="#fff" opacity="0.4"/>
+        <circle cx="430" cy="35" r="35" fill="#fdd835" opacity="0.6"/>
+        <rect x="0" y="190" width="480" height="110" fill="#4fa89f"/>
+        <ellipse cx="240" cy="208" rx="225" ry="50" fill="#d9b682"/>
+        <ellipse cx="240" cy="198" rx="215" ry="42" fill="#f0d487"/>
+        <ellipse cx="240" cy="186" rx="200" ry="32" fill="#b8d9a8"/>
+        <ellipse cx="240" cy="176" rx="180" ry="22" fill="#8fcc7a"/>
+        <rect x="178" y="110" width="76" height="58" fill="#a1887f" rx="3"/>
+        <rect x="172" y="118" width="10" height="50" fill="#8d6e63" rx="2"/>
+        <polygon points="170,114 216,80 262,114" fill="#d4764a"/>
+        <line x1="186" y1="106" x2="246" y2="106" stroke="#bf6a40" stroke-width="1.5" opacity="0.5"/>
+        <line x1="182" y1="100" x2="250" y2="100" stroke="#bf6a40" stroke-width="1.5" opacity="0.5"/>
+        <rect x="188" y="124" width="14" height="14" fill="#ffe082" rx="1"/>
+        <rect x="230" y="124" width="14" height="14" fill="#ffe082" rx="1"/>
+        <rect x="210" y="140" width="14" height="28" fill="#5D4037" rx="2"/>
+        <rect x="242" y="82" width="10" height="28" fill="#795548"/>
+        <circle cx="247" cy="80" r="6" fill="#ccc" opacity="0.3"/>
+        <circle cx="243" cy="70" r="7" fill="#ccc" opacity="0.2"/>
+        <g transform="translate(325, 112)">
+          <rect x="-7" y="-5" width="14" height="50" fill="#a1887f" rx="2"/>
+          <polygon points="-7,-5 0,-24 7,-5" fill="#6d4c41"/>
+          <line x1="0" y1="-24" x2="0" y2="-2" stroke="#333" stroke-width="1.5"/>
+          <line x1="0" y1="-24" x2="-18" y2="-24" stroke="#795548" stroke-width="3"/>
+          <line x1="0" y1="-24" x2="18" y2="-24" stroke="#795548" stroke-width="3"/>
+          <line x1="0" y1="-24" x2="0" y2="-42" stroke="#795548" stroke-width="3"/>
+          <line x1="0" y1="-24" x2="0" y2="-6" stroke="#795548" stroke-width="3"/>
+        </g>
+        <path d="M50,224 Q80,200 130,205 Q180,210 230,196 Q280,182 330,188 Q380,194 430,216" fill="none" stroke="#61d4d0" stroke-width="8" opacity="0.5"/>
+        <rect x="148" y="196" width="22" height="5" fill="#795548" rx="2"/>
+        <rect x="153" y="190" width="2" height="7" fill="#5D4037"/>
+        <rect x="163" y="190" width="2" height="7" fill="#5D4037"/>
+        <g transform="translate(40, 138)"><rect x="-2" y="0" width="4" height="26" fill="#5d4037"/><circle cx="0" cy="-14" r="16" fill="#43a047"/><circle cx="-6" cy="-18" r="10" fill="#2e7d32"/><circle cx="6" cy="-12" r="10" fill="#388e3c"/></g>
+        <g transform="translate(72, 142)"><rect x="-2" y="0" width="4" height="24" fill="#5d4037"/><circle cx="0" cy="-16" r="14" fill="#43a047"/><circle cx="-4" cy="-18" r="9" fill="#2e7d32"/></g>
+        <g transform="translate(100, 136)"><rect x="-2" y="0" width="4" height="28" fill="#5d4037"/><circle cx="0" cy="-14" r="15" fill="#43a047"/><circle cx="5" cy="-16" r="10" fill="#388e3c"/><circle cx="-6" cy="-10" r="8" fill="#2e7d32"/></g>
+        <g transform="translate(260, 144)"><rect x="-2" y="0" width="4" height="24" fill="#5d4037"/><circle cx="0" cy="-16" r="14" fill="#43a047"/><circle cx="4" cy="-18" r="9" fill="#2e7d32"/></g>
+        <g transform="translate(350, 142)"><rect x="-2" y="0" width="4" height="26" fill="#5d4037"/><circle cx="0" cy="-14" r="15" fill="#43a047"/><circle cx="-5" cy="-16" r="10" fill="#388e3c"/></g>
+        <g transform="translate(380, 146)"><rect x="-2" y="0" width="4" height="24" fill="#5d4037"/><circle cx="0" cy="-16" r="13" fill="#43a047"/><circle cx="4" cy="-18" r="8" fill="#2e7d32"/></g>
+        <g transform="translate(410, 144)"><rect x="-2" y="0" width="4" height="26" fill="#5d4037"/><circle cx="0" cy="-14" r="15" fill="#43a047"/><circle cx="-3" cy="-16" r="10" fill="#388e3c"/></g>
+        <g transform="translate(290, 180)">
+          <ellipse cx="0" cy="6" rx="14" ry="8" fill="#d7a86e"/>
+          <ellipse cx="-12" cy="-6" rx="8" ry="7" fill="#d7a86e"/>
+          <ellipse cx="-16" cy="-10" rx="5" ry="4" fill="#c4955a"/>
+          <circle cx="-14" cy="-8" r="2" fill="#333"/>
+          <circle cx="-10" cy="-8" r="2" fill="#333"/>
+          <ellipse cx="-14" cy="-5" rx="3" ry="1.5" fill="#333"/>
+          <ellipse cx="-18" cy="-6" rx="4" ry="6" fill="#c4955a"/>
+          <ellipse cx="-8" cy="-10" rx="4" ry="5" fill="#c4955a"/>
+          <path d="M12,2 Q20,-4 22,-12 Q24,-16 20,-18" stroke="#d7a86e" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <rect x="-8" y="12" width="3" height="8" rx="1" fill="#d7a86e"/>
+          <rect x="-3" y="12" width="3" height="8" rx="1" fill="#d7a86e"/>
+          <rect x="4" y="12" width="3" height="8" rx="1" fill="#d7a86e"/>
+          <rect x="9" y="12" width="3" height="8" rx="1" fill="#d7a86e"/>
+        </g>
+        <rect x="136" y="162" width="2" height="22" fill="#5D4037"/>
+        <rect x="132" y="162" width="10" height="3" fill="#795548" rx="1"/>
+        <rect x="133" y="165" width="8" height="6" fill="#fff9c4" rx="1"/>
+        <circle cx="137" cy="168" r="6" fill="#fff9c4" opacity="0.25"/>
+      </svg>
+    </div>
+    <div class="island-detail">
+      <span class="level-badge" style="background:#5f8b4b;">Lv.11 — Lv.20</span>
+      <h2>🏡 温馨庄园</h2>
+      <p>小岛扩展为一座温馨的庄园。石墙大屋坚固气派，风车缓缓转动。溪流蜿蜒穿过庄园，一座小木桥连接两岸。金毛犬在院子里飞奔，屋檐下的路灯夜晚会亮起暖光。</p>
+      <div class="spec-list">
+        <span class="spec-item">🏛️ 石墙庄园</span>
+        <span class="spec-item">🌬️ 风车</span>
+        <span class="spec-item">🐕 金毛犬</span>
+        <span class="spec-item">🌉 溪流+小桥</span>
+        <span class="spec-item">🌳 橡树 ×8</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== LV4 ==================== -->
+  <div class="island-card">
+    <div class="island-visual" style="background:linear-gradient(160deg,#d0e3de 0%,#e2f0d8 100%)">
+      <svg viewBox="0 0 480 300" xmlns="http://www.w3.org/2000/svg">
+        <rect width="480" height="300" fill="#d0e3de"/>
+        <ellipse cx="150" cy="35" rx="60" ry="18" fill="#fff" opacity="0.5"/>
+        <ellipse cx="390" cy="25" rx="48" ry="15" fill="#fff" opacity="0.4"/>
+        <circle cx="440" cy="32" r="38" fill="#fdd835" opacity="0.55"/>
+        <rect x="0" y="188" width="480" height="112" fill="#4ba49a"/>
+        <ellipse cx="240" cy="206" rx="235" ry="52" fill="#d9b682"/>
+        <ellipse cx="240" cy="194" rx="225" ry="44" fill="#f0d487"/>
+        <ellipse cx="240" cy="180" rx="210" ry="34" fill="#b8d9a8"/>
+        <ellipse cx="240" cy="168" rx="190" ry="24" fill="#8fcc7a"/>
+        <rect x="165" y="82" width="90" height="78" fill="#e0c9a5" rx="3"/>
+        <rect x="158" y="92" width="10" height="68" fill="#bfa88a" rx="2"/>
+        <polygon points="156,86 210,44 264,86" fill="#d4764a"/>
+        <rect x="165" y="112" width="90" height="3" fill="#8d6e63"/>
+        <rect x="165" y="115" width="2" height="10" fill="#8d6e63"/>
+        <rect x="253" y="115" width="2" height="10" fill="#8d6e63"/>
+        <rect x="175" y="94" width="14" height="14" fill="#ffe082" rx="1"/>
+        <rect x="232" y="94" width="14" height="14" fill="#ffe082" rx="1"/>
+        <rect x="196" y="122" width="14" height="14" fill="#ffe082" rx="1"/>
+        <rect x="214" y="122" width="14" height="14" fill="#ffe082" rx="1"/>
+        <rect x="208" y="138" width="12" height="22" fill="#5D4037" rx="2"/>
+        <circle cx="218" cy="150" r="1.5" fill="#ffd36e"/>
+        <g transform="translate(340, 86)">
+          <rect x="-8" y="8" width="16" height="74" fill="#f5f5f5" rx="2"/>
+          <rect x="-10" y="76" width="20" height="8" fill="#795548" rx="2"/>
+          <rect x="-8" y="12" width="16" height="7" fill="#e53935" rx="1"/>
+          <rect x="-8" y="26" width="16" height="7" fill="#e53935" rx="1"/>
+          <rect x="-8" y="40" width="16" height="7" fill="#e53935" rx="1"/>
+          <rect x="-8" y="54" width="16" height="7" fill="#e53935" rx="1"/>
+          <rect x="-4" y="-2" width="8" height="14" fill="#ffd36e"/>
+          <circle cx="0" cy="-4" r="6" fill="#fff9c4"/>
+          <circle cx="0" cy="-4" r="14" fill="#fff9c4" opacity="0.12"/>
+        </g>
+        <g transform="translate(285, 178)">
+          <ellipse cx="0" cy="6" rx="16" ry="4" fill="#90a4ae"/>
+          <rect x="-3" y="-8" width="6" height="14" fill="#78909c"/>
+          <ellipse cx="0" cy="-8" rx="5" ry="2" fill="#61d4d0"/>
+          <path d="M0,-12 Q-6,-24 0,-30" fill="none" stroke="#61d4d0" stroke-width="2" opacity="0.6"/>
+          <path d="M0,-12 Q6,-24 0,-30" fill="none" stroke="#61d4d0" stroke-width="2" opacity="0.6"/>
+          <circle cx="0" cy="-33" r="3" fill="#fff" opacity="0.6"/>
+          <circle cx="-4" cy="-28" r="2" fill="#fff" opacity="0.5"/>
+          <circle cx="4" cy="-28" r="2" fill="#fff" opacity="0.5"/>
+        </g>
+        <rect x="52" y="144" width="36" height="30" fill="#ffcc80" rx="2"/>
+        <rect x="52" y="142" width="36" height="4" fill="#ff8a65" rx="1"/>
+        <rect x="54" y="147" width="3" height="24" fill="#8d6e63"/>
+        <rect x="83" y="147" width="3" height="24" fill="#8d6e63"/>
+        <text x="60" y="163" fill="#5D4037" font-size="10">🍎🍊</text>
+        <g transform="translate(32, 142)"><rect x="-2" y="0" width="4" height="26" fill="#6d4c41"/><path d="M0,-28 Q-8,-40 -2,-48" stroke="#388e3c" stroke-width="2.5" fill="none"/><path d="M0,-28 Q2,-40 8,-48" stroke="#388e3c" stroke-width="2.5" fill="none"/><path d="M0,-28 Q-6,-38 -14,-42" stroke="#2e7d32" stroke-width="2.5" fill="none"/><path d="M0,-28 Q6,-38 14,-42" stroke="#2e7d32" stroke-width="2.5" fill="none"/><path d="M0,-28 Q-10,-32 -18,-30" stroke="#388e3c" stroke-width="2.5" fill="none"/><path d="M0,-28 Q10,-32 18,-30" stroke="#388e3c" stroke-width="2.5" fill="none"/></g>
+        <g transform="translate(92, 130)"><rect x="-2" y="0" width="4" height="28" fill="#5d4037"/><circle cx="0" cy="-14" r="16" fill="#43a047"/><circle cx="-6" cy="-18" r="10" fill="#2e7d32"/></g>
+        <g transform="translate(122, 134)"><rect x="-2" y="0" width="4" height="26" fill="#5d4037"/><circle cx="0" cy="-16" r="14" fill="#43a047"/><circle cx="4" cy="-18" r="9" fill="#388e3c"/></g>
+        <g transform="translate(365, 132)"><rect x="-2" y="0" width="4" height="28" fill="#5d4037"/><circle cx="0" cy="-14" r="16" fill="#43a047"/><circle cx="-5" cy="-16" r="10" fill="#2e7d32"/></g>
+        <g transform="translate(400, 136)"><rect x="-2" y="0" width="4" height="26" fill="#5d4037"/><circle cx="0" cy="-16" r="14" fill="#43a047"/><circle cx="4" cy="-18" r="9" fill="#388e3c"/></g>
+        <g transform="translate(430, 138)"><rect x="-2" y="0" width="4" height="24" fill="#5d4037"/><circle cx="0" cy="-14" r="13" fill="#43a047"/></g>
+        <g transform="translate(298, 178)">
+          <ellipse cx="0" cy="6" rx="16" ry="10" fill="#8d6e63"/>
+          <ellipse cx="-14" cy="-6" rx="10" ry="9" fill="#8d6e63"/>
+          <ellipse cx="-18" cy="-10" rx="6" ry="5" fill="#a1887f"/>
+          <circle cx="-16" cy="-8" r="2" fill="#333"/>
+          <ellipse cx="-16" cy="-4" rx="3" ry="1.5" fill="#5D4037"/>
+          <path d="M-6,-10 Q-2,-22 6,-18" fill="none" stroke="#8d6e63" stroke-width="2.5"/>
+          <path d="M-20,-12 Q-24,-16 -22,-22 Q-18,-16 -14,-14" fill="#6d4c41"/>
+          <rect x="-10" y="14" width="3" height="10" rx="1" fill="#8d6e63"/>
+          <rect x="-5" y="14" width="3" height="10" rx="1" fill="#8d6e63"/>
+          <rect x="4" y="14" width="3" height="10" rx="1" fill="#8d6e63"/>
+          <rect x="9" y="14" width="3" height="10" rx="1" fill="#8d6e63"/>
+          <path d="M14,4 Q22,0 26,-6 Q30,-12 24,-14" fill="none" stroke="#6d4c41" stroke-width="2.5"/>
+        </g>
+        <rect x="148" y="156" width="2" height="22" fill="#5D4037"/>
+        <circle cx="149" cy="154" r="4" fill="#fff9c4"/>
+        <circle cx="149" cy="154" r="3" fill="#ffd36e"/>
+        <rect x="255" y="156" width="2" height="22" fill="#5D4037"/>
+        <circle cx="256" cy="154" r="4" fill="#fff9c4"/>
+        <circle cx="256" cy="154" r="3" fill="#ffd36e"/>
+      </svg>
+    </div>
+    <div class="island-detail">
+      <span class="level-badge" style="background:#2d6a7b;">Lv.21 — Lv.50</span>
+      <h2>🌆 繁荣小镇</h2>
+      <p>岛屿发展为繁荣的小镇中心。双层别墅气派非凡，白色灯塔为归航者引路，华丽喷泉在广场中央水花四溅。市场摊位贩卖着丰收的果实，街灯照亮了傍晚的林荫道。</p>
+      <div class="spec-list">
+        <span class="spec-item">🏰 双层别墅</span>
+        <span class="spec-item">🗼 灯塔</span>
+        <span class="spec-item">⛲ 喷泉</span>
+        <span class="spec-item">🐴 骏马</span>
+        <span class="spec-item">🏪 市场</span>
+        <span class="spec-item">🌴 棕榈+橡树</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== LV5 ==================== -->
+  <div class="island-card">
+    <div class="island-visual" style="background:linear-gradient(160deg,#d5e8e6 0%,#e8f4de 100%)">
+      <svg viewBox="0 0 480 300" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="mg"><stop offset="0" stop-color="#fff9c4" stop-opacity="0.5"/><stop offset="1" stop-color="#fff9c4" stop-opacity="0"/></radialGradient>
+        </defs>
+        <rect width="480" height="300" fill="#d5e8e6"/>
+        <ellipse cx="160" cy="32" rx="65" ry="20" fill="#fff" opacity="0.5"/>
+        <ellipse cx="400" cy="22" rx="52" ry="16" fill="#fff" opacity="0.4"/>
+        <circle cx="450" cy="30" r="42" fill="#fdd835" opacity="0.5"/>
+        <rect x="0" y="186" width="480" height="114" fill="#47a096"/>
+        <ellipse cx="240" cy="204" rx="245" ry="55" fill="#d9b682"/>
+        <ellipse cx="240" cy="190" rx="235" ry="47" fill="#f0d487"/>
+        <ellipse cx="240" cy="174" rx="220" ry="36" fill="#b8d9a8"/>
+        <ellipse cx="240" cy="160" rx="200" ry="26" fill="#8fcc7a"/>
+        <g transform="translate(180, 38)">
+          <rect x="8" y="18" width="74" height="90" fill="#e8dcc8" rx="3"/>
+          <rect x="-6" y="8" width="18" height="90" fill="#d7c9b3" rx="2"/>
+          <polygon points="-8,12 3,-14 14,12" fill="#d4764a"/>
+          <rect x="-2" y="18" width="8" height="7" fill="#ffe082" rx="1"/>
+          <rect x="-2" y="30" width="8" height="7" fill="#ffe082" rx="1"/>
+          <rect x="74" y="8" width="18" height="90" fill="#d7c9b3" rx="2"/>
+          <polygon points="72,12 83,-14 94,12" fill="#d4764a"/>
+          <rect x="80" y="18" width="8" height="7" fill="#ffe082" rx="1"/>
+          <rect x="80" y="30" width="8" height="7" fill="#ffe082" rx="1"/>
+          <polygon points="6,20 45,-8 84,20" fill="#d4764a"/>
+          <rect x="22" y="28" width="16" height="18" fill="#ffe082" rx="2"/>
+          <rect x="52" y="28" width="16" height="18" fill="#ffe082" rx="2"/>
+          <polygon points="36,92 45,78 54,92" fill="#5D4037"/>
+          <rect x="36" y="92" width="18" height="16" fill="#5D4037" rx="1"/>
+          <circle cx="50" cy="101" r="1.5" fill="#ffd36e"/>
+        </g>
+        <line x1="370" y1="18" x2="370" y2="98" stroke="#5D4037" stroke-width="2"/>
+        <polygon points="370,18 394,26 370,34" fill="#e53935"/>
+        <g transform="translate(310, 168)">
+          <ellipse cx="0" cy="8" rx="18" ry="11" fill="#fff"/>
+          <ellipse cx="-16" cy="-6" rx="11" ry="10" fill="#fff"/>
+          <ellipse cx="-22" cy="-10" rx="7" ry="6" fill="#fff"/>
+          <circle cx="-18" cy="-8" r="2.2" fill="#333"/>
+          <ellipse cx="-22" cy="-4" rx="4" ry="2" fill="#e0e0e0"/>
+          <polygon points="-24,-16 -26,-28 -20,-16" fill="#fdd835"/>
+          <path d="M-10,-12 Q-14,-22 -8,-24 Q-2,-22 -4,-14" fill="#f48fb1"/>
+          <path d="M-14,-14 Q-18,-26 -12,-28 Q-6,-26 -8,-16" fill="#f8bbd0"/>
+          <rect x="-12" y="18" width="3.5" height="12" rx="1.5" fill="#e0e0e0"/>
+          <rect x="-6" y="18" width="3.5" height="12" rx="1.5" fill="#e0e0e0"/>
+          <rect x="4" y="18" width="3.5" height="12" rx="1.5" fill="#e0e0e0"/>
+          <rect x="10" y="18" width="3.5" height="12" rx="1.5" fill="#e0e0e0"/>
+          <path d="M16,4 Q26,-2 30,-10 Q34,-18 26,-20" fill="none" stroke="#f48fb1" stroke-width="3"/>
+          <path d="M16,6 Q24,0 28,-6 Q32,-14 24,-16" fill="none" stroke="#f8bbd0" stroke-width="2"/>
+        </g>
+        <g transform="translate(148, 176)">
+          <ellipse cx="0" cy="6" rx="16" ry="5" fill="#90a4ae"/>
+          <rect x="-3" y="-8" width="6" height="14" fill="#78909c"/>
+          <ellipse cx="0" cy="-8" rx="6" ry="3" fill="#61d4d0"/>
+          <ellipse cx="0" cy="-14" rx="4" ry="2" fill="#61d4d0"/>
+          <path d="M0,-16 Q-8,-28 0,-38" fill="none" stroke="#61d4d0" stroke-width="2" opacity="0.7"/>
+          <path d="M0,-16 Q8,-28 0,-38" fill="none" stroke="#61d4d0" stroke-width="2" opacity="0.7"/>
+          <path d="M0,-16 Q0,-28 0,-38" fill="none" stroke="#61d4d0" stroke-width="1.5" opacity="0.5"/>
+          <circle cx="0" cy="-42" r="2.5" fill="#fff" opacity="0.9"/>
+          <circle cx="-4" cy="-34" r="2" fill="#fff" opacity="0.7"/>
+          <circle cx="4" cy="-34" r="2" fill="#fff" opacity="0.7"/>
+          <circle cx="-8" cy="-24" r="1.5" fill="#fff" opacity="0.5"/>
+          <circle cx="8" cy="-24" r="1.5" fill="#fff" opacity="0.5"/>
+          <circle cx="0" cy="-38" r="28" fill="url(#mg)"/>
+        </g>
+        <g transform="translate(92, 162)">
+          <ellipse cx="0" cy="8" rx="20" ry="8" fill="#388e3c"/>
+          <ellipse cx="0" cy="0" rx="16" ry="6" fill="#43a047"/>
+          <ellipse cx="0" cy="-6" rx="12" ry="5" fill="#388e3c"/>
+          <ellipse cx="0" cy="-12" rx="8" ry="4" fill="#43a047"/>
+          <ellipse cx="0" cy="-16" rx="4" ry="3" fill="#66bb6a"/>
+        </g>
+        <g transform="translate(44, 128)"><rect x="-2" y="0" width="4" height="28" fill="#5d4037"/><circle cx="0" cy="-14" r="15" fill="#ff7043"/><circle cx="-5" cy="-16" r="9" fill="#e64a19"/><circle cx="4" cy="-10" r="8" fill="#ff5722"/></g>
+        <g transform="translate(74, 132)"><rect x="-2" y="0" width="4" height="26" fill="#5d4037"/><circle cx="0" cy="-16" r="13" fill="#ff7043"/><circle cx="3" cy="-18" r="8" fill="#ff5722"/></g>
+        <g transform="translate(370, 126)"><rect x="-2" y="0" width="4" height="30" fill="#5d4037"/><circle cx="0" cy="-14" r="17" fill="#43a047"/><circle cx="-6" cy="-18" r="11" fill="#2e7d32"/></g>
+        <g transform="translate(402, 130)"><rect x="-2" y="0" width="4" height="28" fill="#5d4037"/><circle cx="0" cy="-16" r="15" fill="#43a047"/><circle cx="5" cy="-18" r="10" fill="#388e3c"/></g>
+        <g transform="translate(432, 134)"><rect x="-2" y="0" width="4" height="26" fill="#5d4037"/><circle cx="0" cy="-14" r="14" fill="#43a047"/></g>
+        <rect x="208" y="18" width="2" height="22" fill="#5D4037"/>
+        <polygon points="208,18 228,22 208,26" fill="#fdd835"/>
+      </svg>
+    </div>
+    <div class="island-detail">
+      <span class="level-badge" style="background:#b14533;">Lv.50 — Lv.100</span>
+      <h2>🏰 梦幻城堡</h2>
+      <p>整座岛屿化为一座梦幻的城堡王国！高耸的塔楼插着红色旗帜，树篱迷宫是皇家花园的奇观，魔法喷泉闪烁着不灭的星光。圣洁的独角兽在枫树与樟树林间漫步——这是Pomoland的最高荣誉殿堂。</p>
+      <div class="spec-list">
+        <span class="spec-item">🏰 城堡+双塔</span>
+        <span class="spec-item">🚩 王国旗帜</span>
+        <span class="spec-item">🦄 独角兽</span>
+        <span class="spec-item">🌳 树篱迷宫</span>
+        <span class="spec-item">✨ 魔法喷泉</span>
+        <span class="spec-item">🍁 枫树+樟树</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
