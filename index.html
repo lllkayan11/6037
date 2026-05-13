@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pomoland</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="home-shell">
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="Pomoland home">
+        <span class="brand-mark"></span>
+        <span>Pomoland</span>
+      </a>
+      <nav class="site-nav" aria-label="Homepage sections">
+        <button type="button" data-scroll-target="#journey" data-i18n="navJourney">Journey</button>
+        <button type="button" data-scroll-target="#features" data-i18n="navFeatures">Features</button>
+        <button type="button" data-scroll-target="#ai-layer" data-i18n="navAI">AI Layer</button>
+      </nav>
+      <div class="language-switcher" aria-label="Language switcher">
+        <button class="language-button is-active" type="button" data-lang="zh-CN">简</button>
+        <button class="language-button" type="button" data-lang="zh-HK">繁</button>
+        <button class="language-button" type="button" data-lang="en">EN</button>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero-section">
+        <div class="hero-copy">
+          <p class="eyebrow" data-i18n="heroBadge">AI Focus Game</p>
+          <h1 data-i18n="heroTitle">把专注变成自己的番茄岛</h1>
+          <p class="hero-lead" data-i18n="heroLead">AI 帮你拆解目标，Focus Mode 帮你进入番茄钟，每一次完成都会变成 Bonus，继续建设 Pomoland。</p>
+          <div class="hero-actions">
+            <button class="primary-button" type="button" data-open-demo data-i18n="launchDemo">Launch Demo</button>
+            <button class="text-button" type="button" data-scroll-target="#journey" data-i18n="viewJourney">查看流程</button>
+          </div>
+        </div>
+
+        <div class="hero-world" aria-label="Pomoland island preview">
+          <div class="sun"></div>
+          <div class="cloud cloud-a"></div>
+          <div class="cloud cloud-b"></div>
+          <div class="sea"></div>
+          <div class="island-preview">
+            <div class="tomato-house"></div>
+            <div class="sprout sprout-a"></div>
+            <div class="sprout sprout-b"></div>
+            <div class="dock"></div>
+          </div>
+          <div class="floating-card focus-card">
+            <small data-i18n="statFocus">今日专注</small>
+            <strong>70m</strong>
+            <span data-i18n="previewTask">IELTS 词汇冲刺</span>
+          </div>
+          <div class="floating-card bonus-card">
+            <small>Bonus</small>
+            <strong>+40</strong>
+            <span data-i18n="previewBonus">Bonus 已解锁</span>
+          </div>
+          <div class="floating-card island-card">
+            <small data-i18n="statIsland">岛屿等级</small>
+            <strong>Lv. 3</strong>
+            <span data-i18n="previewIsland">番茄苗正在生长</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="journey-section" id="journey">
+        <div class="section-heading">
+          <p class="eyebrow">Journey</p>
+          <h2 data-i18n="journeyTitle">一个让用户愿意回来的专注闭环</h2>
+          <p data-i18n="journeyLead">从大目标到每日行动，再到奖励、建设和社交反馈，Pomoland 把效率工具变成持续养成体验。</p>
+        </div>
+        <div class="journey-track">
+          <article class="journey-step">
+            <span>01</span>
+            <h3 data-i18n="stepPlan">AI 拆解目标</h3>
+          </article>
+          <article class="journey-step">
+            <span>02</span>
+            <h3 data-i18n="stepFocus">进入 Focus Mode</h3>
+          </article>
+          <article class="journey-step">
+            <span>03</span>
+            <h3 data-i18n="stepReward">领取 Bonus</h3>
+          </article>
+          <article class="journey-step">
+            <span>04</span>
+            <h3 data-i18n="stepBuild">建设 Pomoland</h3>
+          </article>
+          <article class="journey-step">
+            <span>05</span>
+            <h3 data-i18n="stepReturn">明天继续打卡</h3>
+          </article>
+        </div>
+      </section>
+
+      <section class="feature-section" id="features">
+        <div class="section-heading">
+          <p class="eyebrow">Features</p>
+          <h2 data-i18n="featuresTitle">功能完整，但演示路径清晰</h2>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card accent-a">
+            <span class="feature-icon task-icon"></span>
+            <h3 data-i18n="featureAI">AI Task Planning</h3>
+            <p data-i18n="featureAIDesc">把考试、项目、习惯目标拆成可执行的每日任务。</p>
+          </article>
+          <article class="feature-card accent-b">
+            <span class="feature-icon timer-icon"></span>
+            <h3 data-i18n="featureFocus">Focus Mode</h3>
+            <p data-i18n="featureFocusDesc">支持 Demo 快进和真实 25/30/45 分钟番茄钟。</p>
+          </article>
+          <article class="feature-card accent-c">
+            <span class="feature-icon island-icon"></span>
+            <h3 data-i18n="featureIsland">Pomoland Island</h3>
+            <p data-i18n="featureIslandDesc">用水滴、种子和金币种植、浇水、喂养和装饰。</p>
+          </article>
+          <article class="feature-card accent-d">
+            <span class="feature-icon friends-icon"></span>
+            <h3 data-i18n="featureSocial">Friends</h3>
+            <p data-i18n="featureSocialDesc">参观好友岛屿，帮忙浇水，或用游戏机会偷取果实。</p>
+          </article>
+          <article class="feature-card accent-e">
+            <span class="feature-icon report-icon"></span>
+            <h3 data-i18n="featureReport">Report</h3>
+            <p data-i18n="featureReportDesc">用 7 天趋势、完成率和 AI 周报展示成长。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="ai-section" id="ai-layer">
+        <div class="section-heading compact">
+          <p class="eyebrow">AI Layer</p>
+          <h2 data-i18n="aiTitle">AI 不抢戏，只推动行动</h2>
+        </div>
+        <div class="ai-grid">
+          <article>
+            <strong data-i18n="aiGoal">目标拆解</strong>
+            <p data-i18n="aiGoalDesc">把长期目标转换成每周和每日 Focus 任务。</p>
+          </article>
+          <article>
+            <strong data-i18n="aiNudge">防拖延干预</strong>
+            <p data-i18n="aiNudgeDesc">连续未完成时降低任务难度并生成鼓励文案。</p>
+          </article>
+          <article>
+            <strong data-i18n="aiReport">成长总结</strong>
+            <p data-i18n="aiReportDesc">根据打卡、专注和奖励数据生成周报。</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="cta-section">
+        <div>
+          <p class="eyebrow">Demo</p>
+          <h2 data-i18n="ctaTitle">准备好演示 Pomoland 的完整闭环</h2>
+          <p data-i18n="ctaLead">进入工作台后可以从 AI 拆任务一路演示到 Bonus 和岛屿建设。</p>
+        </div>
+        <button class="primary-button" type="button" data-open-demo data-i18n="launchDemo">Launch Demo</button>
+      </section>
+    </main>
+  </div>
+
+  <section class="workspace-shell" hidden>
+    <aside class="workspace-sidebar">
+      <div class="workspace-brand">
+        <span class="brand-mark"></span>
+        <div>
+          <strong>Pomoland</strong>
+          <small data-i18n="workspaceTitle">Pomoland Demo</small>
+        </div>
+      </div>
+      <nav class="workspace-nav" aria-label="Demo navigation">
+        <button class="workspace-nav-button is-active" type="button" data-view="today" data-i18n="today">Today / AI Plan</button>
+        <button class="workspace-nav-button" type="button" data-view="focus" data-i18n="focusMode">Focus Mode</button>
+        <button class="workspace-nav-button" type="button" data-view="island" data-i18n="island">Pomoland Island</button>
+        <button class="workspace-nav-button" type="button" data-view="checkin" data-i18n="checkIn">Check-in</button>
+        <button class="workspace-nav-button" type="button" data-view="friends" data-i18n="friends">Friends</button>
+        <button class="workspace-nav-button" type="button" data-view="report" data-i18n="report">Report</button>
+      </nav>
+      <div class="resource-panel">
+        <div><span data-i18n="coins">金币</span><strong data-resource="coins">120</strong></div>
+        <div><span data-i18n="seeds">种子</span><strong data-resource="seeds">2</strong></div>
+        <div><span data-i18n="water">水滴</span><strong data-resource="water">3</strong></div>
+        <div><span data-i18n="chances">游戏机会</span><strong data-resource="chances">1</strong></div>
+      </div>
+    </aside>
+
+    <main class="workspace-main">
+      <header class="workspace-topbar">
+        <div>
+          <p class="eyebrow">Demo Workspace</p>
+          <h1 data-i18n="workspaceTitle">Pomoland Demo</h1>
+        </div>
+        <div class="language-switcher" aria-label="Language switcher">
+          <button class="language-button is-active" type="button" data-lang="zh-CN">简</button>
+          <button class="language-button" type="button" data-lang="zh-HK">繁</button>
+          <button class="language-button" type="button" data-lang="en">EN</button>
+        </div>
+      </header>
+
+      <section class="workspace-panel" data-panel="today">
+        <div class="panel-layout two-column">
+          <div class="tool-panel">
+            <label for="goalInput" data-i18n="goalLabel">输入一个长期目标</label>
+            <textarea id="goalInput" rows="4" data-i18n-placeholder="goalPlaceholder">三个月准备雅思考试</textarea>
+            <button class="primary-button wide" id="generatePlan" type="button" data-i18n="aiButton">生成 AI 任务</button>
+            <div class="agent-progress" id="agentProgress" aria-live="polite"></div>
+          </div>
+          <div>
+            <div class="panel-heading">
+              <p class="eyebrow">AI Plan</p>
+              <h2 data-i18n="generatedPlan">AI 生成的今日计划</h2>
+            </div>
+            <div class="task-list" id="taskList"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="workspace-panel" data-panel="focus" hidden>
+        <div class="panel-layout focus-layout">
+          <div class="focus-board">
+            <div class="panel-heading">
+              <p class="eyebrow">Focus Mode</p>
+              <h2 data-i18n="selectedTask">当前任务</h2>
+            </div>
+            <div class="selected-task" id="selectedTask"></div>
+            <div class="duration-row">
+              <button class="duration-button is-active" type="button" data-seconds="20" data-i18n="demo20">Demo 20s</button>
+              <button class="duration-button" type="button" data-seconds="1500" data-i18n="min25">25m</button>
+              <button class="duration-button" type="button" data-seconds="1800" data-i18n="min30">30m</button>
+              <button class="duration-button" type="button" data-seconds="2700" data-i18n="min45">45m</button>
+            </div>
+            <div class="timer-shell" id="timerRing">
+              <div class="timer-inner">
+                <span id="timerDisplay">00:20</span>
+                <small>Focus Mode</small>
+              </div>
+            </div>
+            <div class="timer-actions">
+              <button class="primary-button" type="button" id="startTimer" data-i18n="start">开始</button>
+              <button class="secondary-button" type="button" id="pauseTimer" data-i18n="pause">暂停</button>
+              <button class="secondary-button" type="button" id="resetTimer" data-i18n="reset">重置</button>
+              <button class="text-button" type="button" id="finishFocus" data-i18n="completeDemo">演示完成</button>
+            </div>
+          </div>
+          <div class="focus-side-visual" aria-label="Focus island animation">
+            <div class="mini-island">
+              <div class="mini-sun"></div>
+              <div class="mini-tomato"></div>
+              <div class="mini-leaf"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="workspace-panel" data-panel="island" hidden>
+        <div class="panel-layout two-column">
+          <div>
+            <div class="panel-heading">
+              <p class="eyebrow">Pomoland Island</p>
+              <h2 data-i18n="islandStatus">岛屿状态</h2>
+            </div>
+            <div class="large-island" id="islandScene" data-level="1" data-growth="starter" data-crop="seedling" data-plants="1" data-hydration="dry" data-pet="sleepy" data-pet-activity="resting" data-decoration="plain" data-decor-items="">
+              <div class="large-sun"></div>
+              <div class="large-sea"></div>
+              <div class="large-land">
+                <div class="farm-plot plot-one"></div>
+                <div class="farm-plot plot-two"></div>
+                <div class="farm-plot plot-three"></div>
+                <div class="farm-plot plot-four"></div>
+                <div class="water-channel"></div>
+                <div class="large-house"></div>
+                <div class="large-pet">
+                  <span class="pet-eye eye-left"></span>
+                  <span class="pet-eye eye-right"></span>
+                  <span class="pet-mouth"></span>
+                  <span class="pet-tail"></span>
+                </div>
+                <div class="pet-bowl"></div>
+                <div class="large-plant plant-one"><span class="plant-flower"></span><span class="plant-fruit"></span></div>
+                <div class="large-plant plant-two"><span class="plant-flower"></span><span class="plant-fruit"></span></div>
+                <div class="large-plant plant-three"><span class="plant-flower"></span><span class="plant-fruit"></span></div>
+                <div class="large-plant plant-four"><span class="plant-flower"></span><span class="plant-fruit"></span></div>
+                <div class="large-dock"></div>
+                <div class="shell-lamp"></div>
+                <div class="study-flag"></div>
+                <div class="harbor-lights"><span></span><span></span><span></span></div>
+              </div>
+              <div class="sparkle sparkle-a"></div>
+              <div class="sparkle sparkle-b"></div>
+            </div>
+            <p class="status-message" id="islandMessage"></p>
+          </div>
+          <div class="tool-panel">
+            <div class="island-actions">
+              <article class="island-action-card">
+                <div>
+                  <strong data-i18n="plant">Plant</strong>
+                  <span data-i18n="plantCost">消耗 1 个种子</span>
+                </div>
+                <p data-i18n="plantPurpose">种下新的作物，让岛上出现新的成长目标。</p>
+                <small data-i18n="plantEffect">新增番茄苗，作物阶段提升。</small>
+                <button class="primary-button wide" type="button" data-island-action="plant" data-i18n="plant">Plant</button>
+              </article>
+              <article class="island-action-card">
+                <div>
+                  <strong data-i18n="waterAction">Water</strong>
+                  <span data-i18n="waterCost">消耗 1 个水滴</span>
+                </div>
+                <p data-i18n="waterPurpose">给已有作物浇水，让它进入更健康的成长状态。</p>
+                <small data-i18n="waterEffect">水面变亮，作物出现水润闪光。</small>
+                <button class="secondary-button wide" type="button" data-island-action="water" data-i18n="waterAction">Water</button>
+              </article>
+              <article class="island-action-card">
+                <div>
+                  <strong data-i18n="feed">Feed</strong>
+                  <span data-i18n="feedCost">消耗 20 金币</span>
+                </div>
+                <p data-i18n="feedPurpose">喂养岛上的小宠物，提高岛屿活跃度。</p>
+                <small data-i18n="feedEffect">宠物醒来，岛屿等级提升。</small>
+                <button class="secondary-button wide" type="button" data-island-action="feed" data-i18n="feed">Feed</button>
+              </article>
+              <article class="island-action-card">
+                <div>
+                  <strong data-i18n="decorate">Decorate</strong>
+                  <span data-i18n="decorateCost">消耗 30 金币</span>
+                </div>
+                <p data-i18n="decoratePurpose">放置码头、灯具等装饰，让 Pomoland 更有展示感。</p>
+                <small data-i18n="decorateEffect">解锁岛屿装饰。</small>
+                <button class="secondary-button wide" type="button" data-island-action="decorate" data-i18n="decorate">Decorate</button>
+              </article>
+            </div>
+            <div class="decorations" id="decorations"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="workspace-panel" data-panel="checkin" hidden>
+        <div class="panel-heading">
+          <p class="eyebrow">Check-in</p>
+          <h2 data-i18n="checkInTitle">打卡与连胜</h2>
+        </div>
+        <div class="metrics-row">
+          <article class="metric">
+            <span data-i18n="streak">连续天数</span>
+            <strong id="streakValue">5</strong>
+          </article>
+          <article class="metric">
+            <span data-i18n="protection">连胜保护卡</span>
+            <strong>1</strong>
+          </article>
+          <article class="metric">
+            <span data-i18n="milestone">里程碑奖励</span>
+            <strong>7 / 30 / 100</strong>
+          </article>
+        </div>
+        <div class="calendar-grid" id="checkInGrid"></div>
+      </section>
+
+      <section class="workspace-panel" data-panel="friends" hidden>
+        <div class="panel-heading">
+          <p class="eyebrow">Friends</p>
+          <h2 data-i18n="friendsTitle">好友岛屿</h2>
+        </div>
+        <div class="friend-grid" id="friendGrid"></div>
+      </section>
+
+      <section class="workspace-panel" data-panel="report" hidden>
+        <div class="panel-heading">
+          <p class="eyebrow">Report</p>
+          <h2 data-i18n="reportTitle">成长报告</h2>
+        </div>
+        <div class="report-layout">
+          <div class="chart-panel">
+            <h3 data-i18n="focusTrend">7 天专注趋势</h3>
+            <div class="bar-chart" id="reportBars"></div>
+          </div>
+          <div class="report-metrics">
+            <article class="metric">
+              <span data-i18n="completionRate">任务完成率</span>
+              <strong id="completionRate">86%</strong>
+            </article>
+            <article class="metric">
+              <span data-i18n="streak">连续天数</span>
+              <strong id="reportStreak">5</strong>
+            </article>
+            <article class="summary-box">
+              <span data-i18n="aiSummary">AI 周报</span>
+              <p id="reportSummary"></p>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+  </section>
+
+  <div class="modal-backdrop" id="bonusModal" hidden>
+    <div class="bonus-modal" role="dialog" aria-modal="true" aria-labelledby="bonusTitle">
+      <button class="modal-close" id="closeBonus" type="button" aria-label="Close">×</button>
+      <p class="eyebrow">Bonus</p>
+      <h2 id="bonusTitle" data-i18n="bonusTitle">Bonus 已掉落</h2>
+      <p data-i18n="bonusLead">这次专注转化成了新的岛屿资源。</p>
+      <div class="bonus-list" id="bonusList"></div>
+      <button class="primary-button wide" id="claimBonus" type="button" data-i18n="claimBonus">Claim Bonus</button>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="visitModal" hidden>
+    <div class="visit-modal" role="dialog" aria-modal="true" aria-labelledby="visitTitle">
+      <button class="modal-close" id="closeVisit" type="button" aria-label="Close">×</button>
+      <p class="eyebrow" data-i18n="visitIslandTitle">参观好友岛屿</p>
+      <h2 id="visitTitle"><span id="visitName">Noah</span>'s Pomoland</h2>
+      <div class="visit-island friend-sun" id="visitIsland"></div>
+      <div class="visit-stats">
+        <article>
+          <span data-i18n="visitFocusLabel">最近专注</span>
+          <strong id="visitFocus">58m</strong>
+        </article>
+        <article>
+          <span data-i18n="visitMoodLabel">岛屿状态</span>
+          <strong id="visitMood">新码头刚建好，适合参观</strong>
+        </article>
+      </div>
+      <div class="visit-resources">
+        <span data-i18n="visitResourcesLabel">可互动资源</span>
+        <div id="visitResources"></div>
+      </div>
+      <p class="visit-note" id="visitNote"></p>
+      <button class="primary-button wide" id="closeVisitAction" type="button" data-i18n="visitClose">关闭参观</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
