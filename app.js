@@ -2125,7 +2125,6 @@ if (typeof document !== 'undefined') {
 
     // 岛屿花园状态
     let islandState = IslandGardenModule.createIslandState();
-    let _pendingDemoCode = null;
     let currentTool = null;
     let selectedPlot = null;
     let currentFriendId = null;
@@ -2180,12 +2179,7 @@ if (typeof document !== 'undefined') {
       visitNote: document.querySelector('#visitNote'),
       authShell: document.querySelector('#authShell'),
       homeShell: document.querySelector('#homeShell'),
-      loginStep1: document.querySelector('#loginStep1'),
-      loginStep2: document.querySelector('#loginStep2'),
-      phoneInput: document.querySelector('#phoneInput'),
-      codeInput: document.querySelector('#codeInput'),
       nicknameInput: document.querySelector('#nicknameInput'),
-      sendCodeBtn: document.querySelector('#sendCodeBtn'),
       confirmLoginBtn: document.querySelector('#confirmLoginBtn'),
       // Social module elements
       addFriendBtn: document.querySelector('#addFriendBtn'),
@@ -2352,8 +2346,9 @@ if (typeof document !== 'undefined') {
       if (auth && auth.loggedIn) {
         elements.authShell.hidden = true;
         elements.homeShell.hidden = false;
-        if (auth.phone) elements.phoneInput.value = auth.phone;
-        if (auth.nickname) elements.nicknameInput.value = auth.nickname;
+        if (elements.nicknameInput && auth.nickname) {
+          elements.nicknameInput.value = auth.nickname;
+        }
       }
     }
 
@@ -4190,46 +4185,16 @@ if (typeof document !== 'undefined') {
       const target = event.target.closest('button, a');
       if (!target) return;
 
-      if (target.id === 'sendCodeBtn') {
-        const phone = elements.phoneInput.value.trim();
-        const phoneRegex = /^1[3-9]\d{9}$/;
-        if (!phone) return alert('请输入手机号');
-        if (!phoneRegex.test(phone)) return alert('请输入有效的 11 位手机号码（例如：13800000000）');
-
-        elements.sendCodeBtn.textContent = '发送中...';
-        elements.sendCodeBtn.disabled = true;
-
-        // Client-side demo: 2 seconds later, show the demo code
-        _pendingDemoCode = String(Math.floor(100000 + Math.random() * 900000));
-        setTimeout(() => {
-          elements.sendCodeBtn.textContent = '发送验证码';
-          elements.sendCodeBtn.disabled = false;
-          elements.loginStep1.hidden = true;
-          elements.loginStep2.hidden = false;
-          alert(`【演示用】验证码：${_pendingDemoCode}`);
-        }, 1200);
-        return;
-      }
-
       if (target.id === 'confirmLoginBtn') {
-        const phone = elements.phoneInput.value.trim();
-        const code = elements.codeInput.value.trim();
         const nickname = elements.nicknameInput.value.trim();
-        if (!code || !nickname) return alert('请输入验证码和昵称');
-
-        if (code !== _pendingDemoCode) {
-          alert('验证码错误，请重新尝试发送验证码');
-          return;
-        }
+        if (!nickname) return alert('请输入昵称');
 
         writeStorage(STORAGE_KEYS.authState, {
           loggedIn: true,
-          phone,
           nickname
         });
         elements.authShell.hidden = true;
         elements.homeShell.hidden = false;
-        _pendingDemoCode = null;
         return;
       }
 

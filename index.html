@@ -10,26 +10,14 @@
   <div class="auth-shell" id="authShell">
     <div class="auth-form-container">
       <div class="auth-form">
-        <p class="eyebrow">Account</p>
+        <p class="eyebrow">Welcome</p>
         <h2>登录 / 注册</h2>
+        <p style="color: var(--muted); margin-bottom: 32px;">输入昵称开始使用 Pomoland 专注工具。</p>
 
-        <div id="loginStep1">
-          <p style="color: var(--muted); margin-bottom: 32px;">输入手机号接收验证码以登录 Pomoland。</p>
-          <label for="phoneInput" style="display:block; margin-bottom: 8px; font-weight: bold; color: var(--muted);">手机号</label>
-          <input type="text" id="phoneInput" placeholder="请输入手机号" style="width: 100%; padding: 14px; border: 1px solid var(--line); border-radius: 8px; margin-bottom: 24px; font-size: 16px; outline: none;" />
-          <button class="primary-button wide" id="sendCodeBtn" type="button" style="height: 52px; font-size: 16px;">发送验证码</button>
-        </div>
+        <label for="nicknameInput" style="display:block; margin-bottom: 8px; font-weight: bold; color: var(--muted);">你的昵称</label>
+        <input type="text" id="nicknameInput" placeholder="例如：小番茄" style="width: 100%; padding: 14px; border: 1px solid var(--line); border-radius: 8px; margin-bottom: 32px; font-size: 16px; outline: none;" />
 
-        <div id="loginStep2" hidden>
-          <p style="color: var(--muted); margin-bottom: 32px;">验证码已发送，请输入验证码并填写昵称。</p>
-          <label for="codeInput" style="display:block; margin-bottom: 8px; font-weight: bold; color: var(--muted);">验证码</label>
-          <input type="text" id="codeInput" placeholder="1234" style="width: 100%; padding: 14px; border: 1px solid var(--line); border-radius: 8px; margin-bottom: 16px; font-size: 16px; outline: none;" />
-
-          <label for="nicknameInput" style="display:block; margin-bottom: 8px; font-weight: bold; color: var(--muted);">你的昵称</label>
-          <input type="text" id="nicknameInput" placeholder="例如：小番茄" style="width: 100%; padding: 14px; border: 1px solid var(--line); border-radius: 8px; margin-bottom: 32px; font-size: 16px; outline: none;" />
-
-          <button class="primary-button wide" id="confirmLoginBtn" type="button" style="height: 52px; font-size: 16px;">进入岛屿</button>
-        </div>
+        <button class="primary-button wide" id="confirmLoginBtn" type="button" style="height: 52px; font-size: 16px;">进入岛屿</button>
       </div>
     </div>
   </div>
