@@ -553,6 +553,41 @@ const PomolandCore = (() => {
     return 10 + Math.round(safeDuration * 0.9) + titleBonus + notesBonus + durationBonus;
   }
 
+  function inferTaskPriority(goal, title = '', duration = 25) {
+    const combined = `${goal} ${title}`.toLowerCase();
+    const urgentKeywords = ['ielts', 'exam', 'test', 'final', 'deadline', 'presentation', 'report', '面试', '考试', '雅思', '汇报', 'ddl', '截止'];
+    const mediumKeywords = ['plan', 'outline', 'review', '复习', '计划', '提纲', '项目', 'project'];
+    if (urgentKeywords.some((keyword) => combined.includes(keyword)) || Number(duration) >= 45) {
+      return 'high';
+    }
+    if (mediumKeywords.some((keyword) => combined.includes(keyword)) || Number(duration) >= 30) {
+      return 'medium';
+    }
+    return 'low';
+  }
+
+  function inferTaskDueDate(goal, index = 0) {
+    const now = new Date();
+    const combined = String(goal || '').toLowerCase();
+    const offset = combined.includes('today') || combined.includes('今天')
+      ? 0
+      : combined.includes('tomorrow') || combined.includes('明天')
+        ? 1
+        : combined.includes('week') || combined.includes('本周')
+          ? Math.min(index + 1, 5)
+          : Math.min(index + 1, 3);
+    now.setDate(now.getDate() + offset);
+    return now.toISOString().slice(0, 10);
+  }
+
+  function inferGoalCategory(goal = '') {
+    const combined = String(goal).toLowerCase();
+    if (/(ielts|exam|study|学习|雅思|考试|复习|阅读|听力|写作)/i.test(combined)) return 'study';
+    if (/(project|prototype|coding|code|design|develop|ship|开发|产品|项目|编程|设计|原型|上线)/i.test(combined)) return 'project';
+    if (/(habit|workout|fitness|exercise|习惯|健身|运动|早起)/i.test(combined)) return 'habit';
+    return 'general';
+  }
+
   function buildTaskNote(goal, title, language) {
     const lang = normalizeLanguage(language);
     if (lang === 'en') {
@@ -582,6 +617,8 @@ const PomolandCore = (() => {
       goldReward,
       duration,
       energy: duration >= 45 ? 'Deep' : duration >= 30 ? 'Steady' : 'Light',
+      priority: task.priority || inferTaskPriority(goal, title, duration),
+      dueDate: task.dueDate || inferTaskDueDate(goal, index),
       customized: Boolean(task.customized),
       completed: Boolean(task.completed)
     };
@@ -1092,6 +1129,7 @@ const PomolandCore = (() => {
     getIslandVisualState,
     getIslandActions,
     calculateTaskGold,
+    inferGoalCategory,
     createTimerState,
     syncTimerState,
     startTimerState,
@@ -1327,6 +1365,17 @@ if (typeof document !== 'undefined') {
       return localizedText(`奖励金币 ${task.goldReward}`, `獎勵金幣 ${task.goldReward}`, `${task.goldReward} coins`);
     }
 
+    function formatTaskPriority(priority) {
+      if (priority === 'high') return localizedText('高优先级', '高優先級', 'High priority');
+      if (priority === 'medium') return localizedText('中优先级', '中優先級', 'Medium priority');
+      return localizedText('低优先级', '低優先級', 'Low priority');
+    }
+
+    function formatTaskDueDate(dueDate) {
+      if (!dueDate) return localizedText('无截止时间', '無截止時間', 'No due date');
+      return localizedText(`截止 ${dueDate}`, `截止 ${dueDate}`, `Due ${dueDate}`);
+    }
+
     function normalizeTaskDurationValue(value, fallback = 25) {
       const numericValue = Number(value);
       if (!Number.isFinite(numericValue)) return fallback;
@@ -1353,6 +1402,8 @@ if (typeof document !== 'undefined') {
       nextTask.duration = normalizeTaskDurationValue(nextTask.duration, target.duration || 25);
       nextTask.goldReward = core.calculateTaskGold(nextTask.duration, nextTask.title, nextTask.notes);
       nextTask.energy = nextTask.duration >= 45 ? 'Deep' : nextTask.duration >= 30 ? 'Steady' : 'Light';
+      nextTask.priority = patch.priority || nextTask.priority || 'medium';
+      nextTask.dueDate = Object.prototype.hasOwnProperty.call(patch, 'dueDate') ? patch.dueDate : (nextTask.dueDate || '');
 
       state.tasks = state.tasks.map((task) => task.id === taskId ? nextTask : task);
       if (state.selectedTask && state.selectedTask.id === taskId) {
@@ -1361,31 +1412,105 @@ if (typeof document !== 'undefined') {
       return nextTask;
     }
 
+    function addCustomTask() {
+      const taskId = `custom-${Date.now()}`;
+      const dueDate = new Date();
+      dueDate.setDate(dueDate.getDate() + 1);
+      const nextTask = {
+        id: taskId,
+        goal: state.goal,
+        title: localizedText('自定义任务', '自訂任務', 'Custom task'),
+        notes: localizedText('写下你真正想完成的动作，比如“整理 lecture 2 笔记并总结 3 个重点”。', '寫下你真正想完成的動作，例如「整理 lecture 2 筆記並總結 3 個重點」。', 'Write the exact action you want to finish, like “summarize lecture 2 and capture 3 key takeaways.”'),
+        description: '',
+        duration: 25,
+        goldReward: core.calculateTaskGold(25, localizedText('自定义任务', '自訂任務', 'Custom task')),
+        energy: 'Normal',
+        priority: 'medium',
+        dueDate: dueDate.toISOString().slice(0, 10),
+        customized: true,
+        completed: false
+      };
+      nextTask.description = nextTask.notes;
+      state.tasks = [nextTask, ...state.tasks];
+      editingTaskId = taskId;
+      return nextTask;
+    }
+
+    function getDaysUntil(dueDate) {
+      if (!dueDate) return null;
+      const due = new Date(`${dueDate}T00:00:00`);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      return Math.round((due - today) / 86400000);
+    }
+
+    function startTaskVoiceInput(taskId, field = 'notes') {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        alert(localizedText('当前浏览器不支持语音输入，你可以先手动输入。', '目前瀏覽器不支援語音輸入，你可以先手動輸入。', 'Voice input is not supported in this browser yet.'));
+        return;
+      }
+
+      const recognition = new SpeechRecognition();
+      recognition.lang = language === 'en' ? 'en-US' : language === 'zh-HK' ? 'zh-HK' : 'zh-CN';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+      recognition.onresult = (event) => {
+        const transcript = event.results?.[0]?.[0]?.transcript?.trim();
+        if (!transcript) return;
+        const card = document.querySelector(`[data-task-card="${taskId}"]`);
+        if (!card) return;
+        const targetField = field === 'title'
+          ? card.querySelector('[data-task-title-input]')
+          : card.querySelector('[data-task-notes-input]');
+        if (targetField) {
+          targetField.value = targetField.value ? `${targetField.value} ${transcript}` : transcript;
+          targetField.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      };
+      recognition.onerror = () => {
+        alert(localizedText('这次没有成功识别语音，可以再试一次。', '這次沒有成功識別語音，可以再試一次。', 'Voice input did not come through this time. Please try again.'));
+      };
+      recognition.start();
+    }
+
     function getCoachInsights() {
       const actionableTasks = (state.tasks || []).filter((task) => !task.completed);
       const shown = state.coachStats?.shown || 0;
       const accepted = state.coachStats?.accepted || 0;
       const completed = state.coachStats?.completed || 0;
+      const goalCategory = core.inferGoalCategory(state.goal);
+      const completionRate = state.tasks.length
+        ? state.tasks.filter((task) => task.completed).length / state.tasks.length
+        : 0;
 
       if (!actionableTasks.length) {
         return {
           recommendedTask: null,
           difficultyTask: null,
           difficultyDuration: null,
-          metrics: { shown, accepted, completed }
+          metrics: { shown, accepted, completed },
+          completionRate,
+          goalCategory,
+          rationale: localizedText('当前任务都完成了，可以生成下一轮计划。', '目前任務都完成了，可以生成下一輪計劃。', 'All current tasks are complete. Generate your next plan.')
         };
       }
 
-      const sortedByDuration = [...actionableTasks].sort((a, b) => a.duration - b.duration);
-      const recommendedTask = state.streak <= 3
-        ? sortedByDuration[0]
-        : state.streak >= 7
-          ? sortedByDuration[sortedByDuration.length - 1]
-          : [...actionableTasks].sort((a, b) => Math.abs(a.duration - 30) - Math.abs(b.duration - 30))[0];
+      const scoredTasks = actionableTasks.map((task) => {
+        let score = 0;
+        const daysUntil = getDaysUntil(task.dueDate);
+        score += task.priority === 'high' ? 30 : task.priority === 'medium' ? 18 : 8;
+        score += daysUntil !== null && daysUntil <= 1 ? 20 : daysUntil !== null && daysUntil <= 3 ? 10 : 0;
+        score += completionRate < 0.45 ? Math.max(0, 26 - task.duration * 0.45) : Math.min(22, task.duration * 0.35);
+        if (goalCategory === 'study' && /(阅读|听力|写作|词汇|study|exam|review|ielts)/i.test(`${task.title} ${task.notes}`)) score += 12;
+        if (goalCategory === 'project' && /(project|code|prototype|design|开发|原型|测试|文档)/i.test(`${task.title} ${task.notes}`)) score += 12;
+        if (goalCategory === 'habit' && /(habit|routine|check|复盘|打卡|习惯|运动)/i.test(`${task.title} ${task.notes}`)) score += 12;
+        if (state.streak >= 7 && task.duration >= 35) score += 6;
+        if (state.streak <= 3 && task.duration <= 30) score += 8;
+        return { task, score, daysUntil };
+      }).sort((a, b) => b.score - a.score);
 
-      const completionRate = state.tasks.length
-        ? state.tasks.filter((task) => task.completed).length / state.tasks.length
-        : 0;
+      const recommendedTask = scoredTasks[0]?.task || actionableTasks[0];
 
       const difficultyTask = completionRate < 0.4 || state.streak <= 3
         ? [...actionableTasks].sort((a, b) => b.duration - a.duration)[0]
@@ -1399,7 +1524,16 @@ if (typeof document !== 'undefined') {
         recommendedTask,
         difficultyTask,
         difficultyDuration,
-        metrics: { shown, accepted, completed }
+        metrics: { shown, accepted, completed },
+        completionRate,
+        goalCategory,
+        rationale: scoredTasks[0]?.daysUntil !== null && scoredTasks[0]?.daysUntil <= 1
+          ? localizedText('因为这项任务更紧急，而且离截止时间最近，所以优先级被抬高了。', '因為這項任務更緊急，而且離截止時間最近，所以優先級被抬高了。', 'This task is ranked first because it is the most urgent and closest to its due date.')
+          : goalCategory === 'study'
+            ? localizedText('这次推荐会更偏向学习闭环：先完成最能推进复习链路的一项任务。', '這次推薦會更偏向學習閉環：先完成最能推進複習鏈路的一項任務。', 'This recommendation leans toward your study loop and picks the task that moves revision forward fastest.')
+            : goalCategory === 'project'
+              ? localizedText('这次推荐会更偏向项目推进：优先选择最能消除阻塞的一项任务。', '這次推薦會更偏向項目推進：優先選擇最能消除阻塞的一項任務。', 'This recommendation leans toward project progress and prioritizes the most unblock-worthy task.')
+              : localizedText('这次推荐综合了完成率、优先级和任务体量，优先帮你建立稳定的推进节奏。', '這次推薦綜合了完成率、優先級和任務體量，優先幫你建立穩定的推進節奏。', 'This recommendation blends completion rate, priority, and task size to keep your momentum stable.')
       };
     }
 
@@ -1969,14 +2103,28 @@ if (typeof document !== 'undefined') {
         `;
         return;
       }
-      const recommendedTaskId = getCoachInsights().recommendedTask?.id;
-      elements.taskList.innerHTML = state.tasks.map((task) => `
-        <article class="task-card ${state.selectedTask && state.selectedTask.id === task.id ? 'is-selected' : ''} ${task.completed ? 'is-complete' : ''}">
+      const insights = getCoachInsights();
+      const recommendedTaskId = insights.recommendedTask?.id;
+      const completedCount = state.tasks.filter((task) => task.completed).length;
+      elements.taskList.innerHTML = `
+        <div class="task-board-bar">
+          <div class="task-board-copy">
+            <strong>${localizedText('计划工作台', '計劃工作台', 'Planning workspace')}</strong>
+            <span>${localizedText(`已完成 ${completedCount}/${state.tasks.length} 项，可继续编辑、补充和排序任务。`, `已完成 ${completedCount}/${state.tasks.length} 項，可繼續編輯、補充和排序任務。`, `${completedCount}/${state.tasks.length} tasks complete. Keep editing, adding, and arranging.`)}</span>
+          </div>
+          <div class="task-board-actions">
+            <button class="small-button secondary" type="button" data-add-custom-task="true">${localizedText('新增自定义任务', '新增自訂任務', 'Add custom task')}</button>
+          </div>
+        </div>
+        ${state.tasks.map((task) => `
+        <article class="task-card ${state.selectedTask && state.selectedTask.id === task.id ? 'is-selected' : ''} ${task.completed ? 'is-complete' : ''}" data-task-card="${task.id}">
           <div class="task-card-top">
             <div>
               <div class="task-chip-row">
                 <span class="task-duration">${task.duration}m</span>
                 <span class="task-chip gold">${escapeHtml(formatTaskReward(task))}</span>
+                <span class="task-chip priority-${task.priority}">${escapeHtml(formatTaskPriority(task.priority))}</span>
+                ${task.dueDate ? `<span class="task-chip due">${escapeHtml(formatTaskDueDate(task.dueDate))}</span>` : ''}
                 ${recommendedTaskId === task.id ? `<span class="task-chip">${localizedText('AI 推荐', 'AI 推薦', 'AI pick')}</span>` : ''}
               </div>
               <h3>${escapeHtml(task.title)}</h3>
@@ -1999,13 +2147,31 @@ if (typeof document !== 'undefined') {
                   <input type="number" min="5" max="120" step="5" data-task-duration-input value="${task.duration}" />
                 </label>
               </div>
+              <div class="task-editor-grid triple">
+                <label>
+                  <span>${localizedText('优先级', '優先級', 'Priority')}</span>
+                  <select data-task-priority-input>
+                    <option value="high" ${task.priority === 'high' ? 'selected' : ''}>${localizedText('高', '高', 'High')}</option>
+                    <option value="medium" ${task.priority === 'medium' ? 'selected' : ''}>${localizedText('中', '中', 'Medium')}</option>
+                    <option value="low" ${task.priority === 'low' ? 'selected' : ''}>${localizedText('低', '低', 'Low')}</option>
+                  </select>
+                </label>
+                <label>
+                  <span>${localizedText('截止时间', '截止時間', 'Due date')}</span>
+                  <input type="date" data-task-due-input value="${task.dueDate || ''}" />
+                </label>
+                <label>
+                  <span>${localizedText('语音输入', '語音輸入', 'Voice input')}</span>
+                  <button class="small-button ghost voice-button" type="button" data-voice-task="${task.id}" data-voice-field="notes">${localizedText('录入说明', '錄入說明', 'Dictate note')}</button>
+                </label>
+              </div>
               <label>
                 <span>${localizedText('任务说明', '任務說明', 'Task note')}</span>
                 <textarea rows="3" data-task-notes-input>${escapeHtml(getTaskNotes(task))}</textarea>
               </label>
               <div class="task-editor-footer">
                 <strong data-task-gold-preview="${task.id}">${escapeHtml(formatTaskReward(task))}</strong>
-                <span>${localizedText('修改时长后，奖励金币会自动重新计算。', '修改時長後，獎勵金幣會自動重新計算。', 'Changing the duration recalculates the coin reward automatically.')}</span>
+                <span>${localizedText('修改时长、标题或说明后，奖励金币会自动重新计算；优先级和截止时间会影响 AI 推荐。', '修改時長、標題或說明後，獎勵金幣會自動重新計算；優先級和截止時間會影響 AI 推薦。', 'Changing duration, title, or notes recalculates coins automatically; priority and due date also affect AI recommendations.')}</span>
               </div>
               <div class="task-card-actions">
                 <button class="small-button secondary" type="button" data-save-task="${task.id}">${localizedText('保存修改', '保存修改', 'Save changes')}</button>
@@ -2014,7 +2180,8 @@ if (typeof document !== 'undefined') {
             </div>
           ` : ''}
         </article>
-      `).join('');
+      `).join('')}
+      `;
     }
 
     function renderCoachPanel() {
@@ -2041,12 +2208,14 @@ if (typeof document !== 'undefined') {
             <div>
               <p class="eyebrow">AI Coach</p>
               <h3>${localizedText('个性化推荐与任务调节', '個人化推薦與任務調節', 'Personalized recommendations')}</h3>
+              <p class="coach-goal-line">${localizedText(`当前会围绕你的目标「${state.goal}」动态调整推荐。`, `當前會圍繞你的目標「${state.goal}」動態調整推薦。`, `Recommendations now adapt around your goal: "${state.goal}".`)}</p>
             </div>
             <div class="coach-kpi">
               <span>${localizedText(`推荐点击率 ${acceptedRate}%`, `推薦點擊率 ${acceptedRate}%`, `CTR ${acceptedRate}%`)}</span>
               <span>${localizedText(`按推荐完成 ${completedRate}%`, `按推薦完成 ${completedRate}%`, `Completion ${completedRate}%`)}</span>
             </div>
           </div>
+          <div class="coach-rationale">${escapeHtml(insights.rationale)}</div>
           <div class="coach-card-grid">
             <article class="coach-card">
               <span class="coach-badge">${localizedText('推荐起手', '推薦起手', 'Best next task')}</span>
@@ -2731,6 +2900,13 @@ if (typeof document !== 'undefined') {
         generatePlan();
       }
 
+      if (target.matches('[data-add-custom-task]')) {
+        addCustomTask();
+        renderAll();
+        persistSession();
+        return;
+      }
+
       if (target.matches('[data-select-task]')) {
         const task = state.tasks.find((item) => item.id === target.dataset.selectTask);
         if (task) {
@@ -2760,10 +2936,14 @@ if (typeof document !== 'undefined') {
         const titleInput = card.querySelector('[data-task-title-input]');
         const notesInput = card.querySelector('[data-task-notes-input]');
         const durationInput = card.querySelector('[data-task-duration-input]');
+        const priorityInput = card.querySelector('[data-task-priority-input]');
+        const dueDateInput = card.querySelector('[data-task-due-input]');
         const updatedTask = updateTaskById(taskId, {
           title: titleInput ? titleInput.value : '',
           notes: notesInput ? notesInput.value : '',
-          duration: durationInput ? durationInput.value : 25
+          duration: durationInput ? durationInput.value : 25,
+          priority: priorityInput ? priorityInput.value : 'medium',
+          dueDate: dueDateInput ? dueDateInput.value : ''
         });
         if (updatedTask && state.selectedTask && state.selectedTask.id === taskId && !timerState.isRunning) {
           setDuration(updatedTask.duration * 60);
@@ -2794,6 +2974,11 @@ if (typeof document !== 'undefined') {
           persistSession();
           return;
         }
+      }
+
+      if (target.matches('[data-voice-task]')) {
+        startTaskVoiceInput(target.dataset.voiceTask, target.dataset.voiceField || 'notes');
+        return;
       }
 
       if (target.matches('[data-seconds]')) {

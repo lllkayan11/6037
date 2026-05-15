@@ -1169,6 +1169,38 @@ a {
   gap: 12px;
 }
 
+.task-board-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(245, 250, 248, 0.96));
+  border: 1px solid rgba(47, 111, 115, 0.12);
+}
+
+.task-board-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.task-board-copy strong {
+  color: var(--teal-900);
+}
+
+.task-board-copy span {
+  font-size: 13px;
+  color: var(--ink-500);
+}
+
+.task-board-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .task-card {
   background: #ffffff;
   border: 1px solid var(--line);
@@ -1252,6 +1284,26 @@ a {
   color: #8a6512;
 }
 
+.task-chip.priority-high {
+  background: rgba(231, 111, 81, 0.14);
+  color: #b85339;
+}
+
+.task-chip.priority-medium {
+  background: rgba(255, 209, 102, 0.26);
+  color: #8a6512;
+}
+
+.task-chip.priority-low {
+  background: rgba(87, 181, 108, 0.12);
+  color: var(--leaf-700);
+}
+
+.task-chip.due {
+  background: rgba(116, 128, 222, 0.14);
+  color: #5462c4;
+}
+
 .task-editor {
   display: flex;
   flex-direction: column;
@@ -1280,6 +1332,7 @@ a {
 }
 
 .task-editor input,
+.task-editor select,
 .task-editor textarea {
   width: 100%;
   border: 1px solid rgba(47, 111, 115, 0.14);
@@ -1293,10 +1346,20 @@ a {
 }
 
 .task-editor input:focus,
+.task-editor select:focus,
 .task-editor textarea:focus {
   outline: none;
   border-color: var(--teal-300);
   box-shadow: 0 0 0 3px rgba(109, 201, 194, 0.15);
+}
+
+.task-editor-grid.triple {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.voice-button {
+  width: 100%;
+  justify-content: center;
 }
 
 .task-editor-footer {
@@ -1345,6 +1408,13 @@ a {
   color: var(--teal-900);
 }
 
+.coach-goal-line {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--ink-500);
+}
+
 .coach-panel-empty p {
   margin: 8px 0 0;
   font-size: 13px;
@@ -1369,6 +1439,16 @@ a {
   color: #5462c4;
   font-size: 11px;
   font-weight: 800;
+}
+
+.coach-rationale {
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(116, 128, 222, 0.08);
+  color: #4a57ae;
+  font-size: 13px;
+  line-height: 1.7;
 }
 
 .coach-card-grid {
@@ -3221,8 +3301,10 @@ a {
     grid-template-columns: 1fr;
   }
 
+  .task-board-bar,
   .task-card-top,
   .task-editor-grid,
+  .task-editor-grid.triple,
   .task-editor-footer,
   .coach-panel-header {
     grid-template-columns: 1fr;

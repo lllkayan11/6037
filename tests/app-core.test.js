@@ -64,6 +64,12 @@ test('task gold reward scales with duration and complexity', () => {
   assert.equal(longReward > shortReward, true);
 });
 
+test('goal category inference changes with different user goals', () => {
+  assert.equal(core.inferGoalCategory('Three months IELTS prep'), 'study');
+  assert.equal(core.inferGoalCategory('Ship a product prototype this week'), 'project');
+  assert.equal(core.inferGoalCategory('Build a morning workout habit'), 'habit');
+});
+
 test('selecting a task moves it into the focus state', async () => {
   const state = core.createInitialState();
   const result = await core.generateTasks('三个月准备雅思考试', 'zh-CN');
