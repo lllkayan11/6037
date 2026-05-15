@@ -146,7 +146,60 @@ const PomolandCore = (() => {
       needSeeds: '种子不足，先完成 Focus Mode 获得 Bonus。',
       needWater: '水滴不足，先完成 Focus Mode 获得 Bonus。',
       needCoins: '金币不足，先完成 Focus Mode 获得 Bonus。',
-      aiFallbackEncouragement: 'AI 暂时无法使用，这里有一些默认任务！'
+      aiFallbackEncouragement: 'AI 暂时无法使用，这里有一些默认任务！',
+      friendsListTab: '好友列表',
+      leaderboardTab: '排行榜',
+      challengesTab: '挑战赛',
+      achievementsTab: '成就墙',
+      friendsListTitle: '我的好友',
+      addFriendBtn: '添加好友',
+      leaderboardFocus: '专注时长',
+      leaderboardStreak: '连胜天数',
+      leaderboardIsland: '岛屿等级',
+      challengesTitle: '进行中的挑战',
+      createChallengeBtn: '创建挑战',
+      myAchievements: '我的成就',
+      addFriendTitle: '添加好友',
+      searchFriend: '搜索好友',
+      searchBtn: '搜索',
+      pendingRequests: '好友请求',
+      createChallengeTitle: '创建挑战',
+      newChallenge: '新建挑战赛',
+      challengeName: '挑战名称',
+      challengeType: '挑战类型',
+      challengeTypeStreak: '连续打卡竞赛',
+      challengeTypeFocus: '专注时长竞赛',
+      challengeTypeIsland: '岛屿建设竞赛',
+      challengeDuration: '挑战时长',
+      durationWeek: '1周',
+      durationTwoWeeks: '2周',
+      durationMonth: '1个月',
+      challengeInvite: '邀请好友',
+      createChallengeSubmit: '创建并邀请',
+      achievementTitle: '成就详情',
+      noFriends: '还没有好友，去添加一些吧！',
+      noChallenges: '暂无进行中的挑战',
+      noAchievements: '还没有解锁成就，继续努力！',
+      acceptRequest: '接受',
+      declineRequest: '拒绝',
+      joinChallenge: '加入挑战',
+      viewProgress: '查看进度',
+      challengeProgress: '挑战进度',
+      challengeParticipants: '参与人数',
+      challengeTimeLeft: '剩余时间',
+      challengeYourRank: '你的排名',
+      achievementsLocked: '成就锁定',
+      achievementsUnlocked: '成就解锁',
+      likeAchievement: '点赞',
+      achievementLikesReceived: '收到的点赞',
+      searchNoResults: '未找到匹配的用户',
+      searchPlaceholder: '输入好友昵称或ID',
+      challengeCreatedSuccess: '挑战创建成功！',
+      friendRequestSent: '好友请求已发送',
+      friendRequestAccepted: '已成为好友',
+      friendRequestDeclined: '已拒绝好友请求',
+      leaderboardTop3: '前三名',
+      leaderboardYourPosition: '你的位置'
     },
     'zh-HK': {
       languageName: '繁體中文',
@@ -292,7 +345,60 @@ const PomolandCore = (() => {
       needSeeds: '種子不足，先完成 Focus Mode 獲得 Bonus。',
       needWater: '水滴不足，先完成 Focus Mode 獲得 Bonus。',
       needCoins: '金幣不足，先完成 Focus Mode 獲得 Bonus。',
-      aiFallbackEncouragement: 'AI 暫時無法使用，這裡有一些默認任務！'
+      aiFallbackEncouragement: 'AI 暫時無法使用，這裡有一些默認任務！',
+      friendsListTab: '好友列表',
+      leaderboardTab: '排行榜',
+      challengesTab: '挑戰賽',
+      achievementsTab: '成就牆',
+      friendsListTitle: '我的好友',
+      addFriendBtn: '添加好友',
+      leaderboardFocus: '專注時長',
+      leaderboardStreak: '連勝天數',
+      leaderboardIsland: '島嶼等級',
+      challengesTitle: '進行中的挑戰',
+      createChallengeBtn: '創建挑戰',
+      myAchievements: '我的成就',
+      addFriendTitle: '添加好友',
+      searchFriend: '搜索好友',
+      searchBtn: '搜索',
+      pendingRequests: '好友請求',
+      createChallengeTitle: '創建挑戰',
+      newChallenge: '新建挑戰賽',
+      challengeName: '挑戰名稱',
+      challengeType: '挑戰類型',
+      challengeTypeStreak: '連續打卡競賽',
+      challengeTypeFocus: '專注時長競賽',
+      challengeTypeIsland: '島嶼建設競賽',
+      challengeDuration: '挑戰時長',
+      durationWeek: '1週',
+      durationTwoWeeks: '2週',
+      durationMonth: '1個月',
+      challengeInvite: '邀請好友',
+      createChallengeSubmit: '創建並邀請',
+      achievementTitle: '成就詳情',
+      noFriends: '還沒有好友，去添加一些吧！',
+      noChallenges: '暫無進行中的挑戰',
+      noAchievements: '還沒有解鎖成就，繼續努力！',
+      acceptRequest: '接受',
+      declineRequest: '拒絕',
+      joinChallenge: '加入挑戰',
+      viewProgress: '查看進度',
+      challengeProgress: '挑戰進度',
+      challengeParticipants: '參與人數',
+      challengeTimeLeft: '剩餘時間',
+      challengeYourRank: '你的排名',
+      achievementsLocked: '成就鎖定',
+      achievementsUnlocked: '成就解鎖',
+      likeAchievement: '點讚',
+      achievementLikesReceived: '收到的點讚',
+      searchNoResults: '未找到匹配的用戶',
+      searchPlaceholder: '輸入好友暱稱或ID',
+      challengeCreatedSuccess: '挑戰創建成功！',
+      friendRequestSent: '好友請求已發送',
+      friendRequestAccepted: '已成為好友',
+      friendRequestDeclined: '已拒絕好友請求',
+      leaderboardTop3: '前三名',
+      leaderboardYourPosition: '你的位置'
     },
     en: {
       languageName: 'English',
@@ -438,7 +544,60 @@ const PomolandCore = (() => {
       needSeeds: 'Not enough seeds. Finish Focus Mode to earn a Bonus.',
       needWater: 'Not enough water. Finish Focus Mode to earn a Bonus.',
       needCoins: 'Not enough coins. Finish Focus Mode to earn a Bonus.',
-      aiFallbackEncouragement: 'AI is currently unavailable, here are some default tasks!'
+      aiFallbackEncouragement: 'AI is currently unavailable, here are some default tasks!',
+      friendsListTab: 'Friends List',
+      leaderboardTab: 'Leaderboard',
+      challengesTab: 'Challenges',
+      achievementsTab: 'Achievements',
+      friendsListTitle: 'My Friends',
+      addFriendBtn: 'Add Friend',
+      leaderboardFocus: 'Focus Time',
+      leaderboardStreak: 'Streak Days',
+      leaderboardIsland: 'Island Level',
+      challengesTitle: 'Active Challenges',
+      createChallengeBtn: 'Create Challenge',
+      myAchievements: 'My Achievements',
+      addFriendTitle: 'Add Friend',
+      searchFriend: 'Search Friends',
+      searchBtn: 'Search',
+      pendingRequests: 'Friend Requests',
+      createChallengeTitle: 'Create Challenge',
+      newChallenge: 'New Challenge',
+      challengeName: 'Challenge Name',
+      challengeType: 'Challenge Type',
+      challengeTypeStreak: 'Check-in Streak',
+      challengeTypeFocus: 'Focus Time',
+      challengeTypeIsland: 'Island Building',
+      challengeDuration: 'Challenge Duration',
+      durationWeek: '1 Week',
+      durationTwoWeeks: '2 Weeks',
+      durationMonth: '1 Month',
+      challengeInvite: 'Invite Friends',
+      createChallengeSubmit: 'Create & Invite',
+      achievementTitle: 'Achievement Details',
+      noFriends: 'No friends yet, add some!',
+      noChallenges: 'No active challenges',
+      noAchievements: 'No achievements yet, keep working!',
+      acceptRequest: 'Accept',
+      declineRequest: 'Decline',
+      joinChallenge: 'Join Challenge',
+      viewProgress: 'View Progress',
+      challengeProgress: 'Challenge Progress',
+      challengeParticipants: 'Participants',
+      challengeTimeLeft: 'Time Left',
+      challengeYourRank: 'Your Rank',
+      achievementsLocked: 'Achievement Locked',
+      achievementsUnlocked: 'Achievement Unlocked',
+      likeAchievement: 'Like',
+      achievementLikesReceived: 'Likes Received',
+      searchNoResults: 'No matching users found',
+      searchPlaceholder: 'Enter friend name or ID',
+      challengeCreatedSuccess: 'Challenge created successfully!',
+      friendRequestSent: 'Friend request sent',
+      friendRequestAccepted: 'You are now friends',
+      friendRequestDeclined: 'Friend request declined',
+      leaderboardTop3: 'Top 3',
+      leaderboardYourPosition: 'Your position'
     }
   };
 
@@ -461,14 +620,78 @@ const PomolandCore = (() => {
   const CROP_VISUALS = ['seedling', 'leafy', 'flowering', 'fruiting'];
   const DECORATION_SEQUENCE = ['Shell lamp', 'Study flag', 'Harbor lights'];
   const FRIENDS = [
-    { id: 'mia', name: 'Mia', statusKey: 'Focus 42m', color: 'mint' },
-    { id: 'leo', name: 'Leo', statusKey: 'Streak 12d', color: 'tomato' },
-    { id: 'noah', name: 'Noah', statusKey: 'New dock', color: 'sun' }
+    { id: 'mia', name: 'Mia', statusKey: 'Focus 42m', color: 'mint', focusMinutes: 42, streak: 8, islandLevel: 3, avatar: 'M' },
+    { id: 'leo', name: 'Leo', statusKey: 'Streak 12d', color: 'tomato', focusMinutes: 35, streak: 12, islandLevel: 4, avatar: 'L' },
+    { id: 'noah', name: 'Noah', statusKey: 'New dock', color: 'sun', focusMinutes: 58, streak: 5, islandLevel: 2, avatar: 'N' },
+    { id: 'emma', name: 'Emma', statusKey: 'Focus 65m', color: 'leaf', focusMinutes: 65, streak: 18, islandLevel: 5, avatar: 'E' },
+    { id: 'alex', name: 'Alex', statusKey: 'Streak 7d', color: 'teal', focusMinutes: 28, streak: 7, islandLevel: 3, avatar: 'A' }
   ];
   const FRIEND_DETAILS = {
     mia: { focusMinutes: 42, moodKey: 'friendMiaMood', noteKey: 'friendMiaNote', resources: ['Water +1', 'Coins +10'] },
     leo: { focusMinutes: 35, moodKey: 'friendLeoMood', noteKey: 'friendLeoNote', resources: ['Fruit +1', 'Chance -1'] },
-    noah: { focusMinutes: 58, moodKey: 'friendNoahMood', noteKey: 'friendNoahNote', resources: ['Decor idea', 'Solar dock'] }
+    noah: { focusMinutes: 58, moodKey: 'friendNoahMood', noteKey: 'friendNoahNote', resources: ['Decor idea', 'Solar dock'] },
+    emma: { focusMinutes: 65, moodKey: 'friendMiaMood', noteKey: 'friendMiaNote', resources: ['Water +1', 'Coins +10'] },
+    alex: { focusMinutes: 28, moodKey: 'friendLeoMood', noteKey: 'friendLeoNote', resources: ['Fruit +1', 'Chance -1'] }
+  };
+
+  // Social module data structures
+  const SOCIAL_DATA = {
+    availableUsers: [
+      { id: 'sarah', name: 'Sarah', nickname: 'Sarah', focusMinutes: 45, streak: 15, islandLevel: 4, avatar: 'S', status: 'online' },
+      { id: 'mike', name: 'Mike', nickname: 'Mike', focusMinutes: 38, streak: 9, islandLevel: 3, avatar: 'M', status: 'offline' },
+      { id: 'lisa', name: 'Lisa', nickname: 'Lisa', focusMinutes: 52, streak: 22, islandLevel: 5, avatar: 'L', status: 'online' },
+      { id: 'david', name: 'David', nickname: 'David', focusMinutes: 41, streak: 6, islandLevel: 2, avatar: 'D', status: 'away' },
+      { id: 'anna', name: 'Anna', nickname: 'Anna', focusMinutes: 33, streak: 11, islandLevel: 3, avatar: 'A', status: 'online' }
+    ],
+    friendRequests: [],
+    challenges: [
+      {
+        id: 'challenge-1',
+        name: '本周专注挑战',
+        type: 'focus_time',
+        duration: 7,
+        startDate: '2026-05-10',
+        endDate: '2026-05-17',
+        participants: ['mia', 'leo', 'noah'],
+        createdBy: 'mia',
+        status: 'active',
+        progress: {
+          mia: { value: 320, unit: 'minutes' },
+          leo: { value: 285, unit: 'minutes' },
+          noah: { value: 198, unit: 'minutes' }
+        }
+      },
+      {
+        id: 'challenge-2',
+        name: '连胜竞赛',
+        type: 'checkin_streak',
+        duration: 14,
+        startDate: '2026-05-08',
+        endDate: '2026-05-22',
+        participants: ['emma', 'alex'],
+        createdBy: 'emma',
+        status: 'active',
+        progress: {
+          emma: { value: 18, unit: 'days' },
+          alex: { value: 7, unit: 'days' }
+        }
+      }
+    ],
+    achievements: [
+      { id: 'first-checkin', name: '初次打卡', icon: '🎯', description: '完成第一次打卡', unlocked: true, progress: 1, target: 1 },
+      { id: 'streak-7', name: '一周连胜', icon: '🔥', description: '连续打卡7天', unlocked: true, progress: 5, target: 7 },
+      { id: 'streak-30', name: '月度连胜', icon: '⭐', description: '连续打卡30天', unlocked: false, progress: 5, target: 30 },
+      { id: 'focus-100', name: '专注大师', icon: '⏱️', description: '累计专注100分钟', unlocked: true, progress: 70, target: 100 },
+      { id: 'focus-500', name: '专注达人', icon: '💎', description: '累计专注500分钟', unlocked: false, progress: 70, target: 500 },
+      { id: 'island-lvl-5', name: '岛屿繁荣', icon: '🏝️', description: '岛屿达到5级', unlocked: false, progress: 1, target: 5 },
+      { id: 'friends-10', name: '社交达人', icon: '👥', description: '添加10个好友', unlocked: false, progress: 3, target: 10 },
+      { id: 'challenge-win', name: '挑战冠军', icon: '🏆', description: '赢得一个挑战赛', unlocked: false, progress: 0, target: 1 }
+    ],
+    likesReceived: [
+      { from: 'mia', achievementId: 'streak-7', time: '2026-05-14T10:30:00Z' },
+      { from: 'leo', achievementId: 'focus-100', time: '2026-05-13T15:45:00Z' }
+    ],
+    givenLikes: []
   };
 
   function normalizeLanguage(language) {
@@ -519,7 +742,17 @@ const PomolandCore = (() => {
         'zh-CN': '完成 Focus Mode 后可以继续建设 Pomoland。',
         'zh-HK': '完成 Focus Mode 後可以繼續建設 Pomoland。',
         en: 'Complete Focus Mode to keep building Pomoland.'
-      }
+      },
+      // Social module state
+      myFriends: ['mia', 'leo', 'noah'],
+      friendRequests: SOCIAL_DATA.friendRequests,
+      myChallenges: [],
+      myAchievements: SOCIAL_DATA.achievements.map(ach => ({ ...ach })),
+      totalFocusMinutes: 70,
+      likesReceived: SOCIAL_DATA.likesReceived,
+      givenLikes: SOCIAL_DATA.givenLikes,
+      activeTab: 'friends-list',
+      activeLeaderboard: 'focus'
     };
   }
 
@@ -1143,7 +1376,184 @@ const PomolandCore = (() => {
     performFriendAction,
     getFriendVisitDetails,
     buildReport,
-    todayIso
+    todayIso,
+    SOCIAL_DATA
+  };
+})();
+
+// Social Module Functions (Extended)
+const SocialModule = (() => {
+  function addFriend(state, friendId) {
+    const next = { ...state };
+    if (!next.myFriends) next.myFriends = [];
+    if (!next.myFriends.includes(friendId)) {
+      next.myFriends.push(friendId);
+    }
+    return next;
+  }
+
+  function removeFriend(state, friendId) {
+    const next = { ...state };
+    next.myFriends = (next.myFriends || []).filter(id => id !== friendId);
+    return next;
+  }
+
+  function sendFriendRequest(state, targetId) {
+    const next = { ...state };
+    if (!next.friendRequests) next.friendRequests = [];
+    next.friendRequests.push({
+      id: `req-${Date.now()}`,
+      from: 'current-user',
+      to: targetId,
+      status: 'pending',
+      timestamp: Date.now()
+    });
+    return next;
+  }
+
+  function acceptFriendRequest(state, requestId) {
+    const next = { ...state };
+    const request = (next.friendRequests || []).find(r => r.id === requestId);
+    if (request) {
+      next.friendRequests = next.friendRequests.filter(r => r.id !== requestId);
+      if (!next.myFriends) next.myFriends = [];
+      next.myFriends.push(request.from);
+    }
+    return next;
+  }
+
+  function declineFriendRequest(state, requestId) {
+    const next = { ...state };
+    next.friendRequests = (next.friendRequests || []).filter(r => r.id !== requestId);
+    return next;
+  }
+
+  function createChallenge(state, challengeData) {
+    const next = { ...state };
+    if (!next.myChallenges) next.myChallenges = [];
+    const newChallenge = {
+      id: `challenge-${Date.now()}`,
+      ...challengeData,
+      status: 'active',
+      createdBy: 'current-user',
+      createdAt: new Date().toISOString(),
+      progress: {
+        'current-user': { value: 0, unit: getChallengeUnit(challengeData.type) }
+      }
+    };
+    next.myChallenges.push(newChallenge);
+    return next;
+  }
+
+  function joinChallenge(state, challengeId) {
+    const next = { ...state };
+    if (!next.myChallenges) next.myChallenges = [];
+    const challenge = SOCIAL_DATA.challenges.find(c => c.id === challengeId);
+    if (challenge) {
+      const existing = next.myChallenges.find(c => c.id === challengeId);
+      if (!existing) {
+        next.myChallenges.push({
+          ...challenge,
+          joinedAt: new Date().toISOString()
+        });
+      }
+    }
+    return next;
+  }
+
+  function getChallengeUnit(type) {
+    return type === 'checkin_streak' ? 'days' : type === 'focus_time' ? 'minutes' : 'points';
+  }
+
+  function likeAchievement(state, friendId, achievementId) {
+    const next = { ...state };
+    if (!next.givenLikes) next.givenLikes = [];
+    next.givenLikes.push({
+      to: friendId,
+      achievementId,
+      timestamp: Date.now()
+    });
+    return next;
+  }
+
+  function updateChallengeProgress(state, challengeId, value) {
+    const next = { ...state };
+    const challenge = next.myChallenges.find(c => c.id === challengeId);
+    if (challenge && challenge.progress) {
+      challenge.progress['current-user'] = {
+        value: value,
+        unit: getChallengeUnit(challenge.type)
+      };
+    }
+    return next;
+  }
+
+  function getLeaderboard(type, state) {
+    const users = [
+      {
+        id: 'current-user',
+        name: '我',
+        focusMinutes: state.totalFocusMinutes || 70,
+        streak: state.streak || 5,
+        islandLevel: state.islandLevel || 1,
+        isCurrentUser: true,
+        trend: 'up'
+      },
+      ...FRIENDS.filter(f => (state.myFriends || []).includes(f.id)).map(f => ({
+        id: f.id,
+        name: f.name,
+        focusMinutes: f.focusMinutes,
+        streak: f.streak,
+        islandLevel: f.islandLevel,
+        trend: ['up', 'down', 'same'][Math.floor(Math.random() * 3)]
+      })),
+      ...SOCIAL_DATA.availableUsers.slice(0, 3).map(u => ({
+        id: u.id,
+        name: u.name,
+        focusMinutes: u.focusMinutes,
+        streak: u.streak,
+        islandLevel: u.islandLevel,
+        trend: ['up', 'down', 'same'][Math.floor(Math.random() * 3)]
+      }))
+    ];
+
+    const sortBy = {
+      focus: (a, b) => b.focusMinutes - a.focusMinutes,
+      streak: (a, b) => b.streak - a.streak,
+      island: (a, b) => b.islandLevel - a.islandLevel
+    };
+
+    return users.sort(sortBy[type]).map((user, index) => ({
+      ...user,
+      rank: index + 1
+    }));
+  }
+
+  function getChallenges(state) {
+    const myChallengeIds = (state.myChallenges || []).map(c => c.id);
+    return [
+      ...(state.myChallenges || []),
+      ...SOCIAL_DATA.challenges.filter(c => !myChallengeIds.includes(c.id))
+    ];
+  }
+
+  function getAchievements(state) {
+    return state.myAchievements || SOCIAL_DATA.achievements;
+  }
+
+  return {
+    addFriend,
+    removeFriend,
+    sendFriendRequest,
+    acceptFriendRequest,
+    declineFriendRequest,
+    createChallenge,
+    joinChallenge,
+    likeAchievement,
+    updateChallengeProgress,
+    getLeaderboard,
+    getChallenges,
+    getAchievements
   };
 })();
 
@@ -1237,7 +1647,34 @@ if (typeof document !== 'undefined') {
       codeInput: document.querySelector('#codeInput'),
       nicknameInput: document.querySelector('#nicknameInput'),
       sendCodeBtn: document.querySelector('#sendCodeBtn'),
-      confirmLoginBtn: document.querySelector('#confirmLoginBtn')
+      confirmLoginBtn: document.querySelector('#confirmLoginBtn'),
+      // Social module elements
+      addFriendBtn: document.querySelector('#addFriendBtn'),
+      createChallengeBtn: document.querySelector('#createChallengeBtn'),
+      addFriendModal: document.querySelector('#addFriendModal'),
+      closeAddFriend: document.querySelector('#closeAddFriend'),
+      friendSearchInput: document.querySelector('#friendSearchInput'),
+      searchFriendBtn: document.querySelector('#searchFriendBtn'),
+      searchResults: document.querySelector('#searchResults'),
+      requestsList: document.querySelector('#requestsList'),
+      createChallengeModal: document.querySelector('#createChallengeModal'),
+      closeCreateChallenge: document.querySelector('#closeCreateChallenge'),
+      challengeNameInput: document.querySelector('#challengeNameInput'),
+      challengeTypeSelect: document.querySelector('#challengeTypeSelect'),
+      challengeDurationSelect: document.querySelector('#challengeDurationSelect'),
+      challengeInviteList: document.querySelector('#challengeInviteList'),
+      createChallengeSubmit: document.querySelector('#createChallengeSubmit'),
+      achievementModal: document.querySelector('#achievementModal'),
+      closeAchievement: document.querySelector('#closeAchievement'),
+      achievementDetail: document.querySelector('#achievementDetail'),
+      friendsListPanel: document.querySelector('#friendsListPanel'),
+      leaderboardPanel: document.querySelector('#leaderboardPanel'),
+      challengesPanel: document.querySelector('#challengesPanel'),
+      achievementsPanel: document.querySelector('#achievementsPanel'),
+      leaderboardContent: document.querySelector('#leaderboardContent'),
+      challengesList: document.querySelector('#challengesList'),
+      achievementsGrid: document.querySelector('#achievementsGrid'),
+      achievementsLikes: document.querySelector('#achievementsLikes')
     };
 
     const STORAGE_KEYS = {
@@ -2400,25 +2837,224 @@ if (typeof document !== 'undefined') {
 
     function renderFriends() {
       if (!elements.friendGrid) return;
-      elements.friendGrid.innerHTML = core.FRIENDS.map((friend) => {
+      const myFriends = (state.myFriends || []);
+      const friendsData = core.FRIENDS.filter(f => myFriends.includes(f.id));
+
+      if (friendsData.length === 0) {
+        elements.friendGrid.innerHTML = `
+          <div class="empty-state">
+            <strong>${core.t(language, 'noFriends')}</strong>
+            <span>${core.t(language, 'addFriendBtn')}</span>
+          </div>
+        `;
+        return;
+      }
+
+      elements.friendGrid.innerHTML = friendsData.map((friend) => {
         const message = state.friendMessages[friend.id];
         const visitDetails = core.getFriendVisitDetails(friend.id, language);
         return `
           <article class="friend-card">
-            <div class="friend-island friend-${friend.color}"></div>
-            <div>
-              <h3>${friend.name}</h3>
-              <p>${escapeHtml(visitDetails.mood)}</p>
-              <span class="friend-message">${message ? (message[language] || message.en) : '&nbsp;'}</span>
+            <div class="friend-card-header">
+              <div class="friend-avatar">${friend.avatar || friend.name[0]}</div>
+              <div class="friend-info">
+                <h4>${escapeHtml(friend.name)}</h4>
+                <span>${visitDetails.focusMinutes}m · ${core.t(language, 'streak')} ${friend.streak}d</span>
+              </div>
             </div>
-            <div class="friend-actions">
+            <div class="friend-stats">
+              <div class="friend-stat">
+                <small>${core.t(language, 'statFocus')}</small>
+                <strong>${visitDetails.focusMinutes}m</strong>
+              </div>
+              <div class="friend-stat">
+                <small>${core.t(language, 'statIsland')}</small>
+                <strong>Lv.${friend.islandLevel}</strong>
+              </div>
+              <div class="friend-stat">
+                <small>${core.t(language, 'streak')}</small>
+                <strong>${friend.streak}d</strong>
+              </div>
+              <div class="friend-stat">
+                <small>Status</small>
+                <strong style="color: var(--leaf-500)">Online</strong>
+              </div>
+            </div>
+            <div class="friend-card-actions">
               <button type="button" class="small-button" data-friend="${friend.id}" data-action="help">${core.t(language, 'help')}</button>
               <button type="button" class="small-button secondary" data-friend="${friend.id}" data-action="visit">${core.t(language, 'visit')}</button>
-              <button type="button" class="small-button ghost" data-friend="${friend.id}" data-action="steal">${core.t(language, 'steal')}</button>
+              <button type="button" class="small-button ghost" data-friend="${friend.id}" data-action="remove">Remove</button>
+            </div>
+            <span class="friend-message">${message ? (message[language] || message.en) : ''}</span>
+          </article>
+        `;
+      }).join('');
+
+      renderSocialTabs();
+    }
+
+    function renderSocialTabs() {
+      document.querySelectorAll('.friends-tab-button').forEach(btn => {
+        btn.classList.toggle('is-active', btn.dataset.friendsTab === (state.activeTab || 'friends-list'));
+      });
+
+      ['friendsListPanel', 'leaderboardPanel', 'challengesPanel', 'achievementsPanel'].forEach(panelId => {
+        const panel = document.getElementById(panelId);
+        if (panel) {
+          const isActive = (state.activeTab || 'friends-list') === panelId.replace('Panel', '').toLowerCase().replace('friendslist', 'friends-list');
+          panel.hidden = !isActive;
+          if (isActive) {
+            if (panelId === 'friendsListPanel') renderFriends();
+            if (panelId === 'leaderboardPanel') renderLeaderboard();
+            if (panelId === 'challengesPanel') renderChallenges();
+            if (panelId === 'achievementsPanel') renderAchievements();
+          }
+        }
+      });
+    }
+
+    function renderLeaderboard() {
+      if (!elements.leaderboardContent) return;
+      const type = state.activeLeaderboard || 'focus';
+      const leaderboard = SocialModule.getLeaderboard(type, state);
+
+      const unitLabel = type === 'focus' ? '分钟' : type === 'streak' ? '天' : '级';
+      const valueKey = type === 'focus' ? 'focusMinutes' : type === 'streak' ? 'streak' : 'islandLevel';
+
+      elements.leaderboardContent.innerHTML = leaderboard.map((user, index) => `
+        <div class="leaderboard-item ${user.isCurrentUser ? 'current-user' : ''}">
+          <div class="leaderboard-rank">${user.rank}</div>
+          <div class="leaderboard-user">
+            <div class="leaderboard-user-avatar" style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--${user.rank <= 3 ? 'sun' : 'teal'}-500),var(--${user.rank <= 3 ? 'tomato' : 'leaf'}-500));display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:14px;">
+              ${user.isCurrentUser ? '我' : (user.avatar || user.name[0])}
+            </div>
+            <div class="leaderboard-user-info">
+              <strong>${escapeHtml(user.name)}</strong>
+              <span>${user.trend === 'up' ? '↑ 上升' : user.trend === 'down' ? '↓ 下降' : '→ 持平'}</span>
+            </div>
+          </div>
+          <div class="leaderboard-value">${user[valueKey]}${unitLabel}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderChallenges() {
+      if (!elements.challengesList) return;
+      const challenges = SocialModule.getChallenges(state);
+
+      if (challenges.length === 0) {
+        elements.challengesList.innerHTML = `
+          <div class="empty-state">
+            <strong>${core.t(language, 'noChallenges')}</strong>
+            <span>${core.t(language, 'createChallengeBtn')}</span>
+          </div>
+        `;
+        return;
+      }
+
+      elements.challengesList.innerHTML = challenges.map(challenge => {
+        const typeLabel = challenge.type === 'checkin_streak' ? core.t(language, 'challengeTypeStreak') :
+                          challenge.type === 'focus_time' ? core.t(language, 'challengeTypeFocus') :
+                          core.t(language, 'challengeTypeIsland');
+        const durationLabel = `${challenge.duration}天`;
+
+        const participants = challenge.participants.map(id => {
+          const friend = core.FRIENDS.find(f => f.id === id);
+          return friend ? friend.name : id;
+        }).join(', ');
+
+        const myProgress = challenge.progress['current-user'] || { value: 0, unit: 'minutes' };
+        const maxProgress = Math.max(...Object.values(challenge.progress).map(p => p.value), myProgress.value + 50);
+
+        return `
+          <article class="challenge-card ${challenge.status === 'active' ? 'active' : ''}">
+            <div class="challenge-card-header">
+              <div class="challenge-title">
+                <h4>${escapeHtml(challenge.name)}</h4>
+                <span>${typeLabel} · ${durationLabel}</span>
+              </div>
+              <span class="challenge-badge ${challenge.status === 'completed' ? 'completed' : ''}">
+                ${challenge.status === 'active' ? '进行中' : '已完成'}
+              </span>
+            </div>
+            <div class="challenge-card-content">
+              <div class="challenge-stat">
+                <small>${core.t(language, 'challengeParticipants')}</small>
+                <strong>${challenge.participants.length}</strong>
+              </div>
+              <div class="challenge-stat">
+                <small>${core.t(language, 'challengeYourRank')}</small>
+                <strong>#${Object.entries(challenge.progress).sort((a, b) => b[1].value - a[1].value).findIndex(([id]) => id === 'current-user') + 1}</strong>
+              </div>
+              <div class="challenge-stat">
+                <small>我的进度</small>
+                <strong>${myProgress.value} ${myProgress.unit === 'minutes' ? '分钟' : myProgress.unit === 'days' ? '天' : '分'}</strong>
+              </div>
+            </div>
+            <div class="challenge-card-footer">
+              <div class="challenge-progress">
+                <div class="challenge-progress-bar">
+                  <div class="challenge-progress-fill" style="width:${(myProgress.value / maxProgress) * 100}%"></div>
+                </div>
+                <span class="challenge-progress-text">进度: ${Math.round((myProgress.value / maxProgress) * 100)}%</span>
+              </div>
+              <button class="small-button secondary" type="button" data-challenge-id="${challenge.id}">${core.t(language, 'viewProgress')}</button>
             </div>
           </article>
         `;
       }).join('');
+    }
+
+    function renderAchievements() {
+      if (!elements.achievementsGrid) return;
+      const achievements = SocialModule.getAchievements(state);
+
+      elements.achievementsGrid.innerHTML = achievements.map(ach => `
+        <article class="achievement-item ${ach.unlocked ? '' : 'locked'}" data-achievement-id="${ach.id}">
+          <div class="achievement-icon">${ach.icon}</div>
+          <h5>${escapeHtml(ach.name)}</h5>
+          <p>${escapeHtml(ach.description)}</p>
+          ${ach.unlocked ? '' : `<small style="color:var(--ink-400)">进度: ${ach.progress}/${ach.target}</small>`}
+        </article>
+      `).join('');
+
+      // Render likes received
+      if (elements.achievementsLikes) {
+        const likes = (state.likesReceived || []);
+        if (likes.length === 0) {
+          elements.achievementsLikes.innerHTML = `
+            <h4>${core.t(language, 'achievementLikesReceived')}</h4>
+            <div class="empty-state" style="padding:20px;">
+              <span>还没有收到点赞</span>
+            </div>
+          `;
+        } else {
+          elements.achievementsLikes.innerHTML = `
+            <h4>${core.t(language, 'achievementLikesReceived')}</h4>
+            <div class="achievement-likes-list">
+              ${likes.map(like => {
+                const friend = core.FRIENDS.find(f => f.id === like.from) || { name: like.from, avatar: like.from[0] };
+                const achievement = achievements.find(a => a.id === like.achievementId) || { name: '成就', icon: '🏆' };
+                const timeAgo = Math.floor((Date.now() - new Date(like.time).getTime()) / 86400000);
+                return `
+                  <div class="achievement-like-item">
+                    <div class="achievement-like-avatar">${friend.avatar || friend.name[0]}</div>
+                    <div class="achievement-like-info">
+                      <strong>${escapeHtml(friend.name)}</strong>
+                      <span>点赞了 ${achievement.icon} ${escapeHtml(achievement.name)}</span>
+                      <span style="font-size:10px;color:var(--ink-400);">${timeAgo}天前</span>
+                    </div>
+                    <button class="achievement-like-btn" data-like-id="${like.from}-${like.achievementId}">
+                      <span class="icon">❤️</span>
+                      ${core.t(language, 'likeAchievement')}
+                    </button>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          `;
+        }
+      }
     }
 
     function renderReport() {
@@ -2795,6 +3431,165 @@ if (typeof document !== 'undefined') {
         .replace(/'/g, '&#039;');
     }
 
+    // Social module helper functions
+    function renderSearchUsers() {
+      if (!elements.searchResults) return;
+      const availableUsers = core.SOCIAL_DATA.availableUsers.filter(
+        user => !(state.myFriends || []).includes(user.id)
+      );
+
+      if (availableUsers.length === 0) {
+        elements.searchResults.innerHTML = `
+          <div class="empty-state" style="padding:16px;">
+            <span>没有可添加的用户</span>
+          </div>
+        `;
+        return;
+      }
+
+      elements.searchResults.innerHTML = availableUsers.slice(0, 5).map(user => `
+        <div class="search-result-item">
+          <div class="result-avatar">${user.avatar || user.name[0]}</div>
+          <div class="result-info">
+            <strong>${escapeHtml(user.name)}</strong>
+            <span>${escapeHtml(user.nickname)}</span>
+          </div>
+          <button class="small-button secondary" data-search-result="${user.id}">
+            ${core.t(language, 'addFriendBtn')}
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function renderSearchResults(searchTerm) {
+      if (!elements.searchResults) return;
+      if (!searchTerm) {
+        renderSearchUsers();
+        return;
+      }
+
+      const filteredUsers = core.SOCIAL_DATA.availableUsers.filter(user =>
+        !(state.myFriends || []).includes(user.id) &&
+        (user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+         user.nickname.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
+
+      if (filteredUsers.length === 0) {
+        elements.searchResults.innerHTML = `
+          <div class="empty-state" style="padding:16px;">
+            <strong>${core.t(language, 'searchNoResults')}</strong>
+          </div>
+        `;
+        return;
+      }
+
+      elements.searchResults.innerHTML = filteredUsers.map(user => `
+        <div class="search-result-item">
+          <div class="result-avatar">${user.avatar || user.name[0]}</div>
+          <div class="result-info">
+            <strong>${escapeHtml(user.name)}</strong>
+            <span>${escapeHtml(user.nickname)}</span>
+          </div>
+          <button class="small-button secondary" data-search-result="${user.id}">
+            ${core.t(language, 'addFriendBtn')}
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function renderPendingRequests() {
+      if (!elements.requestsList) return;
+      const requests = (state.friendRequests || []).filter(r => r.to === 'current-user');
+
+      if (requests.length === 0) {
+        elements.requestsList.innerHTML = `
+          <div class="empty-state" style="padding:12px;">
+            <span>没有待处理的好友请求</span>
+          </div>
+        `;
+        return;
+      }
+
+      elements.requestsList.innerHTML = requests.map(request => {
+        const user = core.SOCIAL_DATA.availableUsers.find(u => u.id === request.from) ||
+                   core.FRIENDS.find(f => f.id === request.from);
+        if (!user) return '';
+        return `
+          <div class="request-item">
+            <div class="request-item-avatar">${user.avatar || user.name[0]}</div>
+            <div class="request-item-info">
+              <strong>${escapeHtml(user.name)}</strong>
+              <span>请求添加你为好友</span>
+            </div>
+            <div class="request-item-actions">
+              <button class="small-button secondary" data-accept-request="${request.id}">
+                ${core.t(language, 'acceptRequest')}
+              </button>
+              <button class="small-button ghost" data-decline-request="${request.id}">
+                ${core.t(language, 'declineRequest')}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderChallengeInviteList() {
+      if (!elements.challengeInviteList) return;
+      const friends = core.FRIENDS.filter(f => (state.myFriends || []).includes(f.id));
+
+      if (friends.length === 0) {
+        elements.challengeInviteList.innerHTML = `
+          <div class="empty-state" style="padding:12px;">
+            <span>还没有好友，先添加好友</span>
+          </div>
+        `;
+        return;
+      }
+
+      elements.challengeInviteList.innerHTML = friends.map(friend => `
+        <label class="invite-checkbox">
+          <input type="checkbox" value="${friend.id}" data-invite-checkbox>
+          <span>${escapeHtml(friend.name)}</span>
+        </label>
+      `).join('');
+    }
+
+    function renderAchievementDetail(achievement) {
+      if (!elements.achievementDetail) return;
+
+      const progressPercent = achievement.unlocked ? 100 : Math.round((achievement.progress / achievement.target) * 100);
+
+      elements.achievementDetail.innerHTML = `
+        <div class="achievement-detail-header">
+          <div class="achievement-detail-icon" style="font-size:48px;">${achievement.icon}</div>
+          <div class="achievement-detail-info">
+            <h3>${escapeHtml(achievement.name)}</h3>
+            <p>${escapeHtml(achievement.description)}</p>
+          </div>
+        </div>
+        ${achievement.unlocked ? `
+          <div style="background:linear-gradient(135deg,var(--leaf-500),var(--sun-500));color:#fff;padding:12px;border-radius:8px;text-align:center;">
+            <strong style="font-size:18px;">已解锁！</strong>
+          </div>
+        ` : `
+          <div class="achievement-detail-stats">
+            <div class="achievement-detail-stat">
+              <small>当前进度</small>
+              <strong>${achievement.progress}/${achievement.target}</strong>
+            </div>
+            <div class="achievement-detail-stat">
+              <small>完成度</small>
+              <strong>${progressPercent}%</strong>
+            </div>
+          </div>
+          <div style="margin-top:12px;background:var(--teal-100);border-radius:8px;padding:8px;">
+            <div style="height:8px;background:var(--teal-500);border-radius:4px;width:${progressPercent}%"></div>
+          </div>
+        `}
+      `;
+    }
+
     document.addEventListener('click', (event) => {
       const target = event.target.closest('button, a');
       if (!target) return;
@@ -3036,6 +3831,152 @@ if (typeof document !== 'undefined') {
         }
         renderAll();
         persistSession();
+      }
+
+      // Social module event handlers
+      if (target.matches('[data-friends-tab]')) {
+        state.activeTab = target.dataset.friendsTab;
+        renderSocialTabs();
+        persistSession();
+      }
+
+      if (target.id === 'addFriendBtn') {
+        if (elements.addFriendModal) {
+          elements.addFriendModal.hidden = false;
+          renderSearchUsers();
+          renderPendingRequests();
+        }
+      }
+
+      if (target.id === 'closeAddFriend') {
+        if (elements.addFriendModal) {
+          elements.addFriendModal.hidden = true;
+        }
+      }
+
+      if (target.id === 'searchFriendBtn') {
+        const searchTerm = elements.friendSearchInput ? elements.friendSearchInput.value.trim() : '';
+        renderSearchResults(searchTerm);
+      }
+
+      if (target.matches('[data-search-result]')) {
+        const userId = target.dataset.searchResult;
+        state = SocialModule.sendFriendRequest(state, userId);
+        state.lastMessage = {
+          'zh-CN': core.t(language, 'friendRequestSent'),
+          'zh-HK': core.t(language, 'friendRequestSent'),
+          en: core.t(language, 'friendRequestSent')
+        };
+        if (elements.addFriendModal) {
+          elements.addFriendModal.hidden = true;
+        }
+        renderAll();
+        persistSession();
+      }
+
+      if (target.matches('[data-accept-request]')) {
+        const requestId = target.dataset.acceptRequest;
+        state = SocialModule.acceptFriendRequest(state, requestId);
+        state.lastMessage = {
+          'zh-CN': core.t(language, 'friendRequestAccepted'),
+          'zh-HK': core.t(language, 'friendRequestAccepted'),
+          en: core.t(language, 'friendRequestAccepted')
+        };
+        renderPendingRequests();
+        renderAll();
+        persistSession();
+      }
+
+      if (target.matches('[data-decline-request]')) {
+        const requestId = target.dataset.declineRequest;
+        state = SocialModule.declineFriendRequest(state, requestId);
+        renderPendingRequests();
+        persistSession();
+      }
+
+      if (target.id === 'createChallengeBtn') {
+        if (elements.createChallengeModal) {
+          elements.createChallengeModal.hidden = false;
+          renderChallengeInviteList();
+        }
+      }
+
+      if (target.id === 'closeCreateChallenge') {
+        if (elements.createChallengeModal) {
+          elements.createChallengeModal.hidden = true;
+        }
+      }
+
+      if (target.id === 'createChallengeSubmit') {
+        const challengeName = elements.challengeNameInput ? elements.challengeNameInput.value.trim() : '';
+        const challengeType = elements.challengeTypeSelect ? elements.challengeTypeSelect.value : 'checkin_streak';
+        const challengeDuration = elements.challengeDurationSelect ? parseInt(elements.challengeDurationSelect.value) : 7;
+
+        if (!challengeName) {
+          alert('请输入挑战名称');
+          return;
+        }
+
+        const invitedFriends = Array.from(document.querySelectorAll('[data-invite-checkbox]:checked'))
+          .map(cb => cb.value);
+
+        state = SocialModule.createChallenge(state, {
+          name: challengeName,
+          type: challengeType,
+          duration: challengeDuration,
+          participants: invitedFriends
+        });
+
+        state.lastMessage = {
+          'zh-CN': core.t(language, 'challengeCreatedSuccess'),
+          'zh-HK': core.t(language, 'challengeCreatedSuccess'),
+          en: core.t(language, 'challengeCreatedSuccess')
+        };
+
+        if (elements.createChallengeModal) {
+          elements.createChallengeModal.hidden = true;
+        }
+        if (elements.challengeNameInput) elements.challengeNameInput.value = '';
+        renderAll();
+        persistSession();
+      }
+
+      if (target.matches('[data-leaderboard-type]')) {
+        state.activeLeaderboard = target.dataset.leaderboardType;
+        document.querySelectorAll('.leaderboard-tab').forEach(tab => {
+          tab.classList.toggle('is-active', tab.dataset.leaderboardType === state.activeLeaderboard);
+        });
+        renderLeaderboard();
+        persistSession();
+      }
+
+      if (target.matches('[data-challenge-id]')) {
+        const challengeId = target.dataset.challengeId;
+        const challenge = SocialModule.getChallenges(state).find(c => c.id === challengeId);
+        if (challenge) {
+          alert(`挑战详情：\n名称: ${challenge.name}\n类型: ${challenge.type}\n参与人数: ${challenge.participants.length}`);
+        }
+      }
+
+      if (target.matches('[data-achievement-id]')) {
+        const achievementId = target.dataset.achievementId;
+        const achievements = SocialModule.getAchievements(state);
+        const achievement = achievements.find(a => a.id === achievementId);
+        if (achievement && elements.achievementModal) {
+          renderAchievementDetail(achievement);
+          elements.achievementModal.hidden = false;
+        }
+      }
+
+      if (target.id === 'closeAchievement') {
+        if (elements.achievementModal) {
+          elements.achievementModal.hidden = true;
+        }
+      }
+
+      if (target.matches('[data-like-id]')) {
+        // Like button clicked - just show feedback for now
+        alert('感谢点赞！');
       }
     });
 

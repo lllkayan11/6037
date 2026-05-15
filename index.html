@@ -435,9 +435,53 @@
       <section class="workspace-panel" data-panel="friends" hidden>
         <div class="panel-heading">
           <p class="eyebrow">Friends</p>
-          <h2 data-i18n="friendsTitle">好友岛屿</h2>
+          <h2 data-i18n="friendsTitle">社交中心</h2>
         </div>
-        <div class="friend-grid" id="friendGrid"></div>
+        <div class="friends-tabs">
+          <button class="friends-tab-button is-active" data-friends-tab="friends-list" data-i18n="friendsListTab">好友列表</button>
+          <button class="friends-tab-button" data-friends-tab="leaderboard" data-i18n="leaderboardTab">排行榜</button>
+          <button class="friends-tab-button" data-friends-tab="challenges" data-i18n="challengesTab">挑战赛</button>
+          <button class="friends-tab-button" data-friends-tab="achievements" data-i18n="achievementsTab">成就墙</button>
+        </div>
+
+        <!-- 好友列表 -->
+        <div class="friends-content-panel" id="friendsListPanel">
+          <div class="friends-header">
+            <h3 data-i18n="friendsListTitle">我的好友</h3>
+            <div class="friends-header-actions">
+              <button class="secondary-button" type="button" id="addFriendBtn" data-i18n="addFriendBtn">添加好友</button>
+            </div>
+          </div>
+          <div class="friends-grid" id="friendGrid"></div>
+        </div>
+
+        <!-- 排行榜 -->
+        <div class="friends-content-panel" id="leaderboardPanel" hidden>
+          <div class="leaderboard-tabs">
+            <button class="leaderboard-tab is-active" data-leaderboard-type="focus" data-i18n="leaderboardFocus">专注时长</button>
+            <button class="leaderboard-tab" data-leaderboard-type="streak" data-i18n="leaderboardStreak">连胜天数</button>
+            <button class="leaderboard-tab" data-leaderboard-type="island" data-i18n="leaderboardIsland">岛屿等级</button>
+          </div>
+          <div class="leaderboard-content" id="leaderboardContent"></div>
+        </div>
+
+        <!-- 挑战赛 -->
+        <div class="friends-content-panel" id="challengesPanel" hidden>
+          <div class="challenges-header">
+            <h3 data-i18n="challengesTitle">进行中的挑战</h3>
+            <button class="primary-button" type="button" id="createChallengeBtn" data-i18n="createChallengeBtn">创建挑战</button>
+          </div>
+          <div class="challenges-list" id="challengesList"></div>
+        </div>
+
+        <!-- 成就墙 -->
+        <div class="friends-content-panel" id="achievementsPanel" hidden>
+          <div class="achievements-header">
+            <h3 data-i18n="myAchievements">我的成就</h3>
+          </div>
+          <div class="achievements-grid" id="achievementsGrid"></div>
+          <div class="achievements-likes" id="achievementsLikes"></div>
+        </div>
       </section>
 
       <section class="workspace-panel" data-panel="report" hidden>
@@ -503,6 +547,69 @@
       </div>
       <p class="visit-note" id="visitNote"></p>
       <button class="primary-button wide" id="closeVisitAction" type="button" data-i18n="visitClose">关闭参观</button>
+    </div>
+  </div>
+
+  <!-- 添加好友模态框 -->
+  <div class="modal-backdrop" id="addFriendModal" hidden>
+    <div class="modal-content" role="dialog" aria-modal="true">
+      <button class="modal-close" id="closeAddFriend" type="button" aria-label="Close">×</button>
+      <p class="eyebrow" data-i18n="addFriendTitle">添加好友</p>
+      <h2 data-i18n="searchFriend">搜索好友</h2>
+      <div class="search-box">
+        <input type="text" id="friendSearchInput" placeholder="输入好友昵称或ID" />
+        <button class="secondary-button" type="button" id="searchFriendBtn" data-i18n="searchBtn">搜索</button>
+      </div>
+      <div class="search-results" id="searchResults"></div>
+      <div class="pending-requests" id="pendingRequests">
+        <h3 data-i18n="pendingRequests">好友请求</h3>
+        <div id="requestsList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 创建挑战模态框 -->
+  <div class="modal-backdrop" id="createChallengeModal" hidden>
+    <div class="modal-content" role="dialog" aria-modal="true">
+      <button class="modal-close" id="closeCreateChallenge" type="button" aria-label="Close">×</button>
+      <p class="eyebrow" data-i18n="createChallengeTitle">创建挑战</p>
+      <h2 data-i18n="newChallenge">新建挑战赛</h2>
+      <div class="challenge-form">
+        <label>
+          <span data-i18n="challengeName">挑战名称</span>
+          <input type="text" id="challengeNameInput" placeholder="例如：本周专注挑战" />
+        </label>
+        <label>
+          <span data-i18n="challengeType">挑战类型</span>
+          <select id="challengeTypeSelect">
+            <option value="checkin_streak" data-i18n="challengeTypeStreak">连续打卡竞赛</option>
+            <option value="focus_time" data-i18n="challengeTypeFocus">专注时长竞赛</option>
+            <option value="island_growth" data-i18n="challengeTypeIsland">岛屿建设竞赛</option>
+          </select>
+        </label>
+        <label>
+          <span data-i18n="challengeDuration">挑战时长</span>
+          <select id="challengeDurationSelect">
+            <option value="7" data-i18n="durationWeek">1周</option>
+            <option value="14" data-i18n="durationTwoWeeks">2周</option>
+            <option value="30" data-i18n="durationMonth">1个月</option>
+          </select>
+        </label>
+        <label>
+          <span data-i18n="challengeInvite">邀请好友</span>
+          <div id="challengeInviteList"></div>
+        </label>
+      </div>
+      <button class="primary-button wide" type="button" id="createChallengeSubmit" data-i18n="createChallengeSubmit">创建并邀请</button>
+    </div>
+  </div>
+
+  <!-- 成就详情模态框 -->
+  <div class="modal-backdrop" id="achievementModal" hidden>
+    <div class="modal-content" role="dialog" aria-modal="true">
+      <button class="modal-close" id="closeAchievement" type="button" aria-label="Close">×</button>
+      <p class="eyebrow" data-i18n="achievementTitle">成就详情</p>
+      <div class="achievement-detail" id="achievementDetail"></div>
     </div>
   </div>
 
