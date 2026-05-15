@@ -2125,6 +2125,7 @@ if (typeof document !== 'undefined') {
 
     // 岛屿花园状态
     let islandState = IslandGardenModule.createIslandState();
+    let _pendingDemoCode = null;
     let currentTool = null;
     let selectedPlot = null;
     let currentFriendId = null;
@@ -4198,29 +4199,15 @@ if (typeof document !== 'undefined') {
         elements.sendCodeBtn.textContent = '发送中...';
         elements.sendCodeBtn.disabled = true;
 
-        fetch('http://localhost:5050/api/send-sms', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone })
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            elements.sendCodeBtn.textContent = '发送验证码';
-            elements.sendCodeBtn.disabled = false;
-            if (data.success) {
-              elements.loginStep1.hidden = true;
-              elements.loginStep2.hidden = false;
-              alert(`【演示用】验证码：${data.demo_code}`);
-            } else {
-              alert(data.message || '发送失败');
-            }
-          })
-          .catch((err) => {
-            elements.sendCodeBtn.textContent = '发送验证码';
-            elements.sendCodeBtn.disabled = false;
-            alert('SMS 后端未启动或请求失败。请先运行 server/app.py');
-            console.error(err);
-          });
+        // Client-side demo: 2 seconds later, show the demo code
+        _pendingDemoCode = String(Math.floor(100000 + Math.random() * 900000));
+        setTimeout(() => {
+          elements.sendCodeBtn.textContent = '发送验证码';
+          elements.sendCodeBtn.disabled = false;
+          elements.loginStep1.hidden = true;
+          elements.loginStep2.hidden = false;
+          alert(`【演示用】验证码：${_pendingDemoCode}`);
+        }, 1200);
         return;
       }
 
@@ -4230,29 +4217,19 @@ if (typeof document !== 'undefined') {
         const nickname = elements.nicknameInput.value.trim();
         if (!code || !nickname) return alert('请输入验证码和昵称');
 
-        fetch('http://localhost:5050/api/verify-code', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone, code })
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            if (data.success) {
-              writeStorage(STORAGE_KEYS.authState, {
-                loggedIn: true,
-                phone,
-                nickname
-              });
-              elements.authShell.hidden = true;
-              elements.homeShell.hidden = false;
-            } else {
-              alert(data.message || '验证码错误');
-            }
-          })
-          .catch((err) => {
-            alert('验证请求失败');
-            console.error(err);
-          });
+        if (code !== _pendingDemoCode) {
+          alert('验证码错误，请重新尝试发送验证码');
+          return;
+        }
+
+        writeStorage(STORAGE_KEYS.authState, {
+          loggedIn: true,
+          phone,
+          nickname
+        });
+        elements.authShell.hidden = true;
+        elements.homeShell.hidden = false;
+        _pendingDemoCode = null;
         return;
       }
 
