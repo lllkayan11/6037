@@ -503,6 +503,9 @@ const PomolandCore = (() => {
       islandHydration: 0,
       petMood: 'sleepy',
       streak: 5,
+      streakProtection: 1,
+      streakShieldActive: false,
+      milestoneClaims: [],
       checkIns: [],
       focusCompleted: false,
       friendMessages: {},
@@ -519,11 +522,14 @@ const PomolandCore = (() => {
       ...state,
       resources: { ...state.resources },
       decorations: [...state.decorations],
+      milestoneClaims: [...(state.milestoneClaims || [])],
       checkIns: [...state.checkIns],
       friendMessages: { ...state.friendMessages },
       lastMessage: { ...state.lastMessage },
       selectedTask: state.selectedTask ? { ...state.selectedTask } : null,
-      tasks: state.tasks.map((task) => ({ ...task }))
+      tasks: state.tasks.map((task) => ({ ...task })),
+      streakProtection: state.streakProtection || 0,
+      streakShieldActive: Boolean(state.streakShieldActive)
     };
   }
 
@@ -874,6 +880,52 @@ const PomolandCore = (() => {
     return next;
   }
 
+  function getNextTask(state) {
+    return (state.tasks || []).find((task) => !task.completed) || null;
+  }
+
+  function claimMilestoneReward(state, milestone) {
+    const next = copyState(state);
+    const normalizedMilestone = Number(milestone);
+    if (!normalizedMilestone || next.streak < normalizedMilestone || next.milestoneClaims.includes(normalizedMilestone)) {
+      return next;
+    }
+
+    const milestoneReward = {
+      7: { coins: 35, seeds: 1, water: 1, chances: 0, streakProtection: 1 },
+      30: { coins: 90, seeds: 2, water: 2, chances: 1, streakProtection: 1 },
+      100: { coins: 180, seeds: 3, water: 3, chances: 1, streakProtection: 2 }
+    }[normalizedMilestone] || { coins: 20, seeds: 1, water: 1, chances: 0, streakProtection: 0 };
+
+    next.resources.coins += milestoneReward.coins;
+    next.resources.seeds += milestoneReward.seeds;
+    next.resources.water += milestoneReward.water;
+    next.resources.chances += milestoneReward.chances;
+    next.streakProtection += milestoneReward.streakProtection;
+    next.milestoneClaims.push(normalizedMilestone);
+    next.lastMessage = {
+      'zh-CN': `已领取 ${normalizedMilestone} 天连胜奖励，继续保持专注节奏。`,
+      'zh-HK': `已領取 ${normalizedMilestone} 天連勝獎勵，繼續保持專注節奏。`,
+      en: `You claimed the ${normalizedMilestone}-day streak reward. Keep the rhythm going.`
+    };
+    return next;
+  }
+
+  function useStreakProtection(state) {
+    const next = copyState(state);
+    if (next.streakProtection <= 0 || next.streakShieldActive) {
+      return next;
+    }
+    next.streakProtection -= 1;
+    next.streakShieldActive = true;
+    next.lastMessage = {
+      'zh-CN': '已启用连胜保护卡，下次错过打卡时会优先保住连胜。',
+      'zh-HK': '已啟用連勝保護卡，下次錯過打卡時會優先保住連勝。',
+      en: 'Streak protection is now active. Your next missed check-in will be protected.'
+    };
+    return next;
+  }
+
   function getFriend(friendId) {
     return FRIENDS.find((friend) => friend.id === friendId) || FRIENDS[0];
   }
@@ -952,12 +1004,15 @@ const PomolandCore = (() => {
     const dayLabels = lang === 'en'
       ? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
       : ['一', '二', '三', '四', '五', '六', '日'];
+    const totalTasks = (state.tasks || []).length;
+    const completedTasks = (state.tasks || []).filter((task) => task.completed).length;
+    const completionRate = totalTasks ? Math.round((completedTasks / totalTasks) * 100) : 86;
     return {
       days: WEEKLY_FOCUS.map((value, index) => ({
         label: dayLabels[index],
         value
       })),
-      completionRate: 86,
+      completionRate,
       streak: state.streak,
       summary: COPY[lang].weeklySummary
     };
@@ -992,6 +1047,9 @@ const PomolandCore = (() => {
     resetTimerState,
     buildRewardBundle,
     recordCheckIn,
+    getNextTask,
+    claimMilestoneReward,
+    useStreakProtection,
     performFriendAction,
     getFriendVisitDetails,
     buildReport,
@@ -1029,10 +1087,15 @@ if (typeof document !== 'undefined') {
       timerRing: document.querySelector('#timerRing'),
       bonusModal: document.querySelector('#bonusModal'),
       bonusList: document.querySelector('#bonusList'),
+      bonusActions: document.querySelector('#bonusActions'),
       resourceRows: document.querySelectorAll('[data-resource]'),
       islandScene: document.querySelector('#islandScene'),
       islandMessage: document.querySelector('#islandMessage'),
       checkInGrid: document.querySelector('#checkInGrid'),
+      checkinActions: document.querySelector('#checkinActions'),
+      journeyGuide: document.querySelector('#journeyGuide'),
+      protectionValue: document.querySelector('#protectionValue'),
+      milestoneValue: document.querySelector('#milestoneValue'),
       friendGrid: document.querySelector('#friendGrid'),
       reportBars: document.querySelector('#reportBars'),
       reportSummary: document.querySelector('#reportSummary'),
@@ -1099,6 +1162,7 @@ if (typeof document !== 'undefined') {
           ...(savedState.resources || {})
         },
         decorations: Array.isArray(savedState.decorations) ? savedState.decorations : [],
+        milestoneClaims: Array.isArray(savedState.milestoneClaims) ? savedState.milestoneClaims : [],
         checkIns: Array.isArray(savedState.checkIns) ? savedState.checkIns : [],
         tasks: Array.isArray(savedState.tasks) ? savedState.tasks : [],
         friendMessages: savedState.friendMessages || {},
@@ -1139,6 +1203,98 @@ if (typeof document !== 'undefined') {
         return localizedText('已选择', '已選擇', 'Selected');
       }
       return core.t(language, 'selectTask');
+    }
+
+    function getMilestoneProgress() {
+      const targets = [7, 30, 100];
+      const nextTarget = targets.find((value) => state.streak < value && !state.milestoneClaims.includes(value)) || null;
+      const available = targets.filter((value) => state.streak >= value && !state.milestoneClaims.includes(value));
+      return { targets, nextTarget, available };
+    }
+
+    function getJourneyState() {
+      const nextTask = core.getNextTask(state);
+      const checkedInToday = state.checkIns.includes(core.todayIso());
+
+      if (!state.tasks.length) {
+        return {
+          title: localizedText('第一步：让 AI 帮你拆任务', '第一步：讓 AI 幫你拆任務', 'Step 1: Let AI break down your goal'),
+          description: localizedText('从一个长期目标开始，生成今天的 to-do list，再进入专注模式。', '從一個長期目標開始，生成今天的 to-do list，再進入專注模式。', 'Start with one long-term goal, generate today’s to-do list, and then move into focus mode.'),
+          chips: [
+            localizedText('Journey 01', 'Journey 01', 'Journey 01'),
+            localizedText('AI Task Planning', 'AI Task Planning', 'AI Task Planning')
+          ],
+          actions: [{ id: 'generate-plan', label: localizedText('生成今日任务', '生成今日任務', 'Generate today plan'), style: 'primary' }]
+        };
+      }
+
+      if (!state.selectedTask) {
+        return {
+          title: localizedText('第二步：选择一个最想完成的任务', '第二步：選擇一個最想完成的任務', 'Step 2: Pick the task you want to finish first'),
+          description: localizedText('选中任务后会直接进入 Focus Mode，倒计时结束会自动掉落奖励。', '選中任務後會直接進入 Focus Mode，倒計時結束會自動掉落獎勵。', 'Selecting a task takes you straight into Focus Mode, and finishing the timer drops a reward.'),
+          chips: [
+            localizedText(`${state.tasks.length} 个任务待专注`, `${state.tasks.length} 個任務待專注`, `${state.tasks.length} tasks ready`),
+            localizedText('Journey 02', 'Journey 02', 'Journey 02')
+          ],
+          actions: [{ id: 'select-next-task', label: localizedText('选第一项任务', '選第一項任務', 'Pick first task'), style: 'primary' }]
+        };
+      }
+
+      if (!state.selectedTask.completed && timerState.isRunning) {
+        return {
+          title: localizedText('第三步：保持专注，倒计时会继续运行', '第三步：保持專注，倒計時會繼續運行', 'Step 3: Stay focused, the timer keeps running'),
+          description: localizedText('现在可以停留在计时界面，或者切到后台。结束后会震动/音效提醒并弹出 Bonus。', '現在可以停留在計時界面，或者切到後台。結束後會震動/音效提醒並彈出 Bonus。', 'Stay on the timer screen or switch to the background. When time is up, you get a cue and a bonus.'),
+          chips: [
+            localizedText(`剩余 ${Math.ceil(timerState.remainingSeconds / 60)} 分钟`, `剩餘 ${Math.ceil(timerState.remainingSeconds / 60)} 分鐘`, `${Math.ceil(timerState.remainingSeconds / 60)} min left`),
+            localizedText('Journey 03', 'Journey 03', 'Journey 03')
+          ],
+          actions: [
+            { id: 'open-focus', label: localizedText('返回计时界面', '返回計時界面', 'Open focus view'), style: 'secondary' },
+            { id: 'pause-focus', label: localizedText('暂停专注', '暫停專注', 'Pause focus'), style: 'ghost' }
+          ]
+        };
+      }
+
+      if (state.focusCompleted) {
+        return {
+          title: localizedText('第四步：领取 Bonus 并推进今日闭环', '第四步：領取 Bonus 並推進今日閉環', 'Step 4: Claim the bonus and move the journey forward'),
+          description: localizedText('奖励已经准备好。你可以先去打卡，再建设岛屿，或者直接开启下一项任务。', '獎勵已經準備好。你可以先去打卡，再建設島嶼，或者直接開啟下一項任務。', 'Your reward is ready. Check in first, build your island, or jump to the next task.'),
+          chips: [
+            localizedText('Journey 04', 'Journey 04', 'Journey 04'),
+            localizedText('Bonus Ready', 'Bonus Ready', 'Bonus Ready')
+          ],
+          actions: [
+            { id: 'open-checkin', label: localizedText('去看打卡', '去看打卡', 'Open check-in'), style: 'primary' },
+            { id: 'open-island', label: localizedText('去建设岛屿', '去建設島嶼', 'Build island'), style: 'secondary' }
+          ]
+        };
+      }
+
+      if (checkedInToday && nextTask) {
+        return {
+          title: localizedText('第五步：今天的闭环已建立，继续下一项或去社交互动', '第五步：今天的閉環已建立，繼續下一項或去社交互動', 'Step 5: Today’s loop is active, continue or socialize'),
+          description: localizedText('今天已经打卡完成。你可以继续下一项专注任务，或者去好友岛屿互动。', '今天已經打卡完成。你可以繼續下一項專注任務，或者去好友島嶼互動。', 'Today’s check-in is done. Continue with the next focus task or visit friends.'),
+          chips: [
+            localizedText('Journey 05', 'Journey 05', 'Journey 05'),
+            localizedText('Friends & Return', 'Friends & Return', 'Friends & Return')
+          ],
+          actions: [
+            { id: 'select-next-task', label: localizedText('开始下一项', '開始下一項', 'Start next task'), style: 'primary' },
+            { id: 'open-friends', label: localizedText('去看好友状态', '去看好友狀態', 'Visit friends'), style: 'secondary' },
+            { id: 'prepare-tomorrow', label: localizedText('安排明日计划', '安排明日計劃', 'Plan tomorrow'), style: 'ghost' }
+          ]
+        };
+      }
+
+      return {
+        title: localizedText('继续推动 Pomoland 的专注旅程', '繼續推動 Pomoland 的專注旅程', 'Keep moving the Pomoland journey forward'),
+        description: localizedText('从任务、专注、奖励到建设和好友互动，每一步都在推动番茄岛成长。', '從任務、專注、獎勵到建設和好友互動，每一步都在推動番茄島成長。', 'Tasks, focus, rewards, building, and social play all push your island forward.'),
+        chips: [localizedText('Journey', 'Journey', 'Journey')],
+        actions: [
+          { id: 'open-today', label: localizedText('回到任务台', '回到任務台', 'Back to today'), style: 'secondary' },
+          { id: 'open-island', label: localizedText('建设岛屿', '建設島嶼', 'Build island'), style: 'primary' }
+        ]
+      };
     }
 
     function stopTicker() {
@@ -1248,6 +1404,7 @@ if (typeof document !== 'undefined') {
 
     function renderAll() {
       renderResources();
+      renderJourneyGuide();
       renderTasks();
       renderSelectedTask();
       renderTimer();
@@ -1256,6 +1413,28 @@ if (typeof document !== 'undefined') {
       renderFriends();
       renderReport();
       renderAgentIdle();
+    }
+
+    function renderJourneyGuide() {
+      if (!elements.journeyGuide) return;
+      const journey = getJourneyState();
+      elements.journeyGuide.innerHTML = `
+        <div class="journey-guide-main">
+          <p class="eyebrow">Journey Coach</p>
+          <h2>${escapeHtml(journey.title)}</h2>
+          <p>${escapeHtml(journey.description)}</p>
+          <div class="journey-guide-meta">
+            ${journey.chips.map((chip) => `<span class="journey-chip">${escapeHtml(chip)}</span>`).join('')}
+          </div>
+        </div>
+        <div class="journey-guide-actions">
+          ${journey.actions.map((action) => `
+            <button class="${action.style === 'primary' ? 'primary-button' : action.style === 'ghost' ? 'small-button ghost' : 'small-button secondary'}" type="button" data-journey-action="${action.id}">
+              ${escapeHtml(action.label)}
+            </button>
+          `).join('')}
+        </div>
+      `;
     }
 
     function renderResources() {
@@ -1369,6 +1548,7 @@ if (typeof document !== 'undefined') {
     function renderCheckIns() {
       if (!elements.checkInGrid) return;
       const today = core.todayIso();
+      const milestoneProgress = getMilestoneProgress();
       const base = new Date(`${today}T00:00:00`);
       const days = Array.from({ length: 14 }, (_, index) => {
         const date = new Date(base);
@@ -1384,18 +1564,63 @@ if (typeof document !== 'undefined') {
       }).join('');
       const streakNode = document.querySelector('#streakValue');
       if (streakNode) streakNode.textContent = state.streak;
+      if (elements.protectionValue) elements.protectionValue.textContent = state.streakProtection;
+      if (elements.milestoneValue) {
+        elements.milestoneValue.textContent = milestoneProgress.available.length
+          ? milestoneProgress.available.map((value) => `${value}d`).join(' / ')
+          : milestoneProgress.nextTarget
+            ? localizedText(`下一档 ${milestoneProgress.nextTarget} 天`, `下一檔 ${milestoneProgress.nextTarget} 天`, `Next at ${milestoneProgress.nextTarget}d`)
+            : localizedText('已全部领取', '已全部領取', 'All claimed');
+      }
+      if (elements.checkinActions) {
+        const milestoneDescription = milestoneProgress.available.length
+          ? localizedText(
+            `你已达成 ${milestoneProgress.available.join(' / ')} 天连胜，可以立即领取奖励。`,
+            `你已達成 ${milestoneProgress.available.join(' / ')} 天連勝，可以立即領取獎勵。`,
+            `You reached ${milestoneProgress.available.join(' / ')}-day streak rewards and can claim them now.`
+          )
+          : milestoneProgress.nextTarget
+            ? localizedText(
+              `继续完成 ${milestoneProgress.nextTarget - state.streak} 天，就能解锁下一档连胜奖励。`,
+              `繼續完成 ${milestoneProgress.nextTarget - state.streak} 天，就能解鎖下一檔連勝獎勵。`,
+              `Complete ${milestoneProgress.nextTarget - state.streak} more days to unlock the next streak reward.`
+            )
+            : localizedText('所有里程碑奖励都已解锁完成。', '所有里程碑獎勵都已解鎖完成。', 'All milestone rewards have been unlocked.');
+        const protectionDescription = state.streakShieldActive
+          ? localizedText('当前保护卡已生效，下次错过打卡会优先保住连胜。', '當前保護卡已生效，下次錯過打卡會優先保住連勝。', 'A protection card is active and will protect your next missed check-in.')
+          : state.streakProtection > 0
+            ? localizedText(`你还有 ${state.streakProtection} 张保护卡，可提前开启保护。`, `你還有 ${state.streakProtection} 張保護卡，可提前開啟保護。`, `You have ${state.streakProtection} protection cards ready to activate.`)
+            : localizedText('暂时没有保护卡，先通过里程碑奖励再获取。', '暫時沒有保護卡，先通過里程碑獎勵再獲取。', 'No protection card left. Earn one from your next milestone reward.');
+        elements.checkinActions.innerHTML = `
+          <article class="checkin-card">
+            <strong>${localizedText('里程碑奖励', '里程碑獎勵', 'Milestone reward')}</strong>
+            <p>${escapeHtml(milestoneDescription)}</p>
+            <button class="small-button secondary" type="button" data-checkin-action="claim-milestone" ${milestoneProgress.available.length ? '' : 'disabled'}>
+              ${localizedText('领取可用奖励', '領取可用獎勵', 'Claim available reward')}
+            </button>
+          </article>
+          <article class="checkin-card">
+            <strong>${localizedText('连胜保护卡', '連勝保護卡', 'Streak protection')}</strong>
+            <p>${escapeHtml(protectionDescription)}</p>
+            <button class="small-button ghost" type="button" data-checkin-action="use-protection" ${(state.streakProtection > 0 && !state.streakShieldActive) ? '' : 'disabled'}>
+              ${state.streakShieldActive ? localizedText('保护已开启', '保護已開啟', 'Protection active') : localizedText('开启保护卡', '開啟保護卡', 'Activate protection')}
+            </button>
+          </article>
+        `;
+      }
     }
 
     function renderFriends() {
       if (!elements.friendGrid) return;
       elements.friendGrid.innerHTML = core.FRIENDS.map((friend) => {
         const message = state.friendMessages[friend.id];
+        const visitDetails = core.getFriendVisitDetails(friend.id, language);
         return `
           <article class="friend-card">
             <div class="friend-island friend-${friend.color}"></div>
             <div>
               <h3>${friend.name}</h3>
-              <p>${friend.statusKey}</p>
+              <p>${escapeHtml(visitDetails.mood)}</p>
               <span class="friend-message">${message ? (message[language] || message.en) : '&nbsp;'}</span>
             </div>
             <div class="friend-actions">
@@ -1580,11 +1805,20 @@ if (typeof document !== 'undefined') {
         `${core.t(language, 'chances')} +${rewardReady.chances}`,
         rewardReady.decoration
       ].filter(Boolean).map((item) => `<span>${escapeHtml(item)}</span>`).join('');
+      if (elements.bonusActions) {
+        elements.bonusActions.innerHTML = `
+          <button class="small-button secondary" type="button" data-bonus-action="checkin">${localizedText('领完去打卡', '領完去打卡', 'Claim and check in')}</button>
+          <button class="small-button secondary" type="button" data-bonus-action="plant">${localizedText('领完去种植', '領完去種植', 'Claim and plant')}</button>
+          <button class="small-button secondary" type="button" data-bonus-action="decorate">${localizedText('领完去装饰', '領完去裝飾', 'Claim and decorate')}</button>
+          <button class="small-button ghost" type="button" data-bonus-action="friends">${localizedText('领完看好友', '領完看好友', 'Claim and visit friends')}</button>
+        `;
+      }
     }
 
-    function claimBonus() {
+    function claimBonus(destination = 'checkin', islandAction = null) {
       state = core.claimReward(state, rewardReady);
       state = core.recordCheckIn(state, core.todayIso());
+      const nextTask = core.getNextTask(state);
       timerState = core.resetTimerState({
         ...timerState,
         taskId: state.selectedTask ? state.selectedTask.id : null,
@@ -1592,8 +1826,88 @@ if (typeof document !== 'undefined') {
       });
       rewardReady = core.buildRewardBundle(language, selectedDuration);
       elements.bonusModal.hidden = true;
-      switchView('island');
+      if (islandAction) {
+        state = core.applyIslandAction(state, islandAction);
+      }
+      if (destination === 'friends') {
+        switchView('friends');
+      } else if (destination === 'island') {
+        switchView('island');
+      } else if (destination === 'focus' && nextTask) {
+        state = core.selectTask(state, nextTask);
+        selectedDuration = nextTask.duration ? nextTask.duration * 60 : selectedDuration;
+        timerState = core.createTimerState(selectedDuration, nextTask.id);
+        switchView('focus');
+      } else if (destination === 'today') {
+        switchView('today');
+      } else {
+        switchView('checkin');
+      }
       persistSession();
+    }
+
+    function handleJourneyAction(action) {
+      if (action === 'generate-plan') {
+        switchView('today');
+        generatePlan();
+        return;
+      }
+      if (action === 'select-next-task') {
+        const nextTask = core.getNextTask(state);
+        if (nextTask) {
+          state = core.selectTask(state, nextTask);
+          selectedDuration = nextTask.duration ? nextTask.duration * 60 : selectedDuration;
+          timerState = core.createTimerState(selectedDuration, nextTask.id);
+          switchView('focus');
+          persistSession();
+        }
+        return;
+      }
+      if (action === 'open-focus') {
+        switchView('focus');
+        return;
+      }
+      if (action === 'pause-focus') {
+        stopTimer();
+        return;
+      }
+      if (action === 'open-checkin') {
+        switchView('checkin');
+        return;
+      }
+      if (action === 'open-island') {
+        switchView('island');
+        return;
+      }
+      if (action === 'open-friends') {
+        switchView('friends');
+        return;
+      }
+      if (action === 'open-today') {
+        switchView('today');
+        return;
+      }
+      if (action === 'prepare-tomorrow') {
+        switchView('today');
+        elements.goalInput.value = localizedText('明天继续完成剩余任务，并保持 1 次 25 分钟专注。', '明天繼續完成剩餘任務，並保持 1 次 25 分鐘專注。', 'Tomorrow: finish the remaining task list and keep one 25-minute focus block.');
+        elements.goalInput.dataset.changed = 'true';
+        generatePlan();
+        return;
+      }
+      if (action === 'claim-milestone') {
+        const available = getMilestoneProgress().available;
+        if (available.length) {
+          state = core.claimMilestoneReward(state, available[0]);
+          renderAll();
+          persistSession();
+        }
+        return;
+      }
+      if (action === 'use-protection') {
+        state = core.useStreakProtection(state);
+        renderAll();
+        persistSession();
+      }
     }
 
     function openVisitModal(friendId) {
@@ -1710,6 +2024,10 @@ if (typeof document !== 'undefined') {
         persistSession();
       }
 
+      if (target.matches('[data-journey-action]')) {
+        handleJourneyAction(target.dataset.journeyAction);
+      }
+
       if (target.id === 'generatePlan') {
         generatePlan();
       }
@@ -1733,11 +2051,26 @@ if (typeof document !== 'undefined') {
       if (target.id === 'resetTimer') resetTimer();
       if (target.id === 'finishFocus') finishFocus();
       if (target.id === 'claimBonus') claimBonus();
+      if (target.matches('[data-bonus-action]')) {
+        if (target.dataset.bonusAction === 'plant') claimBonus('island', 'plant');
+        if (target.dataset.bonusAction === 'decorate') claimBonus('island', 'decorate');
+        if (target.dataset.bonusAction === 'friends') claimBonus('friends');
+        if (target.dataset.bonusAction === 'checkin') claimBonus('checkin');
+      }
       if (target.id === 'closeBonus') {
         elements.bonusModal.hidden = true;
         persistSession();
       }
       if (target.id === 'closeVisit' || target.id === 'closeVisitAction') closeVisitModal();
+
+      if (target.matches('[data-checkin-action]')) {
+        if (target.dataset.checkinAction === 'claim-milestone') {
+          handleJourneyAction('claim-milestone');
+        }
+        if (target.dataset.checkinAction === 'use-protection') {
+          handleJourneyAction('use-protection');
+        }
+      }
 
       if (target.matches('[data-island-action]')) {
         state = core.applyIslandAction(state, target.dataset.islandAction);

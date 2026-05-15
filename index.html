@@ -227,6 +227,8 @@
         </div>
       </header>
 
+      <section class="journey-guide" id="journeyGuide" aria-live="polite"></section>
+
       <section class="workspace-panel" data-panel="today">
         <div class="panel-layout two-column">
           <div class="tool-panel">
@@ -376,13 +378,14 @@
           </article>
           <article class="metric">
             <span data-i18n="protection">连胜保护卡</span>
-            <strong>1</strong>
+            <strong id="protectionValue">1</strong>
           </article>
           <article class="metric">
             <span data-i18n="milestone">里程碑奖励</span>
-            <strong>7 / 30 / 100</strong>
+            <strong id="milestoneValue">7 / 30 / 100</strong>
           </article>
         </div>
+        <div class="checkin-actions" id="checkinActions"></div>
         <div class="calendar-grid" id="checkInGrid"></div>
       </section>
 
@@ -430,6 +433,7 @@
       <h2 id="bonusTitle" data-i18n="bonusTitle">Bonus 已掉落</h2>
       <p data-i18n="bonusLead">这次专注转化成了新的岛屿资源。</p>
       <div class="bonus-list" id="bonusList"></div>
+      <div class="bonus-actions" id="bonusActions"></div>
       <button class="primary-button wide" id="claimBonus" type="button" data-i18n="claimBonus">Claim Bonus</button>
     </div>
   </div>

@@ -217,6 +217,40 @@ test('check-in highlights today and increases streak only once', () => {
   assert.deepEqual(second.checkIns, ['2026-05-13']);
 });
 
+test('next task skips completed entries and returns the next actionable task', () => {
+  const base = core.createInitialState();
+  const tasks = [
+    { id: 'task1', title: 'A', completed: true },
+    { id: 'task2', title: 'B', completed: false },
+    { id: 'task3', title: 'C', completed: false }
+  ];
+  const state = { ...base, tasks };
+  assert.equal(core.getNextTask(state).id, 'task2');
+});
+
+test('claiming a milestone reward grants resources only once', () => {
+  const state = { ...core.createInitialState(), streak: 7, milestoneClaims: [] };
+  const claimed = core.claimMilestoneReward(state, 7);
+  assert.equal(claimed.resources.coins, 155);
+  assert.equal(claimed.streakProtection, 2);
+  assert.deepEqual(claimed.milestoneClaims, [7]);
+
+  const claimedAgain = core.claimMilestoneReward(claimed, 7);
+  assert.equal(claimedAgain.resources.coins, 155);
+  assert.deepEqual(claimedAgain.milestoneClaims, [7]);
+});
+
+test('using streak protection consumes one card and activates shield once', () => {
+  const state = core.createInitialState();
+  const activated = core.useStreakProtection(state);
+  assert.equal(activated.streakProtection, 0);
+  assert.equal(activated.streakShieldActive, true);
+
+  const again = core.useStreakProtection(activated);
+  assert.equal(again.streakProtection, 0);
+  assert.equal(again.streakShieldActive, true);
+});
+
 test('friend actions consume chances when needed and update status', () => {
   const state = core.createInitialState();
   const helped = core.performFriendAction(state, 'mia', 'help');

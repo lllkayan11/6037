@@ -988,6 +988,68 @@ a {
   border: 1px solid var(--line);
 }
 
+.journey-guide {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 18px;
+  margin-bottom: 22px;
+  padding: 20px 24px;
+  background: linear-gradient(135deg, rgba(255, 248, 228, 0.96), rgba(233, 247, 242, 0.96));
+  border: 1px solid rgba(47, 111, 115, 0.16);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+
+.journey-guide-main {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.journey-guide-main h2 {
+  margin: 0;
+  font-size: 22px;
+  color: var(--teal-900);
+}
+
+.journey-guide-main p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--ink-600);
+}
+
+.journey-guide-meta {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.journey-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1px solid rgba(47, 111, 115, 0.12);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--teal-700);
+}
+
+.journey-guide-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-content: flex-start;
+  justify-content: flex-end;
+}
+
+.journey-guide-actions .small-button {
+  min-width: 132px;
+}
+
 .panel-layout {
   display: grid;
   gap: 28px;
@@ -1128,6 +1190,11 @@ a {
 .task-card.is-selected {
   border-color: var(--sun-500);
   background: #fffaee;
+}
+
+.task-card.is-complete {
+  border-color: rgba(70, 136, 94, 0.25);
+  background: rgba(225, 243, 201, 0.36);
 }
 
 .task-card h4 {
@@ -1894,6 +1961,42 @@ a {
   box-shadow: 0 6px 14px rgba(255, 209, 102, 0.4);
 }
 
+.checkin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0 0 22px;
+}
+
+.checkin-card {
+  flex: 1;
+  min-width: 240px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: var(--shadow-card);
+}
+
+.checkin-card strong {
+  font-size: 15px;
+  color: var(--teal-900);
+}
+
+.checkin-card p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink-500);
+}
+
+.checkin-card .small-button {
+  align-self: flex-start;
+}
+
 /* --- Friends --- */
 
 .friend-grid {
@@ -2161,6 +2264,17 @@ a {
   grid-column: 1 / -1;
 }
 
+.bonus-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.bonus-actions .small-button {
+  flex: 1;
+  min-width: 136px;
+}
+
 /* --- Visit modal --- */
 
 .visit-island {
@@ -2293,11 +2407,16 @@ a {
   }
   .resource-panel { width: 100%; }
 
+  .journey-guide-actions {
+    justify-content: flex-start;
+  }
+
   .cta-section {
     flex-direction: column;
     align-items: flex-start;
   }
 
+  .journey-guide,
   .feature-grid,
   .journey-track,
   .friend-grid,
