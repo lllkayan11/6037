@@ -1181,6 +1181,12 @@ a {
   cursor: pointer;
 }
 
+.task-card-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
 .task-card:hover {
   border-color: var(--teal-300);
   transform: translateY(-1px);
@@ -1203,9 +1209,192 @@ a {
   color: var(--teal-900);
 }
 
+.task-card h3 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--teal-900);
+}
+
 .task-card p {
   margin: 0;
   font-size: 13px;
+  color: var(--ink-500);
+}
+
+.task-card-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: flex-end;
+}
+
+.task-chip-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+.task-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(87, 181, 108, 0.12);
+  color: var(--leaf-700);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.task-chip.gold {
+  background: rgba(255, 209, 102, 0.26);
+  color: #8a6512;
+}
+
+.task-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 10px;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(47, 111, 115, 0.16);
+}
+
+.task-editor-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 0.8fr;
+  gap: 12px;
+}
+
+.task-editor label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.task-editor label span {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-500);
+}
+
+.task-editor input,
+.task-editor textarea {
+  width: 100%;
+  border: 1px solid rgba(47, 111, 115, 0.14);
+  border-radius: 12px;
+  background: #ffffff;
+  padding: 10px 12px;
+  font: inherit;
+  color: var(--teal-900);
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.task-editor input:focus,
+.task-editor textarea:focus {
+  outline: none;
+  border-color: var(--teal-300);
+  box-shadow: 0 0 0 3px rgba(109, 201, 194, 0.15);
+}
+
+.task-editor-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(247, 251, 249, 0.92);
+}
+
+.task-editor-footer strong {
+  color: #8a6512;
+}
+
+.task-editor-footer span {
+  font-size: 12px;
+  color: var(--ink-500);
+}
+
+.coach-panel {
+  margin-top: 16px;
+}
+
+.coach-panel-shell,
+.coach-panel-empty {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 250, 248, 0.96));
+  border: 1px solid rgba(47, 111, 115, 0.12);
+  border-radius: 20px;
+  padding: 18px;
+  box-shadow: 0 14px 28px rgba(47, 111, 115, 0.08);
+}
+
+.coach-panel-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+
+.coach-panel-header h3,
+.coach-panel-empty strong {
+  margin: 4px 0 0;
+  color: var(--teal-900);
+}
+
+.coach-panel-empty p {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--ink-500);
+  line-height: 1.7;
+}
+
+.coach-kpi {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.coach-kpi span,
+.coach-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(116, 128, 222, 0.12);
+  color: #5462c4;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.coach-card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.coach-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid rgba(47, 111, 115, 0.1);
+}
+
+.coach-card strong {
+  color: var(--teal-900);
+}
+
+.coach-card p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.7;
   color: var(--ink-500);
 }
 
@@ -2994,6 +3183,10 @@ a {
   .friend-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  .coach-card-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 880px) {
@@ -3026,6 +3219,15 @@ a {
   .focus-mode-grid,
   .custom-duration-card {
     grid-template-columns: 1fr;
+  }
+
+  .task-card-top,
+  .task-editor-grid,
+  .task-editor-footer,
+  .coach-panel-header {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .cta-section {

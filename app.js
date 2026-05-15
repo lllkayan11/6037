@@ -54,7 +54,7 @@ const PomolandCore = (() => {
       report: 'Report',
       goalLabel: '输入一个长期目标',
       goalPlaceholder: '例如：三个月准备雅思考试',
-      aiButton: '生成 AI 任务',
+      aiButton: '帮你制定计划',
       aiLoading: 'AI 正在拆解目标...',
       agentIdle: '点击按钮后，Pomoland Agent 会展示规划过程。',
       agentTitle: 'Pomoland Agent 正在执行',
@@ -200,7 +200,7 @@ const PomolandCore = (() => {
       report: 'Report',
       goalLabel: '輸入一個長期目標',
       goalPlaceholder: '例如：三個月準備雅思考試',
-      aiButton: '生成 AI 任務',
+      aiButton: '幫你制定計劃',
       aiLoading: 'AI 正在拆解目標...',
       agentIdle: '點擊按鈕後，Pomoland Agent 會展示規劃過程。',
       agentTitle: 'Pomoland Agent 正在執行',
@@ -346,7 +346,7 @@ const PomolandCore = (() => {
       report: 'Report',
       goalLabel: 'Enter a long-term goal',
       goalPlaceholder: 'Example: Prepare for IELTS in 3 months',
-      aiButton: 'Generate AI Tasks',
+      aiButton: 'Plan My Day',
       aiLoading: 'AI is breaking down the goal...',
       agentIdle: 'Click the button to watch Pomoland Agent plan step by step.',
       agentTitle: 'Pomoland Agent is working',
@@ -505,6 +505,12 @@ const PomolandCore = (() => {
       streak: 5,
       streakProtection: 1,
       streakShieldActive: false,
+      coachStats: {
+        shown: 0,
+        accepted: 0,
+        completed: 0
+      },
+      coachAcceptedTaskId: null,
       milestoneClaims: [],
       checkIns: [],
       focusCompleted: false,
@@ -529,7 +535,55 @@ const PomolandCore = (() => {
       selectedTask: state.selectedTask ? { ...state.selectedTask } : null,
       tasks: state.tasks.map((task) => ({ ...task })),
       streakProtection: state.streakProtection || 0,
-      streakShieldActive: Boolean(state.streakShieldActive)
+      streakShieldActive: Boolean(state.streakShieldActive),
+      coachStats: {
+        shown: state.coachStats?.shown || 0,
+        accepted: state.coachStats?.accepted || 0,
+        completed: state.coachStats?.completed || 0
+      },
+      coachAcceptedTaskId: state.coachAcceptedTaskId || null
+    };
+  }
+
+  function calculateTaskGold(duration, title = '', notes = '') {
+    const safeDuration = Math.max(5, Math.min(120, Math.round(Number(duration) || 25)));
+    const titleBonus = String(title).trim().length > 12 ? 3 : 0;
+    const notesBonus = String(notes).trim().length > 48 ? 2 : 0;
+    const durationBonus = safeDuration >= 45 ? 8 : safeDuration >= 30 ? 4 : 0;
+    return 10 + Math.round(safeDuration * 0.9) + titleBonus + notesBonus + durationBonus;
+  }
+
+  function buildTaskNote(goal, title, language) {
+    const lang = normalizeLanguage(language);
+    if (lang === 'en') {
+      return `Turn "${goal}" into one clear action by finishing "${title}" and then move to the next step.`;
+    }
+    if (lang === 'zh-HK') {
+      return `把「${goal}」拆成一個可執行的小步驟，先完成「${title}」，再進入下一段專注。`;
+    }
+    return `把「${goal}」拆成一个可执行的小步骤，先完成「${title}」，再进入下一段专注。`;
+  }
+
+  function normalizeTask(task, index, goal, language) {
+    const lang = normalizeLanguage(language);
+    const title = String(task.taskName || task.title || COPY[lang][TASK_IDS[index]] || `Task ${index + 1}`).trim();
+    const note = String(task.notes || task.description || buildTaskNote(goal, title, lang)).trim();
+    const duration = Math.max(5, Math.min(120, Math.round(Number(task.duration) || TASK_DURATIONS[index] || 25)));
+    const goldReward = Number.isFinite(Number(task.goldReward))
+      ? Math.max(1, Math.round(Number(task.goldReward)))
+      : calculateTaskGold(duration, title, note);
+
+    return {
+      id: task.id || `task${index + 1}`,
+      goal,
+      title,
+      notes: note,
+      description: note,
+      goldReward,
+      duration,
+      energy: duration >= 45 ? 'Deep' : duration >= 30 ? 'Steady' : 'Light',
+      customized: Boolean(task.customized),
+      completed: Boolean(task.completed)
     };
   }
 
@@ -553,28 +607,20 @@ const PomolandCore = (() => {
     const cleanGoal = goal && goal.trim() ? goal.trim() : COPY[lang].defaultGoal;
     try {
       const apiResponse = await fetchApi('/api/generate-tasks', { goal: cleanGoal, language: lang });
-      const tasks = apiResponse.tasks.map((task, index) => ({
-        id: `task${index + 1}`, // 生成唯一 ID
-        goal: cleanGoal,
-        title: task.taskName,
-        description: `奖励金币: ${task.goldReward}`,
-        duration: task.duration,
-        energy: task.duration >= 45 ? 'Deep' : 'Normal'
-      }));
-      // 将鼓励语也返回，以便在 UI 中显示
+      const tasks = apiResponse.tasks.map((task, index) => normalizeTask({
+        ...task,
+        id: `task${index + 1}`
+      }, index, cleanGoal, lang));
       return { tasks, encouragement: apiResponse.encouragement };
     } catch (error) {
       console.error('Error fetching tasks from AI:', error);
-      // Fallback to local data if API fails
       return {
-        tasks: TASK_IDS.map((id, index) => ({
+        tasks: TASK_IDS.map((id, index) => normalizeTask({
           id,
-          goal: cleanGoal,
           title: COPY[lang][id],
           description: COPY[lang][`${id}Desc`],
-          duration: TASK_DURATIONS[index],
-          energy: index === 2 ? 'Deep' : 'Normal'
-        })),
+          duration: TASK_DURATIONS[index]
+        }, index, cleanGoal, lang)),
         encouragement: COPY[lang].aiFallbackEncouragement
       };
     }
@@ -599,8 +645,9 @@ const PomolandCore = (() => {
     const lang = normalizeLanguage(language);
     return tasks.map((task) => ({
       ...task,
-      title: COPY[lang][task.id] || task.title,
-      description: COPY[lang][`${task.id}Desc`] || task.description
+      title: task.customized ? task.title : (COPY[lang][task.id] || task.title),
+      notes: task.customized ? task.notes : (COPY[lang][`${task.id}Desc`] || task.notes || task.description),
+      description: task.customized ? task.description : (COPY[lang][`${task.id}Desc`] || task.notes || task.description)
     }));
   }
 
@@ -644,6 +691,10 @@ const PomolandCore = (() => {
           ? { ...task, completed: true }
           : task
       ));
+    }
+    if (next.selectedTask && next.selectedTask.id === next.coachAcceptedTaskId) {
+      next.coachStats.completed += 1;
+      next.coachAcceptedTaskId = null;
     }
     next.lastMessage = {
       'zh-CN': '本次 Focus Mode 已结束，可以领取 Bonus。',
@@ -1040,6 +1091,7 @@ const PomolandCore = (() => {
     applyIslandAction,
     getIslandVisualState,
     getIslandActions,
+    calculateTaskGold,
     createTimerState,
     syncTimerState,
     startTimerState,
@@ -1082,6 +1134,7 @@ if (typeof document !== 'undefined') {
     let timerState = core.createTimerState(selectedDuration);
     let timerId = null;
     let rewardReady = core.buildRewardBundle(language, selectedDuration);
+    let editingTaskId = null;
     let focusSceneState = {
       outcome: 'idle',
       progress: 0,
@@ -1097,6 +1150,7 @@ if (typeof document !== 'undefined') {
       generatePlanButton: document.querySelector('#generatePlan'),
       agentProgress: document.querySelector('#agentProgress'),
       taskList: document.querySelector('#taskList'),
+      coachPanel: document.querySelector('#coachPanel'),
       selectedTask: document.querySelector('#selectedTask'),
       timerDisplay: document.querySelector('#timerDisplay'),
       timerRing: document.querySelector('#timerRing'),
@@ -1221,7 +1275,12 @@ if (typeof document !== 'undefined') {
         checkIns: Array.isArray(savedState.checkIns) ? savedState.checkIns : [],
         tasks: Array.isArray(savedState.tasks) ? savedState.tasks : [],
         friendMessages: savedState.friendMessages || {},
-        lastMessage: savedState.lastMessage || base.lastMessage
+        lastMessage: savedState.lastMessage || base.lastMessage,
+        coachStats: {
+          ...base.coachStats,
+          ...(savedState.coachStats || {})
+        },
+        coachAcceptedTaskId: savedState.coachAcceptedTaskId || null
       };
       merged.selectedTask = merged.tasks.find((task) => task.id === selectedTaskId) || null;
       return merged;
@@ -1258,6 +1317,90 @@ if (typeof document !== 'undefined') {
         return localizedText('已选择', '已選擇', 'Selected');
       }
       return core.t(language, 'selectTask');
+    }
+
+    function getTaskNotes(task) {
+      return task.notes || task.description || '';
+    }
+
+    function formatTaskReward(task) {
+      return localizedText(`奖励金币 ${task.goldReward}`, `獎勵金幣 ${task.goldReward}`, `${task.goldReward} coins`);
+    }
+
+    function normalizeTaskDurationValue(value, fallback = 25) {
+      const numericValue = Number(value);
+      if (!Number.isFinite(numericValue)) return fallback;
+      return Math.max(5, Math.min(120, Math.round(numericValue / 5) * 5));
+    }
+
+    function getTaskDurationLabel(minutes) {
+      return localizedText(`${minutes} 分钟`, `${minutes} 分鐘`, `${minutes} min`);
+    }
+
+    function updateTaskById(taskId, patch) {
+      const target = state.tasks.find((task) => task.id === taskId);
+      if (!target) return null;
+
+      const nextTask = {
+        ...target,
+        ...patch,
+        customized: true
+      };
+
+      nextTask.title = String(nextTask.title || target.title || '').trim() || target.title;
+      nextTask.notes = String(nextTask.notes || target.notes || target.description || '').trim() || getTaskNotes(target);
+      nextTask.description = nextTask.notes;
+      nextTask.duration = normalizeTaskDurationValue(nextTask.duration, target.duration || 25);
+      nextTask.goldReward = core.calculateTaskGold(nextTask.duration, nextTask.title, nextTask.notes);
+      nextTask.energy = nextTask.duration >= 45 ? 'Deep' : nextTask.duration >= 30 ? 'Steady' : 'Light';
+
+      state.tasks = state.tasks.map((task) => task.id === taskId ? nextTask : task);
+      if (state.selectedTask && state.selectedTask.id === taskId) {
+        state.selectedTask = { ...nextTask };
+      }
+      return nextTask;
+    }
+
+    function getCoachInsights() {
+      const actionableTasks = (state.tasks || []).filter((task) => !task.completed);
+      const shown = state.coachStats?.shown || 0;
+      const accepted = state.coachStats?.accepted || 0;
+      const completed = state.coachStats?.completed || 0;
+
+      if (!actionableTasks.length) {
+        return {
+          recommendedTask: null,
+          difficultyTask: null,
+          difficultyDuration: null,
+          metrics: { shown, accepted, completed }
+        };
+      }
+
+      const sortedByDuration = [...actionableTasks].sort((a, b) => a.duration - b.duration);
+      const recommendedTask = state.streak <= 3
+        ? sortedByDuration[0]
+        : state.streak >= 7
+          ? sortedByDuration[sortedByDuration.length - 1]
+          : [...actionableTasks].sort((a, b) => Math.abs(a.duration - 30) - Math.abs(b.duration - 30))[0];
+
+      const completionRate = state.tasks.length
+        ? state.tasks.filter((task) => task.completed).length / state.tasks.length
+        : 0;
+
+      const difficultyTask = completionRate < 0.4 || state.streak <= 3
+        ? [...actionableTasks].sort((a, b) => b.duration - a.duration)[0]
+        : [...actionableTasks].sort((a, b) => a.duration - b.duration)[0];
+
+      const difficultyDuration = completionRate < 0.4 || state.streak <= 3
+        ? Math.max(15, difficultyTask.duration - 10)
+        : Math.min(60, difficultyTask.duration + 10);
+
+      return {
+        recommendedTask,
+        difficultyTask,
+        difficultyDuration,
+        metrics: { shown, accepted, completed }
+      };
     }
 
     function getMilestoneProgress() {
@@ -1726,6 +1869,7 @@ if (typeof document !== 'undefined') {
       renderResources();
       renderJourneyGuide();
       renderTasks();
+      renderCoachPanel();
       renderSelectedTask();
       renderDurationPicker();
       renderTimer();
@@ -1825,16 +1969,111 @@ if (typeof document !== 'undefined') {
         `;
         return;
       }
+      const recommendedTaskId = getCoachInsights().recommendedTask?.id;
       elements.taskList.innerHTML = state.tasks.map((task) => `
         <article class="task-card ${state.selectedTask && state.selectedTask.id === task.id ? 'is-selected' : ''} ${task.completed ? 'is-complete' : ''}">
-          <div>
-            <span class="task-duration">${task.duration}m</span>
-            <h3>${escapeHtml(task.title)}</h3>
-            <p>${escapeHtml(task.description)}</p>
+          <div class="task-card-top">
+            <div>
+              <div class="task-chip-row">
+                <span class="task-duration">${task.duration}m</span>
+                <span class="task-chip gold">${escapeHtml(formatTaskReward(task))}</span>
+                ${recommendedTaskId === task.id ? `<span class="task-chip">${localizedText('AI 推荐', 'AI 推薦', 'AI pick')}</span>` : ''}
+              </div>
+              <h3>${escapeHtml(task.title)}</h3>
+              <p>${escapeHtml(getTaskNotes(task))}</p>
+            </div>
+            <div class="task-card-actions">
+              <button class="small-button" type="button" data-select-task="${task.id}" ${task.completed ? 'disabled' : ''}>${getTaskActionLabel(task)}</button>
+              <button class="small-button secondary" type="button" data-edit-task="${task.id}" ${task.completed ? 'disabled' : ''}>${editingTaskId === task.id ? localizedText('收起编辑', '收起編輯', 'Close editor') : localizedText('自定义修改', '自訂修改', 'Customize')}</button>
+            </div>
           </div>
-          <button class="small-button" type="button" data-select-task="${task.id}" ${task.completed ? 'disabled' : ''}>${getTaskActionLabel(task)}</button>
+          ${editingTaskId === task.id ? `
+            <div class="task-editor">
+              <div class="task-editor-grid">
+                <label>
+                  <span>${localizedText('任务标题', '任務標題', 'Task title')}</span>
+                  <input type="text" data-task-title-input value="${escapeHtml(task.title)}" />
+                </label>
+                <label>
+                  <span>${localizedText('专注时长', '專注時長', 'Focus duration')}</span>
+                  <input type="number" min="5" max="120" step="5" data-task-duration-input value="${task.duration}" />
+                </label>
+              </div>
+              <label>
+                <span>${localizedText('任务说明', '任務說明', 'Task note')}</span>
+                <textarea rows="3" data-task-notes-input>${escapeHtml(getTaskNotes(task))}</textarea>
+              </label>
+              <div class="task-editor-footer">
+                <strong data-task-gold-preview="${task.id}">${escapeHtml(formatTaskReward(task))}</strong>
+                <span>${localizedText('修改时长后，奖励金币会自动重新计算。', '修改時長後，獎勵金幣會自動重新計算。', 'Changing the duration recalculates the coin reward automatically.')}</span>
+              </div>
+              <div class="task-card-actions">
+                <button class="small-button secondary" type="button" data-save-task="${task.id}">${localizedText('保存修改', '保存修改', 'Save changes')}</button>
+                <button class="small-button ghost" type="button" data-cancel-task="${task.id}">${localizedText('取消', '取消', 'Cancel')}</button>
+              </div>
+            </div>
+          ` : ''}
         </article>
       `).join('');
+    }
+
+    function renderCoachPanel() {
+      if (!elements.coachPanel) return;
+      if (!state.tasks.length) {
+        elements.coachPanel.innerHTML = `
+          <div class="coach-panel-empty">
+            <strong>AI Coach</strong>
+            <p>${localizedText('制定计划后，这里会根据你的任务、连胜和完成情况给出更个性化的下一步建议。', '制定計劃後，這裡會根據你的任務、連勝和完成情況給出更個人化的下一步建議。', 'Once your plan is ready, AI Coach will suggest your next best move based on tasks, streak, and completion behavior.')}</p>
+          </div>
+        `;
+        return;
+      }
+
+      const insights = getCoachInsights();
+      const recommendedTask = insights.recommendedTask;
+      const difficultyTask = insights.difficultyTask;
+      const acceptedRate = insights.metrics.shown ? Math.round((insights.metrics.accepted / insights.metrics.shown) * 100) : 0;
+      const completedRate = insights.metrics.accepted ? Math.round((insights.metrics.completed / insights.metrics.accepted) * 100) : 0;
+
+      elements.coachPanel.innerHTML = `
+        <div class="coach-panel-shell">
+          <div class="coach-panel-header">
+            <div>
+              <p class="eyebrow">AI Coach</p>
+              <h3>${localizedText('个性化推荐与任务调节', '個人化推薦與任務調節', 'Personalized recommendations')}</h3>
+            </div>
+            <div class="coach-kpi">
+              <span>${localizedText(`推荐点击率 ${acceptedRate}%`, `推薦點擊率 ${acceptedRate}%`, `CTR ${acceptedRate}%`)}</span>
+              <span>${localizedText(`按推荐完成 ${completedRate}%`, `按推薦完成 ${completedRate}%`, `Completion ${completedRate}%`)}</span>
+            </div>
+          </div>
+          <div class="coach-card-grid">
+            <article class="coach-card">
+              <span class="coach-badge">${localizedText('推荐起手', '推薦起手', 'Best next task')}</span>
+              <strong>${recommendedTask ? escapeHtml(recommendedTask.title) : localizedText('暂无推荐', '暫無推薦', 'No recommendation')}</strong>
+              <p>${recommendedTask ? localizedText(`你现在更适合先完成 ${getTaskDurationLabel(recommendedTask.duration)} 的任务，先建立完成感，再进入下一段 Focus Mode。`, `你現在更適合先完成 ${getTaskDurationLabel(recommendedTask.duration)} 的任務，先建立完成感，再進入下一段 Focus Mode。`, `A ${recommendedTask.duration}-minute task is your best next move. Build momentum first, then enter Focus Mode.`) : ''}</p>
+              ${recommendedTask ? `<button class="small-button secondary" type="button" data-coach-action="pick-recommended">${localizedText('采用这条推荐', '採用這條推薦', 'Use this recommendation')}</button>` : ''}
+            </article>
+            <article class="coach-card">
+              <span class="coach-badge">${localizedText('难度调节', '難度調節', 'Difficulty tuning')}</span>
+              <strong>${difficultyTask ? escapeHtml(difficultyTask.title) : localizedText('暂无可调任务', '暫無可調任務', 'No task to tune')}</strong>
+              <p>${difficultyTask ? (
+                insights.difficultyDuration < difficultyTask.duration
+                  ? localizedText(`如果最近容易分心，建议先把这项任务从 ${difficultyTask.duration} 分钟调到 ${insights.difficultyDuration} 分钟，降低启动压力。`, `如果最近容易分心，建議先把這項任務從 ${difficultyTask.duration} 分鐘調到 ${insights.difficultyDuration} 分鐘，降低啟動壓力。`, `If starting feels hard lately, shorten this task from ${difficultyTask.duration} to ${insights.difficultyDuration} minutes to lower the barrier.`)
+                  : localizedText(`你的状态比较稳，可以把这项任务从 ${difficultyTask.duration} 分钟提升到 ${insights.difficultyDuration} 分钟，吃掉更完整的一块任务。`, `你的狀態比較穩，可以把這項任務從 ${difficultyTask.duration} 分鐘提升到 ${insights.difficultyDuration} 分鐘，吃掉更完整的一塊任務。`, `Your rhythm looks stable. Stretch this task from ${difficultyTask.duration} to ${insights.difficultyDuration} minutes for a fuller deep-work block.`)
+              ) : ''}</p>
+              ${difficultyTask ? `<button class="small-button ghost" type="button" data-coach-action="adjust-difficulty">${localizedText('一键应用调整', '一鍵套用調整', 'Apply adjustment')}</button>` : ''}
+            </article>
+            <article class="coach-card">
+              <span class="coach-badge">${localizedText('行为建议', '行為建議', 'Behavior cue')}</span>
+              <strong>${state.streak >= 7 ? localizedText('你适合进入挑战节奏', '你適合進入挑戰節奏', 'You are ready for a challenge') : localizedText('先把连续完成感养起来', '先把連續完成感養起來', 'Build a steady completion loop')}</strong>
+              <p>${state.streak >= 7
+                ? localizedText('连续打卡不错，建议把长任务放在前面，并保留 1 个短任务做收尾，形成“先难后易”的胜利感。', '連續打卡不錯，建議把長任務放在前面，並保留 1 個短任務做收尾，形成「先難後易」的勝利感。', 'Your streak is healthy. Put the hardest task first and keep one shorter task as a satisfying finish.')
+                : localizedText('如果最近完成率一般，今天先用 20-30 分钟的任务把进入状态这件事做轻，晚一点再加深难度。', '如果最近完成率一般，今天先用 20-30 分鐘的任務把進入狀態這件事做輕，晚一點再加深難度。', 'If completion has felt shaky, start with a 20-30 minute task today and deepen the difficulty later.')}</p>
+            </article>
+          </div>
+        </div>
+      `;
     }
 
     function renderAgentIdle() {
@@ -1877,7 +2116,8 @@ if (typeof document !== 'undefined') {
           : localizedText('选择时长后开始专注。', '選擇時長後開始專注。', 'Choose a duration and start focusing.');
       elements.selectedTask.innerHTML = `
         <strong>${escapeHtml(state.selectedTask.title)}</strong>
-        <span>${escapeHtml(state.selectedTask.description)}</span>
+        <span>${escapeHtml(getTaskNotes(state.selectedTask))}</span>
+        <small>${escapeHtml(`${getTaskDurationLabel(state.selectedTask.duration)} · ${formatTaskReward(state.selectedTask)}`)}</small>
         <small>${escapeHtml(taskStatus)}</small>
       `;
     }
@@ -2058,6 +2298,9 @@ if (typeof document !== 'undefined') {
             core.generateTasks(goal, language)
               .then(response => { // 接收新的响应对象
                 state.tasks = response.tasks;
+                state.coachStats.shown += response.tasks.length ? 1 : 0;
+                state.coachAcceptedTaskId = null;
+                editingTaskId = null;
                 // 显示鼓励语
                 elements.agentProgress.innerHTML = `
                   <div class="agent-progress-header">
@@ -2492,9 +2735,64 @@ if (typeof document !== 'undefined') {
         const task = state.tasks.find((item) => item.id === target.dataset.selectTask);
         if (task) {
           state = core.selectTask(state, task);
-          setDuration(selectedDuration);
+          setDuration((task.duration || Math.round(selectedDuration / 60) || 25) * 60);
           switchView('focus');
           persistSession();
+        }
+      }
+
+      if (target.matches('[data-edit-task]')) {
+        editingTaskId = editingTaskId === target.dataset.editTask ? null : target.dataset.editTask;
+        renderTasks();
+        return;
+      }
+
+      if (target.matches('[data-cancel-task]')) {
+        editingTaskId = null;
+        renderTasks();
+        return;
+      }
+
+      if (target.matches('[data-save-task]')) {
+        const card = target.closest('.task-card');
+        if (!card) return;
+        const taskId = target.dataset.saveTask;
+        const titleInput = card.querySelector('[data-task-title-input]');
+        const notesInput = card.querySelector('[data-task-notes-input]');
+        const durationInput = card.querySelector('[data-task-duration-input]');
+        const updatedTask = updateTaskById(taskId, {
+          title: titleInput ? titleInput.value : '',
+          notes: notesInput ? notesInput.value : '',
+          duration: durationInput ? durationInput.value : 25
+        });
+        if (updatedTask && state.selectedTask && state.selectedTask.id === taskId && !timerState.isRunning) {
+          setDuration(updatedTask.duration * 60);
+        }
+        editingTaskId = null;
+        renderAll();
+        persistSession();
+        return;
+      }
+
+      if (target.matches('[data-coach-action]')) {
+        const insights = getCoachInsights();
+        if (target.dataset.coachAction === 'pick-recommended' && insights.recommendedTask) {
+          state.coachStats.accepted += 1;
+          state.coachAcceptedTaskId = insights.recommendedTask.id;
+          state = core.selectTask(state, insights.recommendedTask);
+          setDuration(insights.recommendedTask.duration * 60);
+          switchView('focus');
+          persistSession();
+          return;
+        }
+        if (target.dataset.coachAction === 'adjust-difficulty' && insights.difficultyTask) {
+          updateTaskById(insights.difficultyTask.id, {
+            duration: insights.difficultyDuration
+          });
+          editingTaskId = insights.difficultyTask.id;
+          renderAll();
+          persistSession();
+          return;
         }
       }
 
@@ -2574,6 +2872,28 @@ if (typeof document !== 'undefined') {
       });
       elements.customDurationInput.addEventListener('change', () => {
         syncCustomDurationInputs(elements.customDurationInput.value);
+      });
+    }
+
+    if (elements.taskList) {
+      elements.taskList.addEventListener('input', (event) => {
+        const durationInput = event.target.closest('[data-task-duration-input]');
+        const titleInput = event.target.closest('[data-task-title-input]');
+        const notesInput = event.target.closest('[data-task-notes-input]');
+        const card = event.target.closest('.task-card');
+        if (!card) return;
+
+        const preview = card.querySelector('[data-task-gold-preview]');
+        if (!preview) return;
+
+        const title = titleInput ? titleInput.value : card.querySelector('[data-task-title-input]')?.value || '';
+        const notes = notesInput ? notesInput.value : card.querySelector('[data-task-notes-input]')?.value || '';
+        const duration = normalizeTaskDurationValue(
+          durationInput ? durationInput.value : card.querySelector('[data-task-duration-input]')?.value || 25,
+          25
+        );
+        const gold = core.calculateTaskGold(duration, title, notes);
+        preview.textContent = localizedText(`奖励金币 ${gold}`, `獎勵金幣 ${gold}`, `${gold} coins`);
       });
     }
 

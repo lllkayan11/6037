@@ -18,7 +18,8 @@ test('AI planning generates localized focus tasks from a goal', async () => {
   assert.equal(typeof tasks[0].duration, 'number');
   assert.equal(tasks[0].duration > 0, true);
   assert.match(tasks[0].title, /.+/); // DeepSeek generated tasks might not have "Vocabulary" directly
-  assert.match(tasks[0].description, /奖励金币: \d+/); // Check for gold reward in description
+  assert.equal(typeof tasks[0].goldReward, 'number');
+  assert.equal(tasks[0].goldReward > 0, true);
   assert.ok(tasks.every((task) => task.goal === 'Prepare for IELTS in 3 months'));
 });
 
@@ -39,6 +40,28 @@ test('task translations can switch language while preserving goal and selection 
   assert.equal(translated[0].goal, 'Prepare for IELTS in 3 months');
   assert.equal(translated[0].duration, tasks[0].duration);
   assert.match(translated[0].title, /.+/);
+});
+
+test('customized tasks keep user edits when switching languages', () => {
+  const tasks = [{
+    id: 'task1',
+    goal: 'Prepare',
+    title: 'My Custom Sprint',
+    notes: 'Write a custom outline first',
+    description: 'Write a custom outline first',
+    goldReward: 28,
+    duration: 20,
+    customized: true
+  }];
+  const translated = core.translateTasks(tasks, 'zh-HK');
+  assert.equal(translated[0].title, 'My Custom Sprint');
+  assert.equal(translated[0].notes, 'Write a custom outline first');
+});
+
+test('task gold reward scales with duration and complexity', () => {
+  const shortReward = core.calculateTaskGold(15, 'Quick review', 'Review one short concept.');
+  const longReward = core.calculateTaskGold(45, 'Deep reading sprint', 'Review several hard passages and summarize key takeaways.');
+  assert.equal(longReward > shortReward, true);
 });
 
 test('selecting a task moves it into the focus state', async () => {
