@@ -602,6 +602,7 @@ const PomolandCore = (() => {
     const next = copyState(state);
     next.selectedTask = { ...task };
     next.currentView = 'focus';
+    next.focusCompleted = false;
     return next;
   }
 
@@ -611,7 +612,7 @@ const PomolandCore = (() => {
     next.resources.seeds += reward.seeds || 0;
     next.resources.water += reward.water || 0;
     next.resources.chances += reward.chances || 0;
-    if (reward.decoration) {
+    if (reward.decoration && !next.decorations.includes(reward.decoration)) {
       next.decorations.push(reward.decoration);
     }
     next.focusCompleted = true;
@@ -626,6 +627,18 @@ const PomolandCore = (() => {
   function completeFocusSession(state, timer) {
     const next = copyState(state);
     next.focusCompleted = true;
+    if (next.selectedTask) {
+      const selectedTaskId = next.selectedTask.id;
+      next.selectedTask = {
+        ...next.selectedTask,
+        completed: true
+      };
+      next.tasks = next.tasks.map((task) => (
+        task.id === selectedTaskId
+          ? { ...task, completed: true }
+          : task
+      ));
+    }
     next.lastMessage = {
       'zh-CN': '本次 Focus Mode 已结束，可以领取 Bonus。',
       'zh-HK': '本次 Focus Mode 已結束，可以領取 Bonus。',
@@ -638,6 +651,97 @@ const PomolandCore = (() => {
         remainingSeconds: 0,
         isRunning: false
       }
+    };
+  }
+
+  function createTimerState(totalSeconds, taskId = null) {
+    const safeSeconds = Math.max(1, Number(totalSeconds) || 20);
+    return {
+      taskId,
+      totalSeconds: safeSeconds,
+      remainingSeconds: safeSeconds,
+      isRunning: false,
+      completed: false,
+      endTime: null
+    };
+  }
+
+  function syncTimerState(timer, now = Date.now()) {
+    const fallback = createTimerState(20);
+    const normalized = timer ? {
+      taskId: timer.taskId || null,
+      totalSeconds: Math.max(1, Number(timer.totalSeconds) || fallback.totalSeconds),
+      remainingSeconds: Math.max(0, Number(timer.remainingSeconds) || 0),
+      isRunning: Boolean(timer.isRunning),
+      completed: Boolean(timer.completed),
+      endTime: typeof timer.endTime === 'number' ? timer.endTime : null
+    } : fallback;
+
+    if (!normalized.remainingSeconds && !normalized.completed && !normalized.isRunning) {
+      normalized.remainingSeconds = normalized.totalSeconds;
+    }
+
+    if (!normalized.isRunning || !normalized.endTime) {
+      return normalized.completed
+        ? { ...normalized, remainingSeconds: 0, endTime: null, isRunning: false }
+        : { ...normalized, endTime: null };
+    }
+
+    const remainingSeconds = Math.max(0, Math.ceil((normalized.endTime - now) / 1000));
+    return {
+      ...normalized,
+      remainingSeconds,
+      isRunning: remainingSeconds > 0,
+      completed: remainingSeconds === 0,
+      endTime: remainingSeconds > 0 ? normalized.endTime : null
+    };
+  }
+
+  function startTimerState(timer, now = Date.now()) {
+    const synced = syncTimerState(timer, now);
+    if (synced.completed) {
+      return synced;
+    }
+    const remainingSeconds = synced.remainingSeconds > 0 ? synced.remainingSeconds : synced.totalSeconds;
+    return {
+      ...synced,
+      remainingSeconds,
+      isRunning: true,
+      completed: false,
+      endTime: now + remainingSeconds * 1000
+    };
+  }
+
+  function pauseTimerState(timer, now = Date.now()) {
+    const synced = syncTimerState(timer, now);
+    if (synced.completed) {
+      return synced;
+    }
+    return {
+      ...synced,
+      isRunning: false,
+      endTime: null
+    };
+  }
+
+  function resetTimerState(timer) {
+    const base = syncTimerState(timer);
+    return createTimerState(base.totalSeconds, base.taskId);
+  }
+
+  function buildRewardBundle(language, totalSeconds, randomValue = Math.random) {
+    const effortMinutes = Math.max(1, Math.round((Number(totalSeconds) || 1200) / 60));
+    const coins = 18 + Math.round(effortMinutes * 0.8) + Math.floor(randomValue() * 10);
+    const seeds = 1 + (randomValue() > 0.55 ? 1 : 0);
+    const water = 1 + (randomValue() > 0.35 ? 1 : 0);
+    const chances = effortMinutes >= 25 && randomValue() > 0.7 ? 1 : 0;
+    const decoration = randomValue() > 0.72 ? t(language, 'rewardDecoration') : null;
+    return {
+      coins,
+      seeds,
+      water,
+      chances,
+      decoration
     };
   }
 
@@ -881,6 +985,12 @@ const PomolandCore = (() => {
     applyIslandAction,
     getIslandVisualState,
     getIslandActions,
+    createTimerState,
+    syncTimerState,
+    startTimerState,
+    pauseTimerState,
+    resetTimerState,
+    buildRewardBundle,
     recordCheckIn,
     performFriendAction,
     getFriendVisitDetails,
@@ -903,16 +1013,9 @@ if (typeof document !== 'undefined') {
     let state = core.createInitialState();
     let language = 'zh-CN';
     let selectedDuration = 20;
-    let remainingSeconds = 20;
-    let totalSeconds = 20;
+    let timerState = core.createTimerState(selectedDuration);
     let timerId = null;
-    let rewardReady = {
-      coins: 40,
-      seeds: 1,
-      water: 2,
-      chances: 1,
-      decoration: core.t(language, 'rewardDecoration')
-    };
+    let rewardReady = core.buildRewardBundle(language, selectedDuration);
 
     const elements = {
       home: document.querySelector('.home-shell'),
@@ -951,6 +1054,149 @@ if (typeof document !== 'undefined') {
       confirmLoginBtn: document.querySelector('#confirmLoginBtn')
     };
 
+    const STORAGE_KEYS = {
+      appState: 'pomoland-demo-state-v2',
+      timerState: 'pomoland-demo-timer-v2',
+      rewardState: 'pomoland-demo-reward-v1',
+      authState: 'pomoland-demo-auth-v1'
+    };
+
+    function localizedText(zhCN, zhHK, en) {
+      if (language === 'zh-HK') return zhHK;
+      if (language === 'en') return en;
+      return zhCN;
+    }
+
+    function readStorage(key) {
+      try {
+        const raw = window.localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : null;
+      } catch (error) {
+        console.warn(`Failed to read ${key} from storage`, error);
+        return null;
+      }
+    }
+
+    function writeStorage(key, value) {
+      try {
+        window.localStorage.setItem(key, JSON.stringify(value));
+      } catch (error) {
+        console.warn(`Failed to save ${key} to storage`, error);
+      }
+    }
+
+    function mergeState(savedState) {
+      const base = core.createInitialState();
+      if (!savedState || typeof savedState !== 'object') {
+        return base;
+      }
+      const selectedTaskId = savedState.selectedTask && savedState.selectedTask.id;
+      const merged = {
+        ...base,
+        ...savedState,
+        resources: {
+          ...base.resources,
+          ...(savedState.resources || {})
+        },
+        decorations: Array.isArray(savedState.decorations) ? savedState.decorations : [],
+        checkIns: Array.isArray(savedState.checkIns) ? savedState.checkIns : [],
+        tasks: Array.isArray(savedState.tasks) ? savedState.tasks : [],
+        friendMessages: savedState.friendMessages || {},
+        lastMessage: savedState.lastMessage || base.lastMessage
+      };
+      merged.selectedTask = merged.tasks.find((task) => task.id === selectedTaskId) || null;
+      return merged;
+    }
+
+    function persistSession() {
+      state.language = language;
+      writeStorage(STORAGE_KEYS.appState, state);
+      writeStorage(STORAGE_KEYS.timerState, timerState);
+      writeStorage(STORAGE_KEYS.rewardState, rewardReady);
+    }
+
+    function restoreSession() {
+      state = mergeState(readStorage(STORAGE_KEYS.appState));
+      language = state.language || language;
+      timerState = core.syncTimerState(readStorage(STORAGE_KEYS.timerState) || core.createTimerState(selectedDuration));
+      selectedDuration = timerState.totalSeconds || selectedDuration;
+      rewardReady = readStorage(STORAGE_KEYS.rewardState) || core.buildRewardBundle(language, selectedDuration);
+
+      const auth = readStorage(STORAGE_KEYS.authState);
+      if (auth && auth.loggedIn) {
+        elements.authShell.hidden = true;
+        elements.homeShell.hidden = false;
+        if (auth.phone) elements.phoneInput.value = auth.phone;
+        if (auth.nickname) elements.nicknameInput.value = auth.nickname;
+      }
+    }
+
+    function getTaskActionLabel(task) {
+      if (task.completed) {
+        return localizedText('已完成', '已完成', 'Done');
+      }
+      if (state.selectedTask && state.selectedTask.id === task.id) {
+        return localizedText('已选择', '已選擇', 'Selected');
+      }
+      return core.t(language, 'selectTask');
+    }
+
+    function stopTicker() {
+      if (timerId) {
+        window.clearInterval(timerId);
+        timerId = null;
+      }
+    }
+
+    function playCompletionCue() {
+      if (navigator.vibrate) {
+        navigator.vibrate([180, 120, 220]);
+      }
+      try {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+          const audioContext = new AudioContextClass();
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+          oscillator.type = 'sine';
+          oscillator.frequency.setValueAtTime(880, audioContext.currentTime);
+          gainNode.gain.setValueAtTime(0.0001, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.18, audioContext.currentTime + 0.02);
+          gainNode.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.28);
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+          oscillator.start();
+          oscillator.stop(audioContext.currentTime + 0.3);
+        }
+      } catch (error) {
+        console.warn('Unable to play completion cue', error);
+      }
+
+      if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+        new Notification(
+          localizedText('Pomoland 专注完成', 'Pomoland 專注完成', 'Pomoland focus complete'),
+          {
+            body: localizedText('回到页面领取 Bonus，并继续建设岛屿。', '回到頁面領取 Bonus，並繼續建設島嶼。', 'Return to Pomoland to claim your bonus and keep building.')
+          }
+        );
+      }
+    }
+
+    function syncTimerFromClock() {
+      timerState = core.syncTimerState(timerState);
+      if (timerState.completed && state.selectedTask && !state.focusCompleted) {
+        finishFocus(true);
+        return;
+      }
+      renderTimer();
+      persistSession();
+    }
+
+    function startTicker() {
+      stopTicker();
+      timerId = window.setInterval(syncTimerFromClock, 250);
+    }
+
     function setLanguage(nextLanguage) {
       language = core.getSupportedLanguages().includes(nextLanguage) ? nextLanguage : 'zh-CN';
       state.language = language;
@@ -979,6 +1225,7 @@ if (typeof document !== 'undefined') {
         decoration: core.t(language, 'rewardDecoration')
       };
       renderAll();
+      persistSession();
     }
 
     function openWorkspace() {
@@ -1030,13 +1277,13 @@ if (typeof document !== 'undefined') {
         return;
       }
       elements.taskList.innerHTML = state.tasks.map((task) => `
-        <article class="task-card ${state.selectedTask && state.selectedTask.id === task.id ? 'is-selected' : ''}">
+        <article class="task-card ${state.selectedTask && state.selectedTask.id === task.id ? 'is-selected' : ''} ${task.completed ? 'is-complete' : ''}">
           <div>
             <span class="task-duration">${task.duration}m</span>
             <h3>${escapeHtml(task.title)}</h3>
             <p>${escapeHtml(task.description)}</p>
           </div>
-          <button class="small-button" type="button" data-select-task="${task.id}">${core.t(language, 'selectTask')}</button>
+          <button class="small-button" type="button" data-select-task="${task.id}" ${task.completed ? 'disabled' : ''}>${getTaskActionLabel(task)}</button>
         </article>
       `).join('');
     }
@@ -1074,17 +1321,23 @@ if (typeof document !== 'undefined') {
         elements.selectedTask.innerHTML = `<span>${core.t(language, 'noTask')}</span>`;
         return;
       }
+      const taskStatus = state.selectedTask.completed
+        ? localizedText('已完成，可以切换下一项任务。', '已完成，可以切換下一項任務。', 'Completed. You can move on to the next task.')
+        : timerState.isRunning
+          ? localizedText('倒计时进行中，切到后台也会继续。', '倒計時進行中，切到後台也會繼續。', 'The countdown is running and continues in the background.')
+          : localizedText('选择时长后开始专注。', '選擇時長後開始專注。', 'Choose a duration and start focusing.');
       elements.selectedTask.innerHTML = `
         <strong>${escapeHtml(state.selectedTask.title)}</strong>
         <span>${escapeHtml(state.selectedTask.description)}</span>
+        <small>${escapeHtml(taskStatus)}</small>
       `;
     }
 
     function renderTimer() {
-      const minutes = Math.floor(remainingSeconds / 60).toString().padStart(2, '0');
-      const seconds = Math.floor(remainingSeconds % 60).toString().padStart(2, '0');
+      const minutes = Math.floor(timerState.remainingSeconds / 60).toString().padStart(2, '0');
+      const seconds = Math.floor(timerState.remainingSeconds % 60).toString().padStart(2, '0');
       elements.timerDisplay.textContent = `${minutes}:${seconds}`;
-      const progress = totalSeconds > 0 ? 1 - remainingSeconds / totalSeconds : 0;
+      const progress = timerState.totalSeconds > 0 ? 1 - timerState.remainingSeconds / timerState.totalSeconds : 0;
       elements.timerRing.style.setProperty('--progress', `${Math.max(0, Math.min(1, progress)) * 360}deg`);
       document.querySelectorAll('.duration-button').forEach((button) => {
         button.classList.toggle('is-active', Number(button.dataset.seconds) === selectedDuration);
@@ -1241,51 +1494,82 @@ if (typeof document !== 'undefined') {
     }
 
     function setDuration(seconds) {
-      stopTimer();
+      stopTicker();
       selectedDuration = seconds;
-      totalSeconds = seconds;
-      remainingSeconds = seconds;
+      timerState = core.createTimerState(seconds, state.selectedTask ? state.selectedTask.id : null);
       renderTimer();
+      persistSession();
     }
 
     function startTimer() {
-      if (!state.selectedTask) return;
-      if (timerId) return;
-      timerId = window.setInterval(() => {
-        remainingSeconds -= 1;
-        if (remainingSeconds <= 0) {
-          remainingSeconds = 0;
-          stopTimer();
-          finishFocus();
-        }
-        renderTimer();
-      }, 1000);
+      if (!state.selectedTask) {
+        alert(localizedText('请先选择一个任务再开始 Focus Mode。', '請先選擇一個任務再開始 Focus Mode。', 'Select a task before starting Focus Mode.'));
+        return;
+      }
+      if (state.selectedTask.completed) {
+        alert(localizedText('这个任务已经完成，请选择新的任务。', '這個任務已經完成，請選擇新的任務。', 'This task is already complete. Please choose a new one.'));
+        return;
+      }
+      if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
+        Notification.requestPermission().catch(() => {});
+      }
+      timerState = core.startTimerState({
+        ...timerState,
+        taskId: state.selectedTask.id,
+        totalSeconds: selectedDuration,
+        remainingSeconds: timerState.remainingSeconds > 0 ? timerState.remainingSeconds : selectedDuration
+      });
+      state.focusCompleted = false;
+      startTicker();
+      syncTimerFromClock();
     }
 
     function stopTimer() {
-      if (timerId) {
-        window.clearInterval(timerId);
-        timerId = null;
-      }
+      stopTicker();
+      timerState = core.pauseTimerState(timerState);
+      renderTimer();
+      persistSession();
     }
 
     function resetTimer() {
-      stopTimer();
-      remainingSeconds = selectedDuration;
-      totalSeconds = selectedDuration;
+      stopTicker();
+      timerState = core.resetTimerState({
+        ...timerState,
+        taskId: state.selectedTask ? state.selectedTask.id : timerState.taskId,
+        totalSeconds: selectedDuration
+      });
+      state.focusCompleted = false;
       renderTimer();
+      persistSession();
     }
 
-    function finishFocus() {
-      if (!state.selectedTask) return;
-      stopTimer();
-      const result = core.completeFocusSession(state, { totalSeconds, remainingSeconds });
+    function finishFocus(fromTimer = false) {
+      if (!state.selectedTask || state.focusCompleted) return;
+      stopTicker();
+      timerState = core.syncTimerState(timerState);
+      const result = core.completeFocusSession(state, {
+        totalSeconds: timerState.totalSeconds || selectedDuration,
+        remainingSeconds: timerState.remainingSeconds
+      });
       state = result.state;
-      remainingSeconds = result.timer.remainingSeconds;
-      totalSeconds = result.timer.totalSeconds || selectedDuration;
+      timerState = {
+        taskId: state.selectedTask.id,
+        totalSeconds: result.timer.totalSeconds || selectedDuration,
+        remainingSeconds: result.timer.remainingSeconds,
+        isRunning: false,
+        completed: true,
+        endTime: null
+      };
+      rewardReady = core.buildRewardBundle(language, timerState.totalSeconds || selectedDuration);
       renderTimer();
+      renderTasks();
+      renderSelectedTask();
       renderBonus();
       elements.bonusModal.hidden = false;
+      if (fromTimer) {
+        playCompletionCue();
+      }
+      persistSession();
     }
 
     function renderBonus() {
@@ -1295,14 +1579,21 @@ if (typeof document !== 'undefined') {
         `${core.t(language, 'water')} +${rewardReady.water}`,
         `${core.t(language, 'chances')} +${rewardReady.chances}`,
         rewardReady.decoration
-      ].map((item) => `<span>${escapeHtml(item)}</span>`).join('');
+      ].filter(Boolean).map((item) => `<span>${escapeHtml(item)}</span>`).join('');
     }
 
     function claimBonus() {
       state = core.claimReward(state, rewardReady);
       state = core.recordCheckIn(state, core.todayIso());
+      timerState = core.resetTimerState({
+        ...timerState,
+        taskId: state.selectedTask ? state.selectedTask.id : null,
+        totalSeconds: selectedDuration
+      });
+      rewardReady = core.buildRewardBundle(language, selectedDuration);
       elements.bonusModal.hidden = true;
       switchView('island');
+      persistSession();
     }
 
     function openVisitModal(friendId) {
@@ -1383,6 +1674,11 @@ if (typeof document !== 'undefined') {
           .then((res) => res.json())
           .then((data) => {
             if (data.success) {
+              writeStorage(STORAGE_KEYS.authState, {
+                loggedIn: true,
+                phone,
+                nickname
+              });
               elements.authShell.hidden = true;
               elements.homeShell.hidden = false;
             } else {
@@ -1411,6 +1707,7 @@ if (typeof document !== 'undefined') {
 
       if (target.matches('[data-view]')) {
         switchView(target.dataset.view);
+        persistSession();
       }
 
       if (target.id === 'generatePlan') {
@@ -1423,6 +1720,7 @@ if (typeof document !== 'undefined') {
           state = core.selectTask(state, task);
           setDuration(selectedDuration);
           switchView('focus');
+          persistSession();
         }
       }
 
@@ -1435,12 +1733,16 @@ if (typeof document !== 'undefined') {
       if (target.id === 'resetTimer') resetTimer();
       if (target.id === 'finishFocus') finishFocus();
       if (target.id === 'claimBonus') claimBonus();
-      if (target.id === 'closeBonus') elements.bonusModal.hidden = true;
+      if (target.id === 'closeBonus') {
+        elements.bonusModal.hidden = true;
+        persistSession();
+      }
       if (target.id === 'closeVisit' || target.id === 'closeVisitAction') closeVisitModal();
 
       if (target.matches('[data-island-action]')) {
         state = core.applyIslandAction(state, target.dataset.islandAction);
         renderAll();
+        persistSession();
       }
 
       if (target.matches('[data-friend]')) {
@@ -1449,6 +1751,7 @@ if (typeof document !== 'undefined') {
           openVisitModal(target.dataset.friend);
         }
         renderAll();
+        persistSession();
       }
     });
 
@@ -1458,7 +1761,36 @@ if (typeof document !== 'undefined') {
       });
     }
 
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && timerState.isRunning) {
+        syncTimerFromClock();
+        if (timerState.isRunning && !timerId) startTicker();
+      }
+    });
+
+    window.addEventListener('beforeunload', () => {
+      if (timerState.isRunning) {
+        timerState = core.syncTimerState(timerState);
+      }
+      persistSession();
+    });
+
+    restoreSession();
     setLanguage(language);
-    setDuration(20);
+    if (state.selectedTask) {
+      timerState = core.syncTimerState(timerState);
+      selectedDuration = timerState.totalSeconds || selectedDuration;
+      renderTimer();
+    } else {
+      setDuration(selectedDuration);
+    }
+    if (timerState.isRunning) {
+      startTicker();
+      syncTimerFromClock();
+    } else if (timerState.completed && state.selectedTask && !state.focusCompleted) {
+      finishFocus(true);
+    } else {
+      renderAll();
+    }
   });
 }
