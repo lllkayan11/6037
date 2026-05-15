@@ -1557,12 +1557,544 @@ const SocialModule = (() => {
   };
 })();
 
+// ==================== Island Garden Module ====================
+const IslandGardenModule = (function() {
+  // 定义作物类型和生长阶段
+  const CROP_TYPES = {
+    tomato: {
+      name: '番茄',
+      icon: '🍅',
+      growthTime: 4 * 60 * 60, // 4小时
+      stages: ['种子', '幼苗', '生长中', '开花', '结果'],
+      rewards: { water: 2, sunlight: 2, coins: 50 },
+      yield: 5
+    },
+    strawberry: {
+      name: '草莓',
+      icon: '🍓',
+      growthTime: 6 * 60 * 60,
+      stages: ['种子', '幼苗', '生长中', '开花', '结果'],
+      rewards: { water: 3, sunlight: 3, coins: 80 },
+      yield: 8
+    },
+    apple: {
+      name: '苹果',
+      icon: '🍎',
+      growthTime: 8 * 60 * 60,
+      stages: ['种子', '幼苗', '小树', '大树', '结果'],
+      rewards: { water: 4, sunlight: 4, coins: 120 },
+      yield: 10
+    },
+    orange: {
+      name: '橘子',
+      icon: '🍊',
+      growthTime: 10 * 60 * 60,
+      stages: ['种子', '幼苗', '小树', '大树', '结果'],
+      rewards: { water: 5, sunlight: 5, coins: 150 },
+      yield: 12
+    },
+    watermelon: {
+      name: '西瓜',
+      icon: '🍉',
+      growthTime: 12 * 60 * 60,
+      stages: ['种子', '幼苗', '藤蔓', '开花', '结果'],
+      rewards: { water: 6, sunlight: 6, coins: 200 },
+      yield: 15
+    },
+    carrot: {
+      name: '胡萝卜',
+      icon: '🥕',
+      growthTime: 3 * 60 * 60,
+      stages: ['种子', '幼苗', '生长中', '成熟'],
+      rewards: { water: 2, sunlight: 2, coins: 40 },
+      yield: 6
+    }
+  };
+
+  // 定义宠物类型
+  const PET_TYPES = {
+    rabbit: {
+      name: '小兔子',
+      icon: '🐰',
+      happinessDecay: 2, // 每小时减少2点
+      feedBonus: { coins: 30, focusBonus: 1.1 },
+      feedInterval: 4 * 60 * 60 // 4小时需要喂一次
+    },
+    cat: {
+      name: '猫咪',
+      icon: '🐱',
+      happinessDecay: 1.5,
+      feedBonus: { coins: 40, focusBonus: 1.15 },
+      feedInterval: 6 * 60 * 60
+    },
+    dog: {
+      name: '小狗',
+      icon: '🐶',
+      happinessDecay: 2.5,
+      feedBonus: { coins: 35, focusBonus: 1.12 },
+      feedInterval: 5 * 60 * 60
+    },
+    bird: {
+      name: '小鸟',
+      icon: '🐦',
+      happinessDecay: 3,
+      feedBonus: { coins: 25, focusBonus: 1.08 },
+      feedInterval: 3 * 60 * 60
+    }
+  };
+
+  // 定义装饰品
+  const DECORATION_TYPES = {
+    fence: { name: '栅栏', icon: '🪜', cost: { coins: 100 }, effect: 'security' },
+    fountain: { name: '喷泉', icon: '⛲', cost: { coins: 500 }, effect: 'happiness' },
+    bench: { name: '长椅', icon: '🪑', cost: { coins: 300 }, effect: 'rest' },
+    lamp: { name: '路灯', icon: '🪔', cost: { coins: 200 }, effect: 'night' },
+    flower: { name: '花朵', icon: '🌸', cost: { coins: 150 }, effect: 'beauty' },
+    statue: { name: '雕像', icon: '🗿', cost: { coins: 800 }, effect: 'prestige' },
+    pond: { name: '池塘', icon: '🌊', cost: { coins: 600 }, effect: 'calm' },
+    bridge: { name: '小桥', icon: '🌉', cost: { coins: 700 }, effect: 'access' }
+  };
+
+  // 创建初始岛屿状态
+  function createIslandState() {
+    return {
+      level: 1,
+      exp: 0,
+      maxExp: 100,
+      coins: 0,
+      water: 10,
+      sunlight: 10,
+      dailyHelpCount: 5,
+      plots: [
+        { id: 'plot1', crop: null, plantedAt: null, growthStage: 0, needsWater: false, wateredAt: null },
+        { id: 'plot2', crop: null, plantedAt: null, growthStage: 0, needsWater: false, wateredAt: null },
+        { id: 'plot3', crop: null, plantedAt: null, growthStage: 0, needsWater: false, wateredAt: null },
+        { id: 'plot4', crop: null, plantedAt: null, growthStage: 0, needsWater: false, wateredAt: null },
+        { id: 'plot5', crop: null, plantedAt: null, growthStage: 0, needsWater: false, wateredAt: null },
+        { id: 'plot6', crop: null, plantedAt: null, growthStage: 0, needsWater: false, wateredAt: null }
+      ],
+      pets: [
+        { id: 'pet1', type: 'rabbit', name: '小白', happiness: 100, lastFedAt: Date.now(), unlocked: true }
+      ],
+      decorations: [],
+      inventory: {
+        seeds: { tomato: 3, strawberry: 2 },
+        harvested: {}
+      },
+      lastVisitTime: Date.now(),
+      islandName: '我的小岛',
+      theme: 'sunny',
+      achievements: {
+        firstHarvest: false,
+        masterGardener: false,
+        petLover: false,
+        socialButterfly: false
+      }
+    };
+  }
+
+  // 种植作物
+  function plantCrop(islandState, plotId, cropType) {
+    const plotIndex = islandState.plots.findIndex(p => p.id === plotId);
+    if (plotIndex === -1) return { success: false, message: '找不到地块' };
+
+    const plot = islandState.plots[plotIndex];
+    if (plot.crop) return { success: false, message: '这个地块已经有作物了' };
+
+    if (!islandState.inventory.seeds[cropType] || islandState.inventory.seeds[cropType] <= 0) {
+      return { success: false, message: '没有这种种子' };
+    }
+
+    islandState.inventory.seeds[cropType]--;
+    plot.crop = cropType;
+    plot.plantedAt = Date.now();
+    plot.growthStage = 0;
+    plot.needsWater = false;
+    plot.wateredAt = null;
+
+    return { success: true, message: `成功种植了${CROP_TYPES[cropType].name}` };
+  }
+
+  // 浇水
+  function waterCrop(islandState, plotId) {
+    const plotIndex = islandState.plots.findIndex(p => p.id === plotId);
+    if (plotIndex === -1) return { success: false, message: '找不到地块' };
+
+    const plot = islandState.plots[plotIndex];
+    if (!plot.crop) return { success: false, message: '这个地块没有作物' };
+
+    if (islandState.water <= 0) return { success: false, message: '水滴不足' };
+
+    islandState.water--;
+    plot.needsWater = false;
+    plot.wateredAt = Date.now();
+
+    // 加速生长时间
+    plot.plantedAt = Math.max(plot.plantedAt - 30 * 60 * 1000, Date.now());
+
+    return { success: true, message: '浇水成功，作物生长加速30分钟' };
+  }
+
+  // 收获作物
+  function harvestCrop(islandState, plotId) {
+    const plotIndex = islandState.plots.findIndex(p => p.id === plotId);
+    if (plotIndex === -1) return { success: false, message: '找不到地块' };
+
+    const plot = islandState.plots[plotIndex];
+    if (!plot.crop) return { success: false, message: '这个地块没有作物' };
+
+    const cropType = CROP_TYPES[plot.crop];
+    const growthProgress = getGrowthProgress(plot);
+    if (growthProgress < 100) return { success: false, message: '作物还没成熟' };
+
+    // 计算收获奖励
+    const yieldAmount = calculateYield(plot);
+    const rewards = {
+      water: cropType.rewards.water * yieldAmount,
+      sunlight: cropType.rewards.sunlight * yieldAmount,
+      coins: cropType.rewards.coins * yieldAmount
+    };
+
+    // 添加到收获记录
+    if (!islandState.inventory.harvested[plot.crop]) {
+      islandState.inventory.harvested[plot.crop] = 0;
+    }
+    islandState.inventory.harvested[plot.crop] += yieldAmount;
+
+    // 获取奖励
+    islandState.water += rewards.water;
+    islandState.sunlight += rewards.sunlight;
+    islandState.coins += rewards.coins;
+
+    // 增加经验
+    addExp(islandState, 20);
+
+    // 重置地块
+    plot.crop = null;
+    plot.plantedAt = null;
+    plot.growthStage = 0;
+    plot.needsWater = false;
+    plot.wateredAt = null;
+
+    // 检查成就
+    checkHarvestAchievements(islandState);
+
+    return {
+      success: true,
+      message: `收获成功！获得${yieldAmount}个${cropType.name}`,
+      rewards,
+      yieldAmount
+    };
+  }
+
+  // 获取生长进度
+  function getGrowthProgress(plot) {
+    if (!plot.crop) return 0;
+
+    const cropType = CROP_TYPES[plot.crop];
+    const elapsedTime = Date.now() - plot.plantedAt;
+    const progress = Math.min((elapsedTime / cropType.growthTime) * 100, 100);
+
+    return progress;
+  }
+
+  // 计算产量
+  function calculateYield(plot) {
+    if (!plot.crop) return 0;
+
+    const cropType = CROP_TYPES[plot.crop];
+    const growthProgress = getGrowthProgress(plot);
+
+    // 如果没及时浇水，产量减少
+    let yieldMultiplier = 1.0;
+    if (plot.needsWater) {
+      yieldMultiplier = 0.5;
+    }
+
+    // 根据生长阶段计算产量
+    let baseYield = Math.floor(cropType.yield * yieldMultiplier);
+    if (growthProgress >= 100) {
+      return baseYield;
+    } else if (growthProgress >= 80) {
+      return Math.floor(baseYield * 0.8);
+    } else {
+      return Math.floor(baseYield * 0.5);
+    }
+  }
+
+  // 喂养宠物
+  function feedPet(islandState, petId) {
+    const petIndex = islandState.pets.findIndex(p => p.id === petId);
+    if (petIndex === -1) return { success: false, message: '找不到宠物' };
+
+    const pet = islandState.pets[petIndex];
+    if (!pet.unlocked) return { success: false, message: '宠物未解锁' };
+
+    const petType = PET_TYPES[pet.type];
+    if (islandState.water < 2) return { success: false, message: '水滴不足' };
+
+    islandState.water -= 2;
+    pet.happiness = Math.min(pet.happiness + 30, 100);
+    pet.lastFedAt = Date.now();
+
+    const bonus = petType.feedBonus;
+    islandState.coins += bonus.coins;
+
+    return {
+      success: true,
+      message: `喂养成功！${pet.name}很开心，获得${bonus.coins}金币`,
+      bonus
+    };
+  }
+
+  // 解锁宠物
+  function unlockPet(islandState, petType) {
+    if (islandState.coins < 500) return { success: false, message: '金币不足500' };
+
+    const existingPet = islandState.pets.find(p => p.type === petType);
+    if (existingPet && existingPet.unlocked) {
+      return { success: false, message: '这个宠物已经解锁了' };
+    }
+
+    islandState.coins -= 500;
+    const newPet = {
+      id: `pet${Date.now()}`,
+      type: petType,
+      name: PET_TYPES[petType].name,
+      happiness: 100,
+      lastFedAt: Date.now(),
+      unlocked: true
+    };
+
+    if (existingPet) {
+      existingPet.unlocked = true;
+      existingPet.lastFedAt = Date.now();
+    } else {
+      islandState.pets.push(newPet);
+    }
+
+    return { success: true, message: `成功解锁${PET_TYPES[petType].name}！` };
+  }
+
+  // 购买装饰品
+  function buyDecoration(islandState, decorationType) {
+    const decoration = DECORATION_TYPES[decorationType];
+    if (islandState.coins < decoration.cost.coins) {
+      return { success: false, message: '金币不足' };
+    }
+
+    islandState.coins -= decoration.cost.coins;
+    islandState.decorations.push({
+      id: `deco${Date.now()}`,
+      type: decorationType,
+      placedAt: Date.now()
+    });
+
+    addExp(islandState, 10);
+
+    return { success: true, message: `成功购买并放置${decoration.name}！` };
+  }
+
+  // 增加经验
+  function addExp(islandState, amount) {
+    islandState.exp += amount;
+    while (islandState.exp >= islandState.maxExp) {
+      islandState.exp -= islandState.maxExp;
+      islandState.level++;
+      islandState.maxExp = Math.floor(islandState.maxExp * 1.5);
+      islandState.dailyHelpCount += 2; // 升级增加帮助次数
+    }
+  }
+
+  // 更新岛屿状态
+  function updateIslandState(islandState) {
+    const now = Date.now();
+    let hasChanges = false;
+
+    // 检查作物状态
+    islandState.plots.forEach(plot => {
+      if (!plot.crop) return;
+
+      const cropType = CROP_TYPES[plot.crop];
+      const hoursSincePlanted = (now - plot.plantedAt) / (60 * 60 * 1000);
+
+      // 如果超过2小时没有浇水，标记为需要浇水
+      if (plot.wateredAt && (now - plot.wateredAt) > 2 * 60 * 60 * 1000) {
+        if (!plot.needsWater) {
+          plot.needsWater = true;
+          hasChanges = true;
+        }
+      }
+
+      // 根据生长时间更新生长阶段
+      const growthProgress = getGrowthProgress(plot);
+      const newStage = Math.floor((growthProgress / 100) * (cropType.stages.length - 1));
+      if (newStage !== plot.growthStage) {
+        plot.growthStage = newStage;
+        hasChanges = true;
+      }
+    });
+
+    // 检查宠物状态
+    islandState.pets.forEach(pet => {
+      if (!pet.unlocked) return;
+
+      const petType = PET_TYPES[pet.type];
+      const hoursSinceFed = (now - pet.lastFedAt) / (60 * 60 * 1000);
+
+      // 根据时间衰减快乐度
+      if (hoursSinceFed > 0) {
+        const happinessDecay = Math.floor(hoursSinceFed * petType.happinessDecay);
+        const newHappiness = Math.max(100 - happinessDecay, 0);
+        if (newHappiness !== pet.happiness) {
+          pet.happiness = newHappiness;
+          hasChanges = true;
+        }
+      }
+    });
+
+    // 每日重置帮助次数
+    const lastVisit = new Date(islandState.lastVisitTime);
+    const today = new Date(now);
+    if (lastVisit.getDate() !== today.getDate() ||
+        lastVisit.getMonth() !== today.getMonth() ||
+        lastVisit.getFullYear() !== today.getFullYear()) {
+      islandState.dailyHelpCount = 5 + (islandState.level - 1) * 2;
+      islandState.lastVisitTime = now;
+      hasChanges = true;
+    }
+
+    return hasChanges;
+  }
+
+  // 检查收获成就
+  function checkHarvestAchievements(islandState) {
+    const totalHarvests = Object.values(islandState.inventory.harvested).reduce((sum, count) => sum + count, 0);
+
+    if (totalHarvests >= 1 && !islandState.achievements.firstHarvest) {
+      islandState.achievements.firstHarvest = true;
+      islandState.coins += 100;
+    }
+
+    if (totalHarvests >= 50 && !islandState.achievements.masterGardener) {
+      islandState.achievements.masterGardener = true;
+      islandState.coins += 500;
+    }
+  }
+
+  // 帮助好友浇水
+  function helpFriendWater(friendId, plotId, islandState) {
+    if (islandState.dailyHelpCount <= 0) {
+      return { success: false, message: '今日帮助次数已用完' };
+    }
+
+    islandState.dailyHelpCount--;
+    islandState.coins += 20; // 帮助获得20金币
+
+    return {
+      success: true,
+      message: '帮助好友浇水成功！获得20金币',
+      reward: { coins: 20 }
+    };
+  }
+
+  // 偷取好友果实
+  function stealFriendCrop(friendId, plotId, islandState) {
+    if (islandState.dailyHelpCount <= 0) {
+      return { success: false, message: '今日互动次数已用完' };
+    }
+
+    islandState.dailyHelpCount--;
+
+    // 随机获得1-3个果实
+    const stolenAmount = Math.floor(Math.random() * 3) + 1;
+    const stolenTypes = Object.keys(CROP_TYPES);
+    const stolenType = stolenTypes[Math.floor(Math.random() * stolenTypes.length)];
+
+    if (!islandState.inventory.harvested[stolenType]) {
+      islandState.inventory.harvested[stolenType] = 0;
+    }
+    islandState.inventory.harvested[stolenType] += stolenAmount;
+
+    return {
+      success: true,
+      message: `成功偷取了${stolenAmount}个${CROP_TYPES[stolenType].name}！`,
+      stolen: { type: stolenType, amount: stolenAmount }
+    };
+  }
+
+  // 获取岛屿信息
+  function getIslandInfo(islandState) {
+    return {
+      level: islandState.level,
+      exp: islandState.exp,
+      maxExp: islandState.maxExp,
+      coins: islandState.coins,
+      water: islandState.water,
+      sunlight: islandState.sunlight,
+      dailyHelpCount: islandState.dailyHelpCount,
+      islandName: islandState.islandName,
+      theme: islandState.theme,
+      plotCount: islandState.plots.length,
+      petCount: islandState.pets.filter(p => p.unlocked).length,
+      decorationCount: islandState.decorations.length
+    };
+  }
+
+  // 获取作物状态
+  function getCropsStatus(islandState) {
+    return islandState.plots.map(plot => ({
+      id: plot.id,
+      crop: plot.crop,
+      cropType: plot.crop ? CROP_TYPES[plot.crop] : null,
+      growthStage: plot.growthStage,
+      growthProgress: plot.crop ? getGrowthProgress(plot) : 0,
+      needsWater: plot.needsWater,
+      canHarvest: plot.crop && getGrowthProgress(plot) >= 100
+    }));
+  }
+
+  // 获取宠物状态
+  function getPetsStatus(islandState) {
+    return islandState.pets.map(pet => ({
+      id: pet.id,
+      type: pet.type,
+      petType: PET_TYPES[pet.type],
+      name: pet.name,
+      happiness: pet.happiness,
+      unlocked: pet.unlocked,
+      needsFeed: pet.unlocked && (Date.now() - pet.lastFedAt) > PET_TYPES[pet.type].feedInterval
+    }));
+  }
+
+  return {
+    createIslandState,
+    plantCrop,
+    waterCrop,
+    harvestCrop,
+    feedPet,
+    unlockPet,
+    buyDecoration,
+    updateIslandState,
+    helpFriendWater,
+    stealFriendCrop,
+    getIslandInfo,
+    getCropsStatus,
+    getPetsStatus,
+    CROP_TYPES,
+    PET_TYPES,
+    DECORATION_TYPES
+  };
+})();
+
+// 主模块导出
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = PomolandCore;
 }
 
 if (typeof window !== 'undefined') {
   window.PomolandCore = PomolandCore;
+  window.IslandGardenModule = IslandGardenModule;
 }
 
 if (typeof document !== 'undefined') {
@@ -1590,6 +2122,12 @@ if (typeof document !== 'undefined') {
       reward: null,
       theme: null
     };
+
+    // 岛屿花园状态
+    let islandState = IslandGardenModule.createIslandState();
+    let currentTool = null;
+    let selectedPlot = null;
+    let currentFriendId = null;
 
     const elements = {
       home: document.querySelector('.home-shell'),
@@ -1674,14 +2212,48 @@ if (typeof document !== 'undefined') {
       leaderboardContent: document.querySelector('#leaderboardContent'),
       challengesList: document.querySelector('#challengesList'),
       achievementsGrid: document.querySelector('#achievementsGrid'),
-      achievementsLikes: document.querySelector('#achievementsLikes')
+      achievementsLikes: document.querySelector('#achievementsLikes'),
+      // Island garden elements
+      islandLevel: document.querySelector('#islandLevel'),
+      expFill: document.querySelector('#expFill'),
+      coinsCount: document.querySelector('#coinsCount'),
+      waterCount: document.querySelector('#waterCount'),
+      sunlightCount: document.querySelector('#sunlightCount'),
+      helpCount: document.querySelector('#helpCount'),
+      farmPlotsGrid: document.querySelector('#farmPlotsGrid'),
+      petArea: document.querySelector('#petArea'),
+      mainPet: document.querySelector('#mainPet'),
+      petBubble: document.querySelector('#petBubble'),
+      petHappinessFill: document.querySelector('#petHappinessFill'),
+      inventoryGrid: document.querySelector('#inventoryGrid'),
+      seedTomatoCount: document.querySelector('#seedTomatoCount'),
+      seedStrawberryCount: document.querySelector('#seedStrawberryCount'),
+      harvestTomatoCount: document.querySelector('#harvestTomatoCount'),
+      plantingModal: document.querySelector('#plantingModal'),
+      closePlanting: document.querySelector('#closePlanting'),
+      seedsGrid: document.querySelector('#seedsGrid'),
+      seedTomatoAmount: document.querySelector('#seedTomatoAmount'),
+      seedStrawberryAmount: document.querySelector('#seedStrawberryAmount'),
+      seedCarrotAmount: document.querySelector('#seedCarrotAmount'),
+      shopModal: document.querySelector('#shopModal'),
+      closeShop: document.querySelector('#closeShop'),
+      shopContent: document.querySelector('#shopContent'),
+      shopDecorations: document.querySelector('#shopDecorations'),
+      shopSeeds: document.querySelector('#shopSeeds'),
+      shopPets: document.querySelector('#shopPets'),
+      inventoryModal: document.querySelector('#inventoryModal'),
+      closeInventory: document.querySelector('#closeInventory'),
+      friendInteractionModal: document.querySelector('#friendInteractionModal'),
+      closeFriendInteraction: document.querySelector('#closeFriendInteraction'),
+      friendIslandPreview: document.querySelector('#friendIslandPreview')
     };
 
     const STORAGE_KEYS = {
       appState: 'pomoland-demo-state-v2',
       timerState: 'pomoland-demo-timer-v2',
       rewardState: 'pomoland-demo-reward-v1',
-      authState: 'pomoland-demo-auth-v1'
+      authState: 'pomoland-demo-auth-v1',
+      islandState: 'pomoland-demo-island-v1'
     };
 
     const focusPreview = (() => {
@@ -2450,6 +3022,8 @@ if (typeof document !== 'undefined') {
       renderFriends();
       renderReport();
       renderAgentIdle();
+      // Update island garden UI
+      updateIslandUI();
     }
 
     function renderDurationPicker() {
@@ -3308,6 +3882,23 @@ if (typeof document !== 'undefined') {
     function claimBonus(destination = 'checkin', islandAction = null) {
       state = core.claimReward(state, rewardReady);
       state = core.recordCheckIn(state, core.todayIso());
+
+      // Add island garden rewards
+      const rewardAmount = Math.floor(selectedDuration / 60);
+      islandState.coins += rewardAmount * 2;
+      islandState.water += rewardAmount;
+      islandState.sunlight += Math.floor(rewardAmount * 0.5);
+
+      // Chance to get seeds
+      if (Math.random() < 0.3) {
+        const seedTypes = ['tomato', 'strawberry', 'carrot'];
+        const randomSeed = seedTypes[Math.floor(Math.random() * seedTypes.length)];
+        if (!islandState.inventory.seeds[randomSeed]) {
+          islandState.inventory.seeds[randomSeed] = 0;
+        }
+        islandState.inventory.seeds[randomSeed]++;
+      }
+
       const nextTask = core.getNextTask(state);
       timerState = core.resetTimerState({
         ...timerState,
@@ -3329,6 +3920,7 @@ if (typeof document !== 'undefined') {
         switchView('friends');
       } else if (destination === 'island') {
         switchView('island');
+        updateIslandUI();
       } else if (destination === 'focus' && nextTask) {
         state = core.selectTask(state, nextTask);
         selectedDuration = nextTask.duration ? nextTask.duration * 60 : selectedDuration;
@@ -3340,6 +3932,7 @@ if (typeof document !== 'undefined') {
         switchView('checkin');
       }
       persistSession();
+      persistIslandState();
     }
 
     function handleJourneyAction(action) {
@@ -3978,6 +4571,74 @@ if (typeof document !== 'undefined') {
         // Like button clicked - just show feedback for now
         alert('感谢点赞！');
       }
+
+      // Island garden event handlers
+      if (target.matches('[data-tool]')) {
+        currentTool = target.dataset.tool;
+        document.querySelectorAll('.farm-tool-btn, .pet-tool-btn, .social-tool-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.tool === currentTool);
+        });
+      }
+
+      if (target.matches('[data-plot]')) {
+        selectedPlot = target.dataset.plot;
+        handlePlotInteraction(selectedPlot);
+      }
+
+      if (target.id === 'closePlanting') {
+        if (elements.plantingModal) {
+          elements.plantingModal.hidden = true;
+        }
+      }
+
+      if (target.matches('.seed-option:not(.locked)')) {
+        const cropType = target.dataset.crop;
+        plantSelectedCrop(cropType);
+      }
+
+      if (target.id === 'closeShop') {
+        if (elements.shopModal) {
+          elements.shopModal.hidden = true;
+        }
+      }
+
+      if (target.matches('.shop-tab')) {
+        handleShopTabChange(target);
+      }
+
+      if (target.matches('.buy-btn')) {
+        const shopItem = target.closest('.shop-item');
+        if (shopItem) {
+          handleShopPurchase(shopItem);
+        }
+      }
+
+      if (target.id === 'closeInventory') {
+        if (elements.inventoryModal) {
+          elements.inventoryModal.hidden = true;
+        }
+      }
+
+      if (target.matches('[data-action]')) {
+        handleQuickAction(target.dataset.action);
+      }
+
+      if (target.id === 'closeFriendInteraction') {
+        if (elements.friendInteractionModal) {
+          elements.friendInteractionModal.hidden = true;
+        }
+      }
+
+      if (target.matches('.interaction-btn')) {
+        const option = target.closest('.interaction-option');
+        if (option) {
+          handleFriendInteraction(option.dataset.action);
+        }
+      }
+
+      if (target.matches('.farm-plot')) {
+        handlePlotClick(target);
+      }
     });
 
     if (elements.goalInput) {
@@ -4073,5 +4734,381 @@ if (typeof document !== 'undefined') {
     } else {
       renderAll();
     }
+
+    // Island garden functions
+    function updateIslandUI() {
+      IslandGardenModule.updateIslandState(islandState);
+
+      // Update header stats
+      if (elements.islandLevel) {
+        elements.islandLevel.textContent = `Lv.${islandState.level}`;
+      }
+      if (elements.expFill) {
+        const expPercent = (islandState.exp / islandState.maxExp) * 100;
+        elements.expFill.style.width = `${expPercent}%`;
+      }
+      if (elements.coinsCount) {
+        elements.coinsCount.textContent = islandState.coins;
+      }
+      if (elements.waterCount) {
+        elements.waterCount.textContent = islandState.water;
+      }
+      if (elements.sunlightCount) {
+        elements.sunlightCount.textContent = islandState.sunlight;
+      }
+      if (elements.helpCount) {
+        elements.helpCount.textContent = islandState.dailyHelpCount;
+      }
+
+      // Update plots
+      updatePlotsUI();
+
+      // Update pet
+      updatePetUI();
+
+      // Update inventory
+      updateInventoryUI();
+
+      // Update island scene data attributes
+      if (elements.islandScene) {
+        elements.islandScene.dataset.level = islandState.level;
+        elements.islandScene.dataset.theme = islandState.theme;
+      }
+    }
+
+    function updatePlotsUI() {
+      islandState.plots.forEach(plot => {
+        const plotElement = document.querySelector(`[data-plot="${plot.id}"]`);
+        if (!plotElement) return;
+
+        const contentElement = plotElement.querySelector('.plot-content');
+        const waterIndicator = plotElement.querySelector('.plot-water-indicator');
+        const growthIndicator = plotElement.querySelector('.plot-growth-indicator');
+
+        if (plot.crop) {
+          const cropType = IslandGardenModule.CROP_TYPES[plot.crop];
+          const growthProgress = IslandGardenModule.getGrowthProgress(plot);
+
+          // Display crop based on growth stage
+          if (growthProgress >= 100) {
+            contentElement.textContent = cropType.icon;
+            plotElement.classList.add('ready-to-harvest');
+          } else if (plot.growthStage > 0) {
+            contentElement.textContent = ['🌱', '🌿', '🪴'][Math.min(plot.growthStage - 1, 2)];
+          } else {
+            contentElement.textContent = '🌰';
+          }
+
+          // Update growth indicator
+          if (growthIndicator) {
+            growthIndicator.style.setProperty('--growth-percent', `${growthProgress}%`);
+          }
+
+          // Update water indicator
+          if (plot.needsWater) {
+            plotElement.classList.add('needs-water');
+            if (waterIndicator) {
+              waterIndicator.textContent = '💧';
+              waterIndicator.style.opacity = '1';
+            }
+          } else {
+            plotElement.classList.remove('needs-water');
+            if (waterIndicator) {
+              waterIndicator.style.opacity = '0';
+            }
+          }
+        } else {
+          contentElement.textContent = '';
+          plotElement.classList.remove('needs-water', 'ready-to-harvest');
+          if (waterIndicator) {
+            waterIndicator.style.opacity = '0';
+          }
+        }
+      });
+    }
+
+    function updatePetUI() {
+      const activePet = islandState.pets.find(p => p.unlocked);
+      if (!activePet || !elements.petHappinessFill) return;
+
+      const petType = IslandGardenModule.PET_TYPES[activePet.type];
+
+      // Update happiness bar
+      elements.petHappinessFill.style.width = `${activePet.happiness}%`;
+
+      // Update pet bubble
+      if (elements.petBubble) {
+        if (activePet.happiness < 30) {
+          elements.petBubble.textContent = '😢 饿饿';
+          elements.petBubble.style.opacity = '1';
+        } else if (activePet.happiness < 60) {
+          elements.petBubble.textContent = '😐 一般';
+          elements.petBubble.style.opacity = '0.7';
+        } else {
+          elements.petBubble.textContent = '😊 开心';
+          elements.petBubble.style.opacity = '0.5';
+        }
+      }
+    }
+
+    function updateInventoryUI() {
+      // Update seed counts
+      if (elements.seedTomatoCount) {
+        elements.seedTomatoCount.textContent = islandState.inventory.seeds.tomato || 0;
+      }
+      if (elements.seedStrawberryCount) {
+        elements.seedStrawberryCount.textContent = islandState.inventory.seeds.strawberry || 0;
+      }
+      if (elements.harvestTomatoCount) {
+        elements.harvestTomatoCount.textContent = islandState.inventory.harvested.tomato || 0;
+      }
+
+      // Update modal seed amounts
+      if (elements.seedTomatoAmount) {
+        elements.seedTomatoAmount.textContent = islandState.inventory.seeds.tomato || 0;
+      }
+      if (elements.seedStrawberryAmount) {
+        elements.seedStrawberryAmount.textContent = islandState.inventory.seeds.strawberry || 0;
+      }
+      if (elements.seedCarrotAmount) {
+        elements.seedCarrotAmount.textContent = islandState.inventory.seeds.carrot || 0;
+      }
+    }
+
+    function handlePlotClick(plotElement) {
+      const plotId = plotElement.dataset.plot;
+      const plot = islandState.plots.find(p => p.id === plotId);
+      if (!plot) return;
+
+      if (!plot.crop) {
+        // Open planting modal
+        if (elements.plantingModal) {
+          elements.plantingModal.hidden = false;
+          selectedPlot = plotId;
+          updateInventoryUI();
+        }
+      } else if (IslandGardenModule.getGrowthProgress(plot) >= 100) {
+        // Harvest crop
+        const result = IslandGardenModule.harvestCrop(islandState, plotId);
+        if (result.success) {
+          showMessage(result.message);
+          updateIslandUI();
+          persistIslandState();
+        } else {
+          showMessage(result.message);
+        }
+      } else {
+        // Show crop details or action options
+        if (plot.needsWater && currentTool === 'water') {
+          const result = IslandGardenModule.waterCrop(islandState, plotId);
+          showMessage(result.message);
+          updateIslandUI();
+          persistIslandState();
+        } else if (currentTool !== 'water') {
+          showMessage('选择工具进行操作：💧浇水或等待收获');
+        }
+      }
+    }
+
+    function handlePlotInteraction(plotId) {
+      if (!currentTool) {
+        showMessage('请先选择一个工具');
+        return;
+      }
+
+      const plot = islandState.plots.find(p => p.id === plotId);
+      if (!plot) return;
+
+      switch (currentTool) {
+        case 'plant':
+          if (elements.plantingModal) {
+            elements.plantingModal.hidden = false;
+            selectedPlot = plotId;
+            updateInventoryUI();
+          }
+          break;
+        case 'water':
+          if (plot.crop) {
+            const result = IslandGardenModule.waterCrop(islandState, plotId);
+            showMessage(result.message);
+            updateIslandUI();
+            persistIslandState();
+          } else {
+            showMessage('这个地块没有作物');
+          }
+          break;
+        case 'harvest':
+          if (plot.crop && IslandGardenModule.getGrowthProgress(plot) >= 100) {
+            const result = IslandGardenModule.harvestCrop(islandState, plotId);
+            showMessage(result.message);
+            updateIslandUI();
+            persistIslandState();
+          } else {
+            showMessage('作物还没成熟');
+          }
+          break;
+        default:
+          showMessage('请选择有效的工具');
+      }
+    }
+
+    function plantSelectedCrop(cropType) {
+      if (!selectedPlot) return;
+
+      const result = IslandGardenModule.plantCrop(islandState, selectedPlot, cropType);
+      if (result.success) {
+        showMessage(result.message);
+        if (elements.plantingModal) {
+          elements.plantingModal.hidden = true;
+        }
+        updateIslandUI();
+        persistIslandState();
+      } else {
+        showMessage(result.message);
+      }
+    }
+
+    function handleShopTabChange(tabElement) {
+      document.querySelectorAll('.shop-tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      tabElement.classList.add('active');
+
+      const tabName = tabElement.dataset.shopTab;
+      document.querySelectorAll('.shop-section').forEach(section => {
+        section.classList.add('hidden');
+      });
+
+      switch (tabName) {
+        case 'decorations':
+          if (elements.shopDecorations) elements.shopDecorations.classList.remove('hidden');
+          break;
+        case 'seeds':
+          if (elements.shopSeeds) elements.shopSeeds.classList.remove('hidden');
+          break;
+        case 'pets':
+          if (elements.shopPets) elements.shopPets.classList.remove('hidden');
+          break;
+      }
+    }
+
+    function handleShopPurchase(shopItem) {
+      const itemType = shopItem.dataset.item;
+      const cost = parseInt(shopItem.dataset.cost);
+
+      if (islandState.coins < cost) {
+        showMessage('金币不足！');
+        return;
+      }
+
+      // Handle different item types
+      const parentSection = shopItem.closest('.shop-section');
+      if (parentSection === elements.shopDecorations) {
+        const result = IslandGardenModule.buyDecoration(islandState, itemType);
+        showMessage(result.message);
+      } else if (parentSection === elements.shopSeeds) {
+        // Purchase seeds
+        islandState.coins -= cost;
+        if (!islandState.inventory.seeds[itemType]) {
+          islandState.inventory.seeds[itemType] = 0;
+        }
+        islandState.inventory.seeds[itemType] += 3;
+        showMessage(`成功购买3个${IslandGardenModule.CROP_TYPES[itemType].name}种子！`);
+      } else if (parentSection === elements.shopPets) {
+        const result = IslandGardenModule.unlockPet(islandState, itemType);
+        showMessage(result.message);
+      }
+
+      updateIslandUI();
+      persistIslandState();
+    }
+
+    function handleQuickAction(action) {
+      switch (action) {
+        case 'inventory':
+          if (elements.inventoryModal) {
+            elements.inventoryModal.hidden = false;
+            updateInventoryUI();
+          }
+          break;
+        case 'shop':
+          if (elements.shopModal) {
+            elements.shopModal.hidden = false;
+          }
+          break;
+        case 'achievements':
+          state.activeView = 'friends';
+          state.activeTab = 'achievements';
+          document.querySelectorAll('.workspace-panel').forEach(panel => {
+            panel.hidden = panel.dataset.panel !== 'friends';
+          });
+          document.querySelectorAll('.workspace-nav-button').forEach(button => {
+            button.classList.toggle('is-active', button.dataset.view === 'friends');
+          });
+          renderAll();
+          break;
+      }
+    }
+
+    function handleFriendInteraction(action) {
+      if (!currentFriendId) {
+        showMessage('请先选择好友');
+        return;
+      }
+
+      if (islandState.dailyHelpCount <= 0) {
+        showMessage('今日互动次数已用完');
+        return;
+      }
+
+      let result;
+      if (action === 'water') {
+        result = IslandGardenModule.helpFriendWater(currentFriendId, 'plot1', islandState);
+      } else if (action === 'steal') {
+        result = IslandGardenModule.stealFriendCrop(currentFriendId, 'plot1', islandState);
+      }
+
+      if (result.success) {
+        showMessage(result.message);
+        if (elements.friendInteractionModal) {
+          elements.friendInteractionModal.hidden = true;
+        }
+        updateIslandUI();
+        persistIslandState();
+      } else {
+        showMessage(result.message);
+      }
+    }
+
+    function showMessage(message) {
+      if (elements.islandMessage) {
+        elements.islandMessage.textContent = message;
+        setTimeout(() => {
+          elements.islandMessage.textContent = '';
+        }, 3000);
+      }
+    }
+
+    function persistIslandState() {
+      writeStorage(STORAGE_KEYS.islandState, islandState);
+    }
+
+    function restoreIslandState() {
+      const savedIslandState = readStorage(STORAGE_KEYS.islandState);
+      if (savedIslandState) {
+        islandState = { ...islandState, ...savedIslandState };
+      }
+      updateIslandUI();
+    }
+
+    // Initialize island state
+    restoreIslandState();
+
+    // Update island state periodically
+    setInterval(() => {
+      IslandGardenModule.updateIslandState(islandState);
+      updateIslandUI();
+      persistIslandState();
+    }, 60000); // Update every minute
   });
 }

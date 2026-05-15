@@ -328,33 +328,104 @@
       </section>
 
       <section class="workspace-panel" data-panel="island" hidden>
-        <div class="panel-layout two-column">
-          <div>
-            <div class="panel-heading">
-              <p class="eyebrow">Pomoland Island</p>
-              <h2 data-i18n="islandStatus">岛屿状态</h2>
-            </div>
-            <div class="large-island" id="islandScene" data-level="1" data-growth="starter" data-crop="seedling" data-plants="1" data-hydration="dry" data-pet="sleepy" data-pet-activity="resting" data-decoration="plain" data-decor-items="">
+        <div class="panel-heading">
+          <p class="eyebrow">Pomoland Island</p>
+          <h2 data-i18n="islandStatus">我的岛屿花园</h2>
+          <div class="island-header-stats">
+            <span class="level-badge" id="islandLevel">Lv.1</span>
+            <span class="exp-bar"><span class="exp-fill" id="expFill"></span></span>
+            <span class="coins-display">💰 <span id="coinsCount">0</span></span>
+            <span class="water-display">💧 <span id="waterCount">10</span></span>
+            <span class="sunlight-display">☀️ <span id="sunlightCount">10</span></span>
+            <span class="help-display">🤝 <span id="helpCount">5</span></span>
+          </div>
+        </div>
+
+        <div class="island-main-layout">
+          <!-- 岛屿场景 -->
+          <div class="island-scene-container">
+            <div class="large-island" id="islandScene" data-level="1" data-growth="starter" data-theme="sunny">
               <div class="large-sun"></div>
+              <div class="large-cloud cloud-one"></div>
+              <div class="large-cloud cloud-two"></div>
+              <div class="large-stars"></div>
               <div class="large-sea"></div>
               <div class="large-land">
-                <div class="farm-plot plot-one"></div>
-                <div class="farm-plot plot-two"></div>
-                <div class="farm-plot plot-three"></div>
-                <div class="farm-plot plot-four"></div>
+                <!-- 装饰品容器 -->
+                <div class="decorations-container" id="decorationsContainer"></div>
+
+                <!-- 农田地块 -->
+                <div class="farm-plots-grid" id="farmPlotsGrid">
+                  <div class="farm-plot" data-plot="plot1">
+                    <div class="plot-content" id="plot1Content"></div>
+                    <div class="plot-water-indicator"></div>
+                    <div class="plot-growth-indicator"></div>
+                  </div>
+                  <div class="farm-plot" data-plot="plot2">
+                    <div class="plot-content" id="plot2Content"></div>
+                    <div class="plot-water-indicator"></div>
+                    <div class="plot-growth-indicator"></div>
+                  </div>
+                  <div class="farm-plot" data-plot="plot3">
+                    <div class="plot-content" id="plot3Content"></div>
+                    <div class="plot-water-indicator"></div>
+                    <div class="plot-growth-indicator"></div>
+                  </div>
+                  <div class="farm-plot" data-plot="plot4">
+                    <div class="plot-content" id="plot4Content"></div>
+                    <div class="plot-water-indicator"></div>
+                    <div class="plot-growth-indicator"></div>
+                  </div>
+                  <div class="farm-plot" data-plot="plot5">
+                    <div class="plot-content" id="plot5Content"></div>
+                    <div class="plot-water-indicator"></div>
+                    <div class="plot-growth-indicator"></div>
+                  </div>
+                  <div class="farm-plot" data-plot="plot6">
+                    <div class="plot-content" id="plot6Content"></div>
+                    <div class="plot-water-indicator"></div>
+                    <div class="plot-growth-indicator"></div>
+                  </div>
+                </div>
+
                 <div class="water-channel"></div>
                 <div class="large-house"></div>
-                <div class="large-pet">
-                  <span class="pet-eye eye-left"></span>
-                  <span class="pet-eye eye-right"></span>
-                  <span class="pet-mouth"></span>
-                  <span class="pet-tail"></span>
+
+                <!-- 宠物区域 -->
+                <div class="pet-area" id="petArea">
+                  <div class="large-pet" id="mainPet">
+                    <span class="pet-eye eye-left"></span>
+                    <span class="pet-eye eye-right"></span>
+                    <span class="pet-mouth"></span>
+                    <span class="pet-tail"></span>
+                    <span class="pet-bubble" id="petBubble"></span>
+                  </div>
+                  <div class="pet-bowl"></div>
+                  <div class="pet-happiness-bar">
+                    <span class="happiness-fill" id="petHappinessFill"></span>
+                  </div>
                 </div>
-                <div class="pet-bowl"></div>
-                <div class="large-plant plant-one"><span class="plant-flower"></span><span class="plant-fruit"></span></div>
-                <div class="large-plant plant-two"><span class="plant-flower"></span><span class="plant-fruit"></span></div>
-                <div class="large-plant plant-three"><span class="plant-flower"></span><span class="plant-fruit"></span></div>
-                <div class="large-plant plant-four"><span class="plant-flower"></span><span class="plant-fruit"></span></div>
+
+                <!-- 成熟植物 -->
+                <div class="mature-plants" id="maturePlants">
+                  <div class="large-plant plant-one" data-plant="1">
+                    <span class="plant-flower"></span>
+                    <span class="plant-fruit"></span>
+                  </div>
+                  <div class="large-plant plant-two" data-plant="2">
+                    <span class="plant-flower"></span>
+                    <span class="plant-fruit"></span>
+                  </div>
+                  <div class="large-plant plant-three" data-plant="3">
+                    <span class="plant-flower"></span>
+                    <span class="plant-fruit"></span>
+                  </div>
+                  <div class="large-plant plant-four" data-plant="4">
+                    <span class="plant-flower"></span>
+                    <span class="plant-fruit"></span>
+                  </div>
+                </div>
+
                 <div class="large-dock"></div>
                 <div class="shell-lamp"></div>
                 <div class="study-flag"></div>
@@ -362,49 +433,95 @@
               </div>
               <div class="sparkle sparkle-a"></div>
               <div class="sparkle sparkle-b"></div>
+              <div class="sparkle sparkle-c"></div>
             </div>
-            <p class="status-message" id="islandMessage"></p>
+
+            <!-- 岛屿信息栏 -->
+            <div class="island-info-bar">
+              <div class="island-message" id="islandMessage">开始种植，打造你的专属花园！</div>
+              <div class="quick-actions">
+                <button class="quick-action-btn" data-action="inventory" title="查看背包">
+                  <span>🎒</span>
+                </button>
+                <button class="quick-action-btn" data-action="shop" title="商店">
+                  <span>🏪</span>
+                </button>
+                <button class="quick-action-btn" data-action="achievements" title="岛屿成就">
+                  <span>🏆</span>
+                </button>
+              </div>
+            </div>
           </div>
-          <div class="tool-panel">
-            <div class="island-actions">
-              <article class="island-action-card">
-                <div>
-                  <strong data-i18n="plant">Plant</strong>
-                  <span data-i18n="plantCost">消耗 1 个种子</span>
-                </div>
-                <p data-i18n="plantPurpose">种下新的作物，让岛上出现新的成长目标。</p>
-                <small data-i18n="plantEffect">新增番茄苗，作物阶段提升。</small>
-                <button class="primary-button wide" type="button" data-island-action="plant" data-i18n="plant">Plant</button>
-              </article>
-              <article class="island-action-card">
-                <div>
-                  <strong data-i18n="waterAction">Water</strong>
-                  <span data-i18n="waterCost">消耗 1 个水滴</span>
-                </div>
-                <p data-i18n="waterPurpose">给已有作物浇水，让它进入更健康的成长状态。</p>
-                <small data-i18n="waterEffect">水面变亮，作物出现水润闪光。</small>
-                <button class="secondary-button wide" type="button" data-island-action="water" data-i18n="waterAction">Water</button>
-              </article>
-              <article class="island-action-card">
-                <div>
-                  <strong data-i18n="feed">Feed</strong>
-                  <span data-i18n="feedCost">消耗 20 金币</span>
-                </div>
-                <p data-i18n="feedPurpose">喂养岛上的小宠物，提高岛屿活跃度。</p>
-                <small data-i18n="feedEffect">宠物醒来，岛屿等级提升。</small>
-                <button class="secondary-button wide" type="button" data-island-action="feed" data-i18n="feed">Feed</button>
-              </article>
-              <article class="island-action-card">
-                <div>
-                  <strong data-i18n="decorate">Decorate</strong>
-                  <span data-i18n="decorateCost">消耗 30 金币</span>
-                </div>
-                <p data-i18n="decoratePurpose">放置码头、灯具等装饰，让 Pomoland 更有展示感。</p>
-                <small data-i18n="decorateEffect">解锁岛屿装饰。</small>
-                <button class="secondary-button wide" type="button" data-island-action="decorate" data-i18n="decorate">Decorate</button>
-              </article>
+
+          <!-- 工具面板 -->
+          <div class="island-tool-panel">
+            <div class="tool-section">
+              <h3 data-i18n="farmActions">农场操作</h3>
+              <div class="farm-tools">
+                <button class="farm-tool-btn" data-tool="plant" title="种植">
+                  <span>🌱</span>
+                  <span>种植</span>
+                </button>
+                <button class="farm-tool-btn" data-tool="water" title="浇水">
+                  <span>💧</span>
+                  <span>浇水</span>
+                </button>
+                <button class="farm-tool-btn" data-tool="harvest" title="收获">
+                  <span>🌾</span>
+                  <span>收获</span>
+                </button>
+              </div>
             </div>
-            <div class="decorations" id="decorations"></div>
+
+            <div class="tool-section">
+              <h3 data-i18n="petActions">宠物照料</h3>
+              <div class="pet-tools">
+                <button class="pet-tool-btn" data-tool="feed" title="喂养">
+                  <span>🍖</span>
+                  <span>喂养</span>
+                </button>
+                <button class="pet-tool-btn" data-tool="pet-shop" title="宠物商店">
+                  <span>🐾</span>
+                  <span>宠物商店</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="tool-section">
+              <h3 data-i18n="socialActions">社交互动</h3>
+              <div class="social-tools">
+                <button class="social-tool-btn" data-tool="visit-friends" title="参观好友">
+                  <span>🚢</span>
+                  <span>参观好友</span>
+                </button>
+                <button class="social-tool-btn" data-tool="invite" title="邀请好友">
+                  <span>💌</span>
+                  <span>邀请好友</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 库存概览 -->
+            <div class="tool-section">
+              <h3 data-i18n="inventory">背包</h3>
+              <div class="inventory-grid" id="inventoryGrid">
+                <div class="inventory-item" data-item="seed-tomato">
+                  <span class="item-icon">🍅</span>
+                  <span class="item-name">番茄种子</span>
+                  <span class="item-count" id="seedTomatoCount">3</span>
+                </div>
+                <div class="inventory-item" data-item="seed-strawberry">
+                  <span class="item-icon">🍓</span>
+                  <span class="item-name">草莓种子</span>
+                  <span class="item-count" id="seedStrawberryCount">2</span>
+                </div>
+                <div class="inventory-item" data-item="harvest-tomato">
+                  <span class="item-icon">🍅</span>
+                  <span class="item-name">番茄</span>
+                  <span class="item-count" id="harvestTomatoCount">0</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -610,6 +727,221 @@
       <button class="modal-close" id="closeAchievement" type="button" aria-label="Close">×</button>
       <p class="eyebrow" data-i18n="achievementTitle">成就详情</p>
       <div class="achievement-detail" id="achievementDetail"></div>
+    </div>
+  </div>
+
+  <!-- 种植模态框 -->
+  <div class="modal-backdrop" id="plantingModal" hidden>
+    <div class="planting-modal" role="dialog" aria-modal="true" aria-labelledby="plantingTitle">
+      <button class="modal-close" id="closePlanting" type="button" aria-label="Close">×</button>
+      <p class="eyebrow" data-i18n="plantingTitle">选择种子</p>
+      <h2 id="plantingTitle">你要种植什么？</h2>
+      <div class="seeds-grid" id="seedsGrid">
+        <div class="seed-option" data-crop="tomato">
+          <span class="seed-icon">🍅</span>
+          <span class="seed-name">番茄</span>
+          <span class="seed-info">生长4小时 | 产量5个</span>
+          <span class="seed-amount" id="seedTomatoAmount">3</span>
+        </div>
+        <div class="seed-option" data-crop="strawberry">
+          <span class="seed-icon">🍓</span>
+          <span class="seed-name">草莓</span>
+          <span class="seed-info">生长6小时 | 产量8个</span>
+          <span class="seed-amount" id="seedStrawberryAmount">2</span>
+        </div>
+        <div class="seed-option" data-crop="carrot">
+          <span class="seed-icon">🥕</span>
+          <span class="seed-name">胡萝卜</span>
+          <span class="seed-info">生长3小时 | 产量6个</span>
+          <span class="seed-amount" id="seedCarrotAmount">1</span>
+        </div>
+        <div class="seed-option locked" data-crop="apple">
+          <span class="seed-icon">🍎</span>
+          <span class="seed-name">苹果</span>
+          <span class="seed-info">生长8小时 | 产量10个</span>
+          <span class="lock-icon">🔒</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 商店模态框 -->
+  <div class="modal-backdrop" id="shopModal" hidden>
+    <div class="shop-modal" role="dialog" aria-modal="true" aria-labelledby="shopTitle">
+      <button class="modal-close" id="closeShop" type="button" aria-label="Close">×</button>
+      <p class="eyebrow" data-i18n="shopTitle">商店</p>
+      <h2 id="shopTitle">购买装饰和种子</h2>
+      <div class="shop-tabs">
+        <button class="shop-tab active" data-shop-tab="decorations">装饰品</button>
+        <button class="shop-tab" data-shop-tab="seeds">种子</button>
+        <button class="shop-tab" data-shop-tab="pets">宠物</button>
+      </div>
+      <div class="shop-content" id="shopContent">
+        <!-- 装饰品列表 -->
+        <div class="shop-section" id="shopDecorations">
+          <div class="shop-item" data-item="fence" data-cost="100">
+            <span class="item-icon">🪜</span>
+            <span class="item-name">栅栏</span>
+            <span class="item-cost">💰 100</span>
+            <button class="buy-btn">购买</button>
+          </div>
+          <div class="shop-item" data-item="flower" data-cost="150">
+            <span class="item-icon">🌸</span>
+            <span class="item-name">花朵</span>
+            <span class="item-cost">💰 150</span>
+            <button class="buy-btn">购买</button>
+          </div>
+          <div class="shop-item" data-item="lamp" data-cost="200">
+            <span class="item-icon">🪔</span>
+            <span class="item-name">路灯</span>
+            <span class="item-cost">💰 200</span>
+            <button class="buy-btn">购买</button>
+          </div>
+          <div class="shop-item" data-item="bench" data-cost="300">
+            <span class="item-icon">🪑</span>
+            <span class="item-name">长椅</span>
+            <span class="item-cost">💰 300</span>
+            <button class="buy-btn">购买</button>
+          </div>
+          <div class="shop-item" data-item="fountain" data-cost="500">
+            <span class="item-icon">⛲</span>
+            <span class="item-name">喷泉</span>
+            <span class="item-cost">💰 500</span>
+            <button class="buy-btn">购买</button>
+          </div>
+        </div>
+
+        <!-- 种子列表 -->
+        <div class="shop-section hidden" id="shopSeeds">
+          <div class="shop-item" data-item="tomato" data-cost="50">
+            <span class="item-icon">🍅</span>
+            <span class="item-name">番茄种子</span>
+            <span class="item-cost">💰 50</span>
+            <button class="buy-btn">购买</button>
+          </div>
+          <div class="shop-item" data-item="strawberry" data-cost="80">
+            <span class="item-icon">🍓</span>
+            <span class="item-name">草莓种子</span>
+            <span class="item-cost">💰 80</span>
+            <button class="buy-btn">购买</button>
+          </div>
+          <div class="shop-item" data-item="carrot" data-cost="40">
+            <span class="item-icon">🥕</span>
+            <span class="item-name">胡萝卜种子</span>
+            <span class="item-cost">💰 40</span>
+            <button class="buy-btn">购买</button>
+          </div>
+          <div class="shop-item" data-item="apple" data-cost="120">
+            <span class="item-icon">🍎</span>
+            <span class="item-name">苹果种子</span>
+            <span class="item-cost">💰 120</span>
+            <button class="buy-btn">购买</button>
+          </div>
+          <div class="shop-item" data-item="watermelon" data-cost="200">
+            <span class="item-icon">🍉</span>
+            <span class="item-name">西瓜种子</span>
+            <span class="item-cost">💰 200</span>
+            <button class="buy-btn">购买</button>
+          </div>
+        </div>
+
+        <!-- 宠物列表 -->
+        <div class="shop-section hidden" id="shopPets">
+          <div class="shop-item" data-item="cat" data-cost="500">
+            <span class="item-icon">🐱</span>
+            <span class="item-name">猫咪</span>
+            <span class="item-cost">💰 500</span>
+            <button class="buy-btn">购买</button>
+          </div>
+          <div class="shop-item" data-item="dog" data-cost="500">
+            <span class="item-icon">🐶</span>
+            <span class="item-name">小狗</span>
+            <span class="item-cost">💰 500</span>
+            <button class="buy-btn">购买</button>
+          </div>
+          <div class="shop-item" data-item="bird" data-cost="500">
+            <span class="item-icon">🐦</span>
+            <span class="item-name">小鸟</span>
+            <span class="item-cost">💰 500</span>
+            <button class="buy-btn">购买</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 背包模态框 -->
+  <div class="modal-backdrop" id="inventoryModal" hidden>
+    <div class="inventory-modal" role="dialog" aria-modal="true" aria-labelledby="inventoryTitle">
+      <button class="modal-close" id="closeInventory" type="button" aria-label="Close">×</button>
+      <p class="eyebrow" data-i18n="inventoryTitle">我的背包</p>
+      <h2 id="inventoryTitle">种子和收获</h2>
+      <div class="inventory-content">
+        <div class="inventory-section">
+          <h3>种子</h3>
+          <div class="inventory-grid" id="seedsInventory">
+            <div class="inv-item">
+              <span class="inv-icon">🍅</span>
+              <span class="inv-name">番茄种子</span>
+              <span class="inv-count" id="invSeedTomato">3</span>
+            </div>
+            <div class="inv-item">
+              <span class="inv-icon">🍓</span>
+              <span class="inv-name">草莓种子</span>
+              <span class="inv-count" id="invSeedStrawberry">2</span>
+            </div>
+            <div class="inv-item">
+              <span class="inv-icon">🥕</span>
+              <span class="inv-name">胡萝卜种子</span>
+              <span class="inv-count" id="invSeedCarrot">1</span>
+            </div>
+          </div>
+        </div>
+        <div class="inventory-section">
+          <h3>收获</h3>
+          <div class="inventory-grid" id="harvestInventory">
+            <div class="inv-item">
+              <span class="inv-icon">🍅</span>
+              <span class="inv-name">番茄</span>
+              <span class="inv-count" id="invHarvestTomato">0</span>
+            </div>
+            <div class="inv-item">
+              <span class="inv-icon">🍓</span>
+              <span class="inv-name">草莓</span>
+              <span class="inv-count" id="invHarvestStrawberry">0</span>
+            </div>
+            <div class="inv-item">
+              <span class="inv-icon">🥕</span>
+              <span class="inv-name">胡萝卜</span>
+              <span class="inv-count" id="invHarvestCarrot">0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 好友互动模态框 -->
+  <div class="modal-backdrop" id="friendInteractionModal" hidden>
+    <div class="friend-interaction-modal" role="dialog" aria-modal="true" aria-labelledby="friendInteractionTitle">
+      <button class="modal-close" id="closeFriendInteraction" type="button" aria-label="Close">×</button>
+      <p class="eyebrow" data-i18n="friendInteraction">好友互动</p>
+      <h2 id="friendInteractionTitle">选择互动方式</h2>
+      <div class="friend-island-preview" id="friendIslandPreview"></div>
+      <div class="interaction-options">
+        <div class="interaction-option" data-action="water">
+          <span class="action-icon">💧</span>
+          <span class="action-name">帮助浇水</span>
+          <span class="action-cost">消耗1次互动机会，双方获得20金币</span>
+          <button class="interaction-btn">帮助</button>
+        </div>
+        <div class="interaction-option" data-action="steal">
+          <span class="action-icon">🍎</span>
+          <span class="action-name">偷取果实</span>
+          <span class="action-cost">消耗1次互动机会，随机获得1-3个果实</span>
+          <button class="interaction-btn">偷取</button>
+        </div>
+      </div>
     </div>
   </div>
 
