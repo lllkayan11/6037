@@ -4402,6 +4402,16 @@ if (typeof document !== 'undefined') {
       }
       if (target.id === 'closeVisit' || target.id === 'closeVisitAction') closeVisitModal();
 
+      if (target.id === 'closePlanting') {
+        if (elements.plantingModal) elements.plantingModal.hidden = true;
+      }
+      if (target.id === 'closeShop') {
+        if (elements.shopModal) elements.shopModal.hidden = true;
+      }
+      if (target.id === 'closeInventory') {
+        if (elements.inventoryModal) elements.inventoryModal.hidden = true;
+      }
+
       if (target.matches('[data-checkin-action]')) {
         if (target.dataset.checkinAction === 'claim-milestone') {
           handleJourneyAction('claim-milestone');
@@ -4636,8 +4646,78 @@ if (typeof document !== 'undefined') {
         }
       }
 
-      if (target.matches('.farm-plot')) {
+      if (target.matches('[data-plot]')) {
         handlePlotClick(target);
+      }
+
+      if (target.matches('[data-tool]')) {
+        const tool = target.dataset.tool;
+        if (tool === 'plant' || tool === 'water' || tool === 'harvest') {
+          currentTool = currentTool === tool ? null : tool;
+          document.querySelectorAll('[data-tool]').forEach(btn => btn.classList.remove('active'));
+          if (currentTool) {
+            target.classList.add('active');
+            showMessage(localizedText(`已选择${tool}工具，点击地块操作`, `已選擇${tool}工具，點擊地塊操作`, `Tool: ${tool}. Click a plot to use it.`));
+          } else {
+            showMessage(localizedText('已取消工具选择', '已取消工具選擇', 'Tool deselected.'));
+          }
+        }
+        if (tool === 'feed') {
+          const activePet = islandState.pets.find(p => p.unlocked);
+          if (activePet) {
+            const result = IslandGardenModule.feedPet(islandState, activePet.id);
+            showMessage(result.message);
+            updateIslandUI();
+            persistIslandState();
+          }
+        }
+        if (tool === 'visit') {
+          document.querySelectorAll('.workspace-panel').forEach(panel => {
+            panel.hidden = panel.dataset.panel !== 'friends';
+          });
+          state.currentView = 'friends';
+        }
+        if (tool === 'pet-shop') {
+          if (elements.shopModal) {
+            elements.shopModal.hidden = false;
+            handleShopTabChange(document.querySelector('[data-shop-tab="pets"]'));
+          }
+        }
+        if (tool === 'help') {
+          if (islandState.dailyHelpCount > 0) {
+            const friends = core.FRIENDS || [];
+            if (friends.length) {
+              const result = IslandGardenModule.helpFriendWater(friends[0].id, 'plot1', islandState);
+              showMessage(result.message);
+              updateIslandUI();
+              persistIslandState();
+            }
+          } else {
+            showMessage(localizedText('今日帮助次数已用完', '今日幫助次數已用完', 'No help actions left today.'));
+          }
+        }
+      }
+
+      if (target.closest('.seed-option') && !target.closest('.locked')) {
+        const cropType = target.closest('.seed-option').dataset.crop;
+        if (cropType) {
+          plantSelectedCrop(cropType);
+        }
+      }
+
+      if (target.closest('.buy-btn')) {
+        const shopItem = target.closest('.shop-item');
+        if (shopItem) {
+          handleShopPurchase(shopItem);
+        }
+      }
+
+      if (target.closest('.shop-tab')) {
+        handleShopTabChange(target.closest('.shop-tab'));
+      }
+
+      if (target.matches('[data-tab]')) {
+        handleShopTabChange(target);
       }
     });
 
@@ -5131,6 +5211,22 @@ if (typeof document !== 'undefined') {
       const savedIslandState = readStorage(STORAGE_KEYS.islandState);
       if (savedIslandState) {
         islandState = { ...islandState, ...savedIslandState };
+        islandState.plots = savedIslandState.plots || islandState.plots;
+        islandState.pets = savedIslandState.pets || islandState.pets;
+        islandState.decorations = savedIslandState.decorations || islandState.decorations;
+        islandState.inventory = {
+          ...islandState.inventory,
+          ...(savedIslandState.inventory || {}),
+          seeds: { ...islandState.inventory.seeds, ...((savedIslandState.inventory || {}).seeds || {}) },
+          harvested: { ...islandState.inventory.harvested, ...((savedIslandState.inventory || {}).harvested || {}) }
+        };
+        islandState.achievements = { ...islandState.achievements, ...(savedIslandState.achievements || {}) };
+      }
+      // Sync initial resources from main state to island
+      if (state && state.resources) {
+        islandState.coins += state.resources.coins;
+        islandState.water += state.resources.water;
+        islandState.sunlight += 5;
       }
       updateIslandUI();
     }

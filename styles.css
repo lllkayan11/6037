@@ -3691,6 +3691,248 @@ a {
   margin-top: 16px;
 }
 
+/* Garden Modals */
+.planting-modal,
+.shop-modal,
+.inventory-modal {
+  max-width: 560px;
+  width: 90%;
+  background: linear-gradient(180deg, #1a2a3a, #0d1b2a);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 28px;
+  color: #fff;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.planting-modal h2,
+.shop-modal h2 {
+  color: #fff;
+  margin: 0 0 20px;
+}
+
+.seeds-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.seed-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.seed-option:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+}
+
+.seed-option.locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.seed-icon {
+  font-size: 36px;
+}
+
+.seed-name {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.seed-info {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.seed-amount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: rgba(76, 175, 80, 0.25);
+  color: #81C784;
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.lock-icon {
+  font-size: 20px;
+}
+
+.shop-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.shop-tab {
+  padding: 8px 20px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.shop-tab.active {
+  background: rgba(76, 175, 80, 0.25);
+  color: #81C784;
+  border-color: rgba(76, 175, 80, 0.4);
+}
+
+.shop-section {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.shop-section.hidden {
+  display: none;
+}
+
+.shop-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.item-icon {
+  font-size: 32px;
+}
+
+.item-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.item-cost {
+  font-size: 13px;
+  color: #FFD54F;
+  font-weight: 700;
+}
+
+.buy-btn {
+  padding: 6px 20px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg, #FFD54F, #FFB300);
+  color: #1a2a3a;
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.buy-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(255, 213, 79, 0.4);
+}
+
+/* Inventory Modal */
+.inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.inv-section-title {
+  grid-column: 1 / -1;
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 8px 0 4px;
+}
+
+.inv-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.inv-card-icon {
+  font-size: 28px;
+}
+
+.inv-card-name {
+  font-size: 13px;
+  font-weight: 600;
+  flex: 1;
+}
+
+.inv-card-amount {
+  font-size: 15px;
+  font-weight: 800;
+  color: #81C784;
+}
+
+/* Friend interaction modal */
+.friend-interaction-modal {
+  max-width: 440px;
+  width: 90%;
+  background: linear-gradient(180deg, #1a2a3a, #0d1b2a);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 28px;
+  color: #fff;
+}
+
+.interaction-options {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.interaction-btn {
+  flex: 1;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  cursor: pointer;
+  text-align: center;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+.interaction-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-2px);
+}
+
+.interaction-btn .icon {
+  display: block;
+  font-size: 28px;
+  margin-bottom: 6px;
+}
+
 /* ============================================================
    Responsive safety (the demo is desktop-first but stay tidy)
    ============================================================ */
