@@ -3595,6 +3595,21 @@ a {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  padding: 20px;
+  background: linear-gradient(135deg, #1a2a3a, #0d1b2a);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Island panel override — dark background instead of white */
+.workspace-panel[data-panel="island"] {
+  background: linear-gradient(135deg, #1a2a3a, #0d1b2a);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.workspace-panel[data-panel="island"] .panel-heading h2,
+.workspace-panel[data-panel="island"] .panel-heading .eyebrow {
+  color: #E8F5E9;
 }
 
 .tool-group {
@@ -3647,6 +3662,23 @@ a {
 
 .inventory-group .tool-buttons {
   display: block;
+}
+
+/* Sync button */
+.sync-btn {
+  background: linear-gradient(135deg, #FFD700, #FFA500) !important;
+  color: #1a2a3a !important;
+  font-weight: 800 !important;
+  margin-top: 4px;
+}
+
+.sync-btn:hover {
+  transform: scale(1.03);
+  box-shadow: 0 4px 16px rgba(255, 215, 0, 0.4);
+}
+
+.sync-btn .tool-icon {
+  font-size: 22px;
 }
 
 .inventory-list {

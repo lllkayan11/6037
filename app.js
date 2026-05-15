@@ -3324,6 +3324,8 @@ if (typeof document !== 'undefined') {
 
     function renderIsland() {
       if (!elements.islandScene) return;
+      // If the garden module is active (has tools panel), skip old visual state
+      if (document.querySelector('.island-tools')) return;
       const visual = core.getIslandVisualState(state);
       elements.islandScene.dataset.level = String(visual.level);
       elements.islandScene.dataset.growth = visual.growthStage;
@@ -4695,6 +4697,21 @@ if (typeof document !== 'undefined') {
           } else {
             showMessage(localizedText('今日帮助次数已用完', '今日幫助次數已用完', 'No help actions left today.'));
           }
+        }
+        if (tool === 'sync-resources') {
+          const oldCoins = islandState.coins;
+          const oldWater = islandState.water;
+          if (state && state.resources) {
+            islandState.coins += state.resources.coins;
+            islandState.water += state.resources.water;
+            islandState.sunlight += 5;
+            state.resources.coins = 0;
+            state.resources.water = 0;
+          }
+          updateIslandUI();
+          persistIslandState();
+          persistSession();
+          showMessage(localizedText(`同步成功！+${islandState.coins - oldCoins} 金币, +${islandState.water - oldWater} 水滴`, `同步成功！+${islandState.coins - oldCoins} 金幣, +${islandState.water - oldWater} 水滴`, `Synced! +${islandState.coins - oldCoins} coins, +${islandState.water - oldWater} water`));
         }
       }
 
