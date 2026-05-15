@@ -1068,9 +1068,17 @@ if (typeof window !== 'undefined') {
 if (typeof document !== 'undefined') {
   document.addEventListener('DOMContentLoaded', () => {
     const core = PomolandCore;
+    const DURATION_PRESETS = [20, 25 * 60, 30 * 60, 45 * 60, 60 * 60];
+    const FOCUS_MODES = [
+      { id: 'light', seconds: 15 * 60, theme: 'sun' },
+      { id: 'standard', seconds: 25 * 60, theme: 'tomato' },
+      { id: 'deep', seconds: 45 * 60, theme: 'leaf' },
+      { id: 'night', seconds: 60 * 60, theme: 'moon' }
+    ];
     let state = core.createInitialState();
     let language = 'zh-CN';
     let selectedDuration = 20;
+    let customDurationMinutes = 25;
     let timerState = core.createTimerState(selectedDuration);
     let timerId = null;
     let rewardReady = core.buildRewardBundle(language, selectedDuration);
@@ -1085,6 +1093,18 @@ if (typeof document !== 'undefined') {
       selectedTask: document.querySelector('#selectedTask'),
       timerDisplay: document.querySelector('#timerDisplay'),
       timerRing: document.querySelector('#timerRing'),
+      timerMoodLabel: document.querySelector('#timerMoodLabel'),
+      focusModeGrid: document.querySelector('#focusModeGrid'),
+      durationPresets: document.querySelector('#durationPresets'),
+      customDurationBadge: document.querySelector('#customDurationBadge'),
+      customDurationTitle: document.querySelector('#customDurationTitle'),
+      customDurationHint: document.querySelector('#customDurationHint'),
+      customDurationRange: document.querySelector('#customDurationRange'),
+      customDurationInput: document.querySelector('#customDurationInput'),
+      customDurationUnit: document.querySelector('#customDurationUnit'),
+      applyCustomDuration: document.querySelector('#applyCustomDuration'),
+      decreaseCustomDuration: document.querySelector('#decreaseCustomDuration'),
+      increaseCustomDuration: document.querySelector('#increaseCustomDuration'),
       bonusModal: document.querySelector('#bonusModal'),
       bonusList: document.querySelector('#bonusList'),
       bonusActions: document.querySelector('#bonusActions'),
@@ -1210,6 +1230,75 @@ if (typeof document !== 'undefined') {
       const nextTarget = targets.find((value) => state.streak < value && !state.milestoneClaims.includes(value)) || null;
       const available = targets.filter((value) => state.streak >= value && !state.milestoneClaims.includes(value));
       return { targets, nextTarget, available };
+    }
+
+    function normalizeCustomMinutes(value) {
+      const numericValue = Number(value);
+      if (!Number.isFinite(numericValue)) return customDurationMinutes;
+      const rounded = Math.round(numericValue / 5) * 5;
+      return Math.max(5, Math.min(120, rounded));
+    }
+
+    function getDurationLabel(seconds) {
+      if (seconds === 20) return 'Demo 20s';
+      const minutes = Math.round(seconds / 60);
+      return localizedText(`${minutes} 分钟`, `${minutes} 分鐘`, `${minutes} min`);
+    }
+
+    function getTimerTheme(seconds = selectedDuration) {
+      if (seconds <= 20) {
+        return {
+          key: 'tomato',
+          label: localizedText('番茄热身', '番茄熱身', 'Tomato warm-up')
+        };
+      }
+      if (seconds <= 20 * 60) {
+        return {
+          key: 'sun',
+          label: localizedText('轻专注晨光', '輕專注晨光', 'Light focus glow')
+        };
+      }
+      if (seconds <= 35 * 60) {
+        return {
+          key: 'tomato',
+          label: localizedText('标准番茄节奏', '標準番茄節奏', 'Standard tomato rhythm')
+        };
+      }
+      if (seconds <= 55 * 60) {
+        return {
+          key: 'leaf',
+          label: localizedText('深度森林沉浸', '深度森林沉浸', 'Deep forest flow')
+        };
+      }
+      return {
+        key: 'moon',
+        label: localizedText('夜间静谧模式', '夜間靜謐模式', 'Quiet night mode')
+      };
+    }
+
+    function getModeCopy(modeId) {
+      if (modeId === 'light') {
+        return {
+          title: localizedText('轻专注', '輕專注', 'Light'),
+          description: localizedText('15 分钟快速进入状态，适合热身。', '15 分鐘快速進入狀態，適合熱身。', '15-minute warm-up to ease into focus.')
+        };
+      }
+      if (modeId === 'deep') {
+        return {
+          title: localizedText('深度专注', '深度專注', 'Deep'),
+          description: localizedText('45 分钟沉浸冲刺，适合长块任务。', '45 分鐘沉浸衝刺，適合長塊任務。', '45-minute immersive sprint for heavier work.')
+        };
+      }
+      if (modeId === 'night') {
+        return {
+          title: localizedText('夜间模式', '夜間模式', 'Night'),
+          description: localizedText('60 分钟安静沉淀，适合夜晚复盘。', '60 分鐘安靜沉澱，適合夜晚復盤。', '60-minute calm session for quiet nighttime work.')
+        };
+      }
+      return {
+        title: localizedText('标准', '標準', 'Standard'),
+        description: localizedText('25 分钟经典番茄钟，最平衡的节奏。', '25 分鐘經典番茄鐘，最平衡的節奏。', '25-minute classic Pomodoro rhythm.')
+      };
     }
 
     function getJourneyState() {
@@ -1407,12 +1496,61 @@ if (typeof document !== 'undefined') {
       renderJourneyGuide();
       renderTasks();
       renderSelectedTask();
+      renderDurationPicker();
       renderTimer();
       renderIsland();
       renderCheckIns();
       renderFriends();
       renderReport();
       renderAgentIdle();
+    }
+
+    function renderDurationPicker() {
+      if (elements.focusModeGrid) {
+        elements.focusModeGrid.innerHTML = FOCUS_MODES.map((mode) => {
+          const copy = getModeCopy(mode.id);
+          const isActive = selectedDuration === mode.seconds;
+          return `
+            <button class="focus-mode-card ${isActive ? 'is-active' : ''}" type="button" data-mode-seconds="${mode.seconds}" data-theme="${mode.theme}">
+              <span class="mode-icon" aria-hidden="true"></span>
+              <strong>${escapeHtml(copy.title)}</strong>
+              <span>${escapeHtml(copy.description)}</span>
+            </button>
+          `;
+        }).join('');
+      }
+      if (!elements.durationPresets) return;
+      elements.durationPresets.innerHTML = DURATION_PRESETS.map((seconds) => `
+        <button class="duration-button ${selectedDuration === seconds ? 'is-active' : ''}" type="button" data-duration-preset="${seconds}">
+          ${escapeHtml(getDurationLabel(seconds))}
+        </button>
+      `).join('');
+
+      if (elements.customDurationBadge) {
+        elements.customDurationBadge.textContent = localizedText('Timer Studio', 'Timer Studio', 'Timer Studio');
+      }
+      if (elements.customDurationTitle) {
+        elements.customDurationTitle.textContent = localizedText('自定义专注时间', '自訂專注時間', 'Custom focus duration');
+      }
+      if (elements.customDurationHint) {
+        elements.customDurationHint.textContent = localizedText(
+          '拖动滑块或输入分钟数，做一个更适合自己的番茄钟。',
+          '拖動滑塊或輸入分鐘數，做一個更適合自己的番茄鐘。',
+          'Use the slider or type in minutes to build a timer that fits your own rhythm.'
+        );
+      }
+      if (elements.customDurationUnit) {
+        elements.customDurationUnit.textContent = localizedText('分钟', '分鐘', 'min');
+      }
+      if (elements.applyCustomDuration) {
+        elements.applyCustomDuration.textContent = localizedText('应用自定义时长', '套用自訂時長', 'Apply custom time');
+      }
+      if (elements.customDurationRange) {
+        elements.customDurationRange.value = String(customDurationMinutes);
+      }
+      if (elements.customDurationInput) {
+        elements.customDurationInput.value = String(customDurationMinutes);
+      }
     }
 
     function renderJourneyGuide() {
@@ -1513,13 +1651,22 @@ if (typeof document !== 'undefined') {
     }
 
     function renderTimer() {
+      const timerTheme = getTimerTheme(timerState.totalSeconds || selectedDuration);
       const minutes = Math.floor(timerState.remainingSeconds / 60).toString().padStart(2, '0');
       const seconds = Math.floor(timerState.remainingSeconds % 60).toString().padStart(2, '0');
       elements.timerDisplay.textContent = `${minutes}:${seconds}`;
       const progress = timerState.totalSeconds > 0 ? 1 - timerState.remainingSeconds / timerState.totalSeconds : 0;
       elements.timerRing.style.setProperty('--progress', `${Math.max(0, Math.min(1, progress)) * 360}deg`);
+      elements.timerRing.dataset.theme = timerTheme.key;
+      elements.timerRing.classList.toggle('is-running', timerState.isRunning);
+      if (elements.timerMoodLabel) {
+        elements.timerMoodLabel.textContent = timerTheme.label;
+      }
       document.querySelectorAll('.duration-button').forEach((button) => {
-        button.classList.toggle('is-active', Number(button.dataset.seconds) === selectedDuration);
+        button.classList.toggle('is-active', Number(button.dataset.durationPreset) === selectedDuration);
+      });
+      document.querySelectorAll('.focus-mode-card').forEach((card) => {
+        card.classList.toggle('is-active', Number(card.dataset.modeSeconds) === selectedDuration);
       });
     }
 
@@ -1721,9 +1868,28 @@ if (typeof document !== 'undefined') {
     function setDuration(seconds) {
       stopTicker();
       selectedDuration = seconds;
+      if (seconds !== 20) {
+        customDurationMinutes = normalizeCustomMinutes(seconds / 60);
+      }
       timerState = core.createTimerState(seconds, state.selectedTask ? state.selectedTask.id : null);
+      renderDurationPicker();
       renderTimer();
       persistSession();
+    }
+
+    function syncCustomDurationInputs(value) {
+      customDurationMinutes = normalizeCustomMinutes(value);
+      if (elements.customDurationRange) {
+        elements.customDurationRange.value = String(customDurationMinutes);
+      }
+      if (elements.customDurationInput) {
+        elements.customDurationInput.value = String(customDurationMinutes);
+      }
+    }
+
+    function applyCustomDuration() {
+      syncCustomDurationInputs(customDurationMinutes);
+      setDuration(customDurationMinutes * 60);
     }
 
     function startTimer() {
@@ -2024,6 +2190,14 @@ if (typeof document !== 'undefined') {
         persistSession();
       }
 
+      if (target.matches('[data-duration-preset]')) {
+        setDuration(Number(target.dataset.durationPreset));
+      }
+
+      if (target.matches('[data-mode-seconds]')) {
+        setDuration(Number(target.dataset.modeSeconds));
+      }
+
       if (target.matches('[data-journey-action]')) {
         handleJourneyAction(target.dataset.journeyAction);
       }
@@ -2044,6 +2218,18 @@ if (typeof document !== 'undefined') {
 
       if (target.matches('[data-seconds]')) {
         setDuration(Number(target.dataset.seconds));
+      }
+
+      if (target.id === 'applyCustomDuration') {
+        applyCustomDuration();
+      }
+
+      if (target.id === 'decreaseCustomDuration') {
+        syncCustomDurationInputs(customDurationMinutes - 5);
+      }
+
+      if (target.id === 'increaseCustomDuration') {
+        syncCustomDurationInputs(customDurationMinutes + 5);
       }
 
       if (target.id === 'startTimer') startTimer();
@@ -2091,6 +2277,21 @@ if (typeof document !== 'undefined') {
     if (elements.goalInput) {
       elements.goalInput.addEventListener('input', () => {
         elements.goalInput.dataset.changed = 'true';
+      });
+    }
+
+    if (elements.customDurationRange) {
+      elements.customDurationRange.addEventListener('input', (event) => {
+        syncCustomDurationInputs(event.target.value);
+      });
+    }
+
+    if (elements.customDurationInput) {
+      elements.customDurationInput.addEventListener('input', (event) => {
+        syncCustomDurationInputs(event.target.value);
+      });
+      elements.customDurationInput.addEventListener('change', () => {
+        syncCustomDurationInputs(elements.customDurationInput.value);
       });
     }
 

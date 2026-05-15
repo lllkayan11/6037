@@ -255,16 +255,31 @@
               <h2 data-i18n="selectedTask">当前任务</h2>
             </div>
             <div class="selected-task" id="selectedTask"></div>
-            <div class="duration-row">
-              <button class="duration-button is-active" type="button" data-seconds="20" data-i18n="demo20">Demo 20s</button>
-              <button class="duration-button" type="button" data-seconds="1500" data-i18n="min25">25m</button>
-              <button class="duration-button" type="button" data-seconds="1800" data-i18n="min30">30m</button>
-              <button class="duration-button" type="button" data-seconds="2700" data-i18n="min45">45m</button>
+            <div class="focus-duration-shell">
+              <div class="focus-mode-grid" id="focusModeGrid"></div>
+              <div class="duration-row" id="durationPresets"></div>
+              <div class="custom-duration-card">
+                <div class="custom-duration-copy">
+                  <span class="custom-duration-badge" id="customDurationBadge">Timer Studio</span>
+                  <strong id="customDurationTitle">自定义专注时间</strong>
+                  <p id="customDurationHint">拖动滑块或输入分钟数，做一个更适合自己的番茄钟。</p>
+                </div>
+                <div class="custom-duration-controls">
+                  <input type="range" id="customDurationRange" min="5" max="120" step="5" value="25" />
+                  <div class="custom-duration-input-wrap">
+                    <button class="duration-stepper" type="button" id="decreaseCustomDuration" aria-label="Decrease duration">-</button>
+                    <input type="number" id="customDurationInput" min="5" max="120" step="5" value="25" />
+                    <span id="customDurationUnit">min</span>
+                    <button class="duration-stepper" type="button" id="increaseCustomDuration" aria-label="Increase duration">+</button>
+                  </div>
+                  <button class="small-button secondary" type="button" id="applyCustomDuration">应用自定义时长</button>
+                </div>
+              </div>
             </div>
             <div class="timer-shell" id="timerRing">
               <div class="timer-inner">
                 <span id="timerDisplay">00:20</span>
-                <small>Focus Mode</small>
+                <small id="timerMoodLabel">Focus Mode</small>
               </div>
             </div>
             <div class="timer-actions">
