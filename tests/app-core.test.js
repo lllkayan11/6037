@@ -15,7 +15,8 @@ test('AI planning generates localized focus tasks from a goal', async () => {
   const tasks = result.tasks;
   assert.equal(tasks.length, 4);
   assert.equal(typeof result.encouragement, 'string'); // Check for encouragement
-  assert.equal(tasks[0].duration, 25);
+  assert.equal(typeof tasks[0].duration, 'number');
+  assert.equal(tasks[0].duration > 0, true);
   assert.match(tasks[0].title, /.+/); // DeepSeek generated tasks might not have "Vocabulary" directly
   assert.match(tasks[0].description, /奖励金币: \d+/); // Check for gold reward in description
   assert.ok(tasks.every((task) => task.goal === 'Prepare for IELTS in 3 months'));
@@ -36,7 +37,7 @@ test('task translations can switch language while preserving goal and selection 
   assert.equal(translated.length, 4);
   assert.equal(translated[0].id, 'task1');
   assert.equal(translated[0].goal, 'Prepare for IELTS in 3 months');
-  assert.equal(translated[0].duration, 25);
+  assert.equal(translated[0].duration, tasks[0].duration);
   assert.match(translated[0].title, /.+/);
 });
 
@@ -70,8 +71,38 @@ test('completing focus marks the task done and resets timer state', () => {
   const state = core.selectTask(core.createInitialState(), core.generateTasks('Prepare for IELTS in 3 months', 'en')[0]);
   const result = core.completeFocusSession(state, { totalSeconds: 20, remainingSeconds: 11 });
   assert.equal(result.state.focusCompleted, true);
+  assert.equal(result.state.selectedTask.completed, true);
   assert.equal(result.timer.remainingSeconds, 0);
   assert.equal(result.timer.isRunning, false);
+});
+
+test('timer state keeps counting after resume and reaches completion by clock time', () => {
+  const base = core.createTimerState(90, 'task1');
+  const started = core.startTimerState(base, 1_000);
+  const synced = core.syncTimerState(started, 31_000);
+  assert.equal(synced.remainingSeconds, 60);
+  assert.equal(synced.isRunning, true);
+
+  const paused = core.pauseTimerState(synced, 31_000);
+  assert.equal(paused.isRunning, false);
+  assert.equal(paused.remainingSeconds, 60);
+
+  const resumed = core.startTimerState(paused, 41_000);
+  const finished = core.syncTimerState(resumed, 101_500);
+  assert.equal(finished.remainingSeconds, 0);
+  assert.equal(finished.completed, true);
+  assert.equal(finished.isRunning, false);
+});
+
+test('reward bundle scales with effort and only returns supported fields', () => {
+  const sequence = [0.1, 0.7, 0.4, 0.8, 0.9];
+  let index = 0;
+  const reward = core.buildRewardBundle('zh-CN', 1800, () => sequence[index++]);
+  assert.equal(reward.coins > 0, true);
+  assert.equal(reward.seeds, 2);
+  assert.equal(reward.water, 2);
+  assert.equal(reward.chances, 1);
+  assert.equal(reward.decoration, core.t('zh-CN', 'rewardDecoration'));
 });
 
 test('island actions spend resources and advance island progress', () => {
@@ -184,6 +215,40 @@ test('check-in highlights today and increases streak only once', () => {
   assert.equal(first.streak, 6);
   assert.equal(second.streak, 6);
   assert.deepEqual(second.checkIns, ['2026-05-13']);
+});
+
+test('next task skips completed entries and returns the next actionable task', () => {
+  const base = core.createInitialState();
+  const tasks = [
+    { id: 'task1', title: 'A', completed: true },
+    { id: 'task2', title: 'B', completed: false },
+    { id: 'task3', title: 'C', completed: false }
+  ];
+  const state = { ...base, tasks };
+  assert.equal(core.getNextTask(state).id, 'task2');
+});
+
+test('claiming a milestone reward grants resources only once', () => {
+  const state = { ...core.createInitialState(), streak: 7, milestoneClaims: [] };
+  const claimed = core.claimMilestoneReward(state, 7);
+  assert.equal(claimed.resources.coins, 155);
+  assert.equal(claimed.streakProtection, 2);
+  assert.deepEqual(claimed.milestoneClaims, [7]);
+
+  const claimedAgain = core.claimMilestoneReward(claimed, 7);
+  assert.equal(claimedAgain.resources.coins, 155);
+  assert.deepEqual(claimedAgain.milestoneClaims, [7]);
+});
+
+test('using streak protection consumes one card and activates shield once', () => {
+  const state = core.createInitialState();
+  const activated = core.useStreakProtection(state);
+  assert.equal(activated.streakProtection, 0);
+  assert.equal(activated.streakShieldActive, true);
+
+  const again = core.useStreakProtection(activated);
+  assert.equal(again.streakProtection, 0);
+  assert.equal(again.streakShieldActive, true);
 });
 
 test('friend actions consume chances when needed and update status', () => {

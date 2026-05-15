@@ -1082,6 +1082,13 @@ if (typeof document !== 'undefined') {
     let timerState = core.createTimerState(selectedDuration);
     let timerId = null;
     let rewardReady = core.buildRewardBundle(language, selectedDuration);
+    let focusSceneState = {
+      outcome: 'idle',
+      progress: 0,
+      reason: 'ready',
+      reward: null,
+      theme: null
+    };
 
     const elements = {
       home: document.querySelector('.home-shell'),
@@ -1094,6 +1101,10 @@ if (typeof document !== 'undefined') {
       timerDisplay: document.querySelector('#timerDisplay'),
       timerRing: document.querySelector('#timerRing'),
       timerMoodLabel: document.querySelector('#timerMoodLabel'),
+      focusScene: document.querySelector('#focusScene'),
+      focusSceneEyebrow: document.querySelector('#focusSceneEyebrow'),
+      focusSceneTitle: document.querySelector('#focusSceneTitle'),
+      focusSceneMessage: document.querySelector('#focusSceneMessage'),
       focusModeGrid: document.querySelector('#focusModeGrid'),
       durationPresets: document.querySelector('#durationPresets'),
       customDurationBadge: document.querySelector('#customDurationBadge'),
@@ -1144,10 +1155,34 @@ if (typeof document !== 'undefined') {
       authState: 'pomoland-demo-auth-v1'
     };
 
+    const focusPreview = (() => {
+      const params = new URLSearchParams(window.location.search);
+      const outcome = params.get('focusPreview');
+      if (!outcome) return null;
+      const safeOutcome = ['idle', 'growing', 'happy', 'rotten'].includes(outcome) ? outcome : 'idle';
+      const progressValue = Number(params.get('focusProgress'));
+      const theme = params.get('focusTheme');
+      return {
+        outcome: safeOutcome,
+        progress: Number.isFinite(progressValue)
+          ? clamp(progressValue, 0, 1)
+          : safeOutcome === 'happy'
+            ? 1
+            : safeOutcome === 'rotten'
+              ? 0.42
+              : 0.5,
+        theme: ['tomato', 'sun', 'leaf', 'moon'].includes(theme) ? theme : null
+      };
+    })();
+
     function localizedText(zhCN, zhHK, en) {
       if (language === 'zh-HK') return zhHK;
       if (language === 'en') return en;
       return zhCN;
+    }
+
+    function clamp(value, min, max) {
+      return Math.min(max, Math.max(min, value));
     }
 
     function readStorage(key) {
@@ -1301,6 +1336,194 @@ if (typeof document !== 'undefined') {
       };
     }
 
+    function getFocusProgress(timer = timerState) {
+      if (!timer || !timer.totalSeconds) return 0;
+      return clamp(1 - timer.remainingSeconds / timer.totalSeconds, 0, 1);
+    }
+
+    function setFocusScene(outcome, options = {}) {
+      focusSceneState = {
+        ...focusSceneState,
+        outcome,
+        progress: typeof options.progress === 'number' ? clamp(options.progress, 0, 1) : focusSceneState.progress,
+        reason: options.reason || focusSceneState.reason,
+        reward: Object.prototype.hasOwnProperty.call(options, 'reward') ? options.reward : focusSceneState.reward,
+        theme: Object.prototype.hasOwnProperty.call(options, 'theme') ? options.theme : focusSceneState.theme
+      };
+    }
+
+    function getFocusSceneCopy(themeKey, outcome, progress) {
+      if (outcome === 'happy') {
+        const reward = focusSceneState.reward || rewardReady;
+        return {
+          eyebrow: localizedText('Focus Celebration', 'Focus Celebration', 'Focus Celebration'),
+          title: themeKey === 'moon'
+            ? localizedText('夜晚也被你点亮了', '夜晚也被你點亮了', 'You lit up the night')
+            : localizedText('你把番茄养成啦', '你把番茄養成啦', 'You raised a joyful tomato'),
+          message: localizedText(
+            `专注成功收官，番茄已经笑开花。奖励掉落：${reward.water} 水滴、${reward.coins} 金币，还有 ${reward.seeds} 颗种子在等你去建设小岛。`,
+            `專注成功收官，番茄已經笑開花。獎勵掉落：${reward.water} 水滴、${reward.coins} 金幣，還有 ${reward.seeds} 顆種子等你去建設小島。`,
+            `You finished strong and your tomato is glowing. Rewards are ready: ${reward.water} water, ${reward.coins} coins, and ${reward.seeds} seeds for your island.`
+          )
+        };
+      }
+
+      if (outcome === 'rotten') {
+        return {
+          eyebrow: localizedText('番茄撒娇中', '番茄撒嬌中', 'Tomato needs a hug'),
+          title: localizedText('半途离开也没关系', '半途離開也沒關係', 'Leaving midway is okay'),
+          message: localizedText(
+            '小番茄已经委屈地变成了可爱烂番茄，但它还在等你下一轮把它重新养回来。休息一下，我们再开一颗新的番茄。',
+            '小番茄已經委屈地變成可愛爛番茄，但它還在等你下一輪把它重新養回來。休息一下，我們再開一顆新的番茄。',
+            'Your tomato turned into a cute little rotten bean, but it is still waiting for a comeback run. Take a breath and grow a fresh one next round.'
+          )
+        };
+      }
+
+      if (outcome === 'growing') {
+        if (progress < 0.2) {
+          return {
+            eyebrow: localizedText('番茄发芽中', '番茄發芽中', 'Tomato sprouting'),
+            title: localizedText('先稳稳进入状态', '先穩穩進入狀態', 'Ease into the rhythm'),
+            message: localizedText(
+              '专注才刚刚开始，番茄还是颗小小苗。先守住前几分钟，今天的状态就会慢慢站稳。',
+              '專注才剛剛開始，番茄還是一顆小小苗。先守住前幾分鐘，今天的狀態就會慢慢站穩。',
+              'Focus has just started and your tomato is still tiny. Hold the first few minutes steady and the session will lock in.'
+            )
+          };
+        }
+        if (progress < 0.55) {
+          return {
+            eyebrow: localizedText('番茄正在长大', '番茄正在長大', 'Tomato growing'),
+            title: localizedText('你已经把节奏养起来了', '你已經把節奏養起來了', 'You have momentum now'),
+            message: localizedText(
+              '倒计时过半之前，番茄会一点点变圆变饱满。继续保持，现在正是最容易进入心流的时候。',
+              '倒計時過半之前，番茄會一點點變圓變飽滿。繼續保持，現在正是最容易進入心流的時候。',
+              'Your tomato is getting plumper with every minute. Keep the rhythm and you are entering the easiest window for flow.'
+            )
+          };
+        }
+        if (progress < 0.9) {
+          return {
+            eyebrow: localizedText('番茄快熟啦', '番茄快熟啦', 'Almost ripe'),
+            title: localizedText('离奖励只差一点点', '離獎勵只差一點點', 'Rewards are close'),
+            message: localizedText(
+              '现在的每一分钟都在让番茄接近成熟。别切走，这一段坚持下来会很有成就感。',
+              '現在的每一分鐘都在讓番茄接近成熟。別切走，這一段堅持下來會很有成就感。',
+              'Every minute now ripens the tomato further. Stay with it and the finish will feel extra satisfying.'
+            )
+          };
+        }
+        return {
+          eyebrow: localizedText('最后冲刺', '最後衝刺', 'Final sprint'),
+          title: localizedText('再坚持一下就开花庆祝', '再堅持一下就開花慶祝', 'One more push to celebrate'),
+          message: localizedText(
+            '番茄已经圆润到快要发光了，最后这一小段坚持下来，马上就是奖励时刻。',
+            '番茄已經圓潤到快要發光了，最後這一小段堅持下來，馬上就是獎勵時刻。',
+            'Your tomato is practically glowing. Hold this last stretch and the reward moment is next.'
+          )
+        };
+      }
+
+      if (focusSceneState.reason === 'paused' && progress > 0) {
+        return {
+          eyebrow: localizedText('暂停补气中', '暫停補氣中', 'Paused for a breath'),
+          title: localizedText('番茄在等你回来', '番茄在等你回來', 'Your tomato is waiting'),
+          message: localizedText(
+            '暂停不算失败，番茄只是先停在这里等你。回来继续的时候，它会从现在的大小接着长。',
+            '暫停不算失敗，番茄只是先停在這裡等你。回來繼續的時候，它會從現在的大小接著長。',
+            'A pause is not a failure. Your tomato is simply waiting here and will keep growing from this exact size when you return.'
+          )
+        };
+      }
+
+      if (themeKey === 'sun') {
+        return {
+          eyebrow: localizedText('晨光模式', '晨光模式', 'Morning glow'),
+          title: localizedText('先来一颗轻盈小番茄', '先來一顆輕盈小番茄', 'Start with a light tomato'),
+          message: localizedText(
+            '短时专注适合热身，让大脑柔和地进入工作状态。开始后，番茄会随着倒计时慢慢鼓起来。',
+            '短時專注適合熱身，讓大腦柔和地進入工作狀態。開始後，番茄會隨著倒計時慢慢鼓起來。',
+            'A shorter session is perfect for warming up. Once you start, the tomato slowly puffs up with the countdown.'
+          )
+        };
+      }
+
+      if (themeKey === 'leaf') {
+        return {
+          eyebrow: localizedText('森林深潜', '森林深潛', 'Forest flow'),
+          title: localizedText('适合把任务一口气吃掉', '適合把任務一口氣吃掉', 'Built for deep focus'),
+          message: localizedText(
+            '更长的专注会把氛围切到森林沉浸感。开始后，番茄会越长越饱满，像陪你一起闯关的小宠物。',
+            '更長的專注會把氛圍切到森林沉浸感。開始後，番茄會越長越飽滿，像陪你一起闖關的小寵物。',
+            'Longer sessions switch the mood into a forest flow. Your tomato grows beside you like a tiny companion clearing the level.'
+          )
+        };
+      }
+
+      if (themeKey === 'moon') {
+        return {
+          eyebrow: localizedText('夜航静谧', '夜航靜謐', 'Quiet night'),
+          title: localizedText('把夜晚变成安静奖励区', '把夜晚變成安靜獎勵區', 'Turn the night into a reward zone'),
+          message: localizedText(
+            '夜间模式会切换成更安静的氛围。番茄会在星空边慢慢长大，陪你把思路稳定下来。',
+            '夜間模式會切換成更安靜的氛圍。番茄會在星空邊慢慢長大，陪你把思路穩定下來。',
+            'Night mode creates a calmer atmosphere. The tomato grows under the stars while your thoughts settle into place.'
+          )
+        };
+      }
+
+      return {
+        eyebrow: localizedText('番茄待命中', '番茄待命中', 'Tomato on standby'),
+        title: localizedText('让番茄陪你一起长大', '讓番茄陪你一起長大', 'Grow the tomato with your focus'),
+        message: localizedText(
+          '开始专注后，番茄会随着倒计时慢慢成熟。坚持完成，会收获超可爱的奖励时刻。',
+          '開始專注後，番茄會隨著倒計時慢慢成熟。堅持完成，會收穫超可愛的獎勵時刻。',
+          'Start focusing and the tomato ripens with the countdown. Finish the session to unlock a delightfully rewarding moment.'
+        )
+      };
+    }
+
+    function renderFocusScene() {
+      if (!elements.focusScene) return;
+
+      const timerTheme = getTimerTheme(timerState.totalSeconds || selectedDuration);
+      const themeKey = focusPreview?.theme || focusSceneState.theme || timerTheme.key;
+      const previewProgress = typeof focusPreview?.progress === 'number' ? focusPreview.progress : null;
+      const progress = previewProgress ?? (timerState.isRunning ? getFocusProgress() : focusSceneState.progress);
+      const outcome = focusPreview?.outcome || (timerState.isRunning ? 'growing' : focusSceneState.outcome);
+      const scale = outcome === 'happy'
+        ? 1.18
+        : outcome === 'rotten'
+          ? 0.94
+          : 0.78 + clamp(progress, 0, 1) * 0.42;
+      const copy = getFocusSceneCopy(themeKey, outcome, progress);
+      const burstLabels = outcome === 'happy'
+        ? [
+            `+${rewardReady.water}${localizedText(' 水滴', ' 水滴', ' water')}`,
+            `+${rewardReady.coins}${localizedText(' 金币', ' 金幣', ' coins')}`,
+            `+${rewardReady.seeds}${localizedText(' 种子', ' 種子', ' seeds')}`
+          ]
+        : [
+            localizedText('稳住节奏', '穩住節奏', 'Stay steady'),
+            localizedText('继续长大', '繼續長大', 'Keep growing'),
+            localizedText('快熟啦', '快熟啦', 'Almost ripe')
+          ];
+
+      elements.focusScene.dataset.theme = themeKey;
+      elements.focusScene.dataset.outcome = outcome;
+      elements.focusScene.style.setProperty('--tomato-scale', scale.toFixed(3));
+      elements.focusScene.style.setProperty('--focus-progress', progress.toFixed(3));
+
+      if (elements.focusSceneEyebrow) elements.focusSceneEyebrow.textContent = copy.eyebrow;
+      if (elements.focusSceneTitle) elements.focusSceneTitle.textContent = copy.title;
+      if (elements.focusSceneMessage) elements.focusSceneMessage.textContent = copy.message;
+
+      document.querySelectorAll('.mini-reward-bursts span').forEach((node, index) => {
+        if (burstLabels[index]) node.textContent = burstLabels[index];
+      });
+    }
+
     function getJourneyState() {
       const nextTask = core.getNextTask(state);
       const checkedInToday = state.checkIns.includes(core.todayIso());
@@ -1433,6 +1656,14 @@ if (typeof document !== 'undefined') {
         finishFocus(true);
         return;
       }
+      if (timerState.isRunning) {
+        setFocusScene('growing', {
+          progress: getFocusProgress(timerState),
+          reason: 'running',
+          reward: null,
+          theme: null
+        });
+      }
       renderTimer();
       persistSession();
     }
@@ -1498,6 +1729,7 @@ if (typeof document !== 'undefined') {
       renderSelectedTask();
       renderDurationPicker();
       renderTimer();
+      renderFocusScene();
       renderIsland();
       renderCheckIns();
       renderFriends();
@@ -1866,12 +2098,30 @@ if (typeof document !== 'undefined') {
     }
 
     function setDuration(seconds) {
+      const previousProgress = getFocusProgress(timerState);
+      const changedDuration = selectedDuration !== seconds;
+      if (!focusPreview && changedDuration && previousProgress > 0.08 && !timerState.completed) {
+        setFocusScene('rotten', {
+          progress: previousProgress,
+          reason: 'changed-duration',
+          reward: null,
+          theme: null
+        });
+      }
       stopTicker();
       selectedDuration = seconds;
       if (seconds !== 20) {
         customDurationMinutes = normalizeCustomMinutes(seconds / 60);
       }
       timerState = core.createTimerState(seconds, state.selectedTask ? state.selectedTask.id : null);
+      if (!focusPreview && previousProgress <= 0.08) {
+        setFocusScene('idle', {
+          progress: 0,
+          reason: 'ready',
+          reward: null,
+          theme: null
+        });
+      }
       renderDurationPicker();
       renderTimer();
       persistSession();
@@ -1911,6 +2161,12 @@ if (typeof document !== 'undefined') {
         remainingSeconds: timerState.remainingSeconds > 0 ? timerState.remainingSeconds : selectedDuration
       });
       state.focusCompleted = false;
+      setFocusScene('growing', {
+        progress: getFocusProgress(timerState),
+        reason: 'running',
+        reward: null,
+        theme: null
+      });
       startTicker();
       syncTimerFromClock();
     }
@@ -1918,11 +2174,19 @@ if (typeof document !== 'undefined') {
     function stopTimer() {
       stopTicker();
       timerState = core.pauseTimerState(timerState);
+      setFocusScene('idle', {
+        progress: getFocusProgress(timerState),
+        reason: 'paused',
+        reward: null,
+        theme: null
+      });
       renderTimer();
       persistSession();
     }
 
     function resetTimer() {
+      const progressBeforeReset = getFocusProgress(timerState);
+      const abandoned = progressBeforeReset > 0.08 && !timerState.completed;
       stopTicker();
       timerState = core.resetTimerState({
         ...timerState,
@@ -1930,6 +2194,12 @@ if (typeof document !== 'undefined') {
         totalSeconds: selectedDuration
       });
       state.focusCompleted = false;
+      setFocusScene(abandoned ? 'rotten' : 'idle', {
+        progress: abandoned ? progressBeforeReset : 0,
+        reason: abandoned ? 'abandoned' : 'ready',
+        reward: null,
+        theme: null
+      });
       renderTimer();
       persistSession();
     }
@@ -1952,6 +2222,12 @@ if (typeof document !== 'undefined') {
         endTime: null
       };
       rewardReady = core.buildRewardBundle(language, timerState.totalSeconds || selectedDuration);
+      setFocusScene('happy', {
+        progress: 1,
+        reason: 'completed',
+        reward: rewardReady,
+        theme: null
+      });
       renderTimer();
       renderTasks();
       renderSelectedTask();
@@ -1991,6 +2267,12 @@ if (typeof document !== 'undefined') {
         totalSeconds: selectedDuration
       });
       rewardReady = core.buildRewardBundle(language, selectedDuration);
+      setFocusScene('idle', {
+        progress: 0,
+        reason: 'ready',
+        reward: null,
+        theme: null
+      });
       elements.bonusModal.hidden = true;
       if (islandAction) {
         state = core.applyIslandAction(state, islandAction);
@@ -2311,6 +2593,25 @@ if (typeof document !== 'undefined') {
 
     restoreSession();
     setLanguage(language);
+    if (focusPreview) {
+      if (elements.home) elements.home.hidden = true;
+      if (elements.workspace) elements.workspace.hidden = false;
+      state.currentView = 'focus';
+      document.querySelectorAll('.workspace-panel').forEach((panel) => {
+        panel.hidden = panel.dataset.panel !== 'focus';
+      });
+      document.querySelectorAll('.workspace-nav-button').forEach((button) => {
+        button.classList.toggle('is-active', button.dataset.view === 'focus');
+      });
+      setFocusScene(focusPreview.outcome, {
+        progress: focusPreview.progress,
+        reason: 'preview',
+        reward: focusPreview.outcome === 'happy' ? rewardReady : null,
+        theme: focusPreview.theme ?? null
+      });
+      renderAll();
+      return;
+    }
     if (state.selectedTask) {
       timerState = core.syncTimerState(timerState);
       selectedDuration = timerState.totalSeconds || selectedDuration;
