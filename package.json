@@ -1,0 +1,19 @@
+
+{
+  "name": "pomoland-backend",
+  "version": "1.0.0",
+  "description": "Backend proxy for Pomoland AI API integration",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "openai": "^4.0.0",
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1"
+  }
+}

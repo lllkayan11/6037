@@ -8,38 +8,26 @@
 </head>
 <body>
   <div class="auth-shell" id="authShell">
-    <div class="auth-visual">
-      <div class="brand-mark" style="width: 48px; height: 48px; margin-bottom: 24px; background: var(--tomato); border-radius: 16px;"></div>
-      <h1 style="font-size: 48px; color: var(--sea-dark); margin: 0 0 16px;">Pomoland</h1>
-      <p style="font-size: 20px; color: var(--sea-dark); opacity: 0.8; margin: 0;">把专注变成自己的番茄岛</p>
-      <div class="hero-world" style="transform: scale(0.6); min-height: 300px; margin-top: -40px;">
-        <div class="island-preview">
-          <div class="tomato-house"></div>
-          <div class="sprout sprout-a"></div>
-          <div class="sprout sprout-b"></div>
-        </div>
-      </div>
-    </div>
     <div class="auth-form-container">
       <div class="auth-form">
         <p class="eyebrow">Account</p>
-        <h2 data-i18n="loginTitle">登录 / 注册</h2>
-        
+        <h2>登录 / 注册</h2>
+
         <div id="loginStep1">
-          <p style="color: var(--muted); margin-bottom: 32px;" data-i18n="loginDesc">输入手机号接收验证码以登录 Pomoland。</p>
+          <p style="color: var(--muted); margin-bottom: 32px;">输入手机号接收验证码以登录 Pomoland。</p>
           <label for="phoneInput" style="display:block; margin-bottom: 8px; font-weight: bold; color: var(--muted);">手机号</label>
           <input type="text" id="phoneInput" placeholder="请输入手机号" style="width: 100%; padding: 14px; border: 1px solid var(--line); border-radius: 8px; margin-bottom: 24px; font-size: 16px; outline: none;" />
           <button class="primary-button wide" id="sendCodeBtn" type="button" style="height: 52px; font-size: 16px;">发送验证码</button>
         </div>
 
         <div id="loginStep2" hidden>
-          <p style="color: var(--muted); margin-bottom: 32px;">验证码已发送，如果是新账号，请创建你的岛屿昵称。</p>
+          <p style="color: var(--muted); margin-bottom: 32px;">验证码已发送，请输入验证码并填写昵称。</p>
           <label for="codeInput" style="display:block; margin-bottom: 8px; font-weight: bold; color: var(--muted);">验证码</label>
           <input type="text" id="codeInput" placeholder="1234" style="width: 100%; padding: 14px; border: 1px solid var(--line); border-radius: 8px; margin-bottom: 16px; font-size: 16px; outline: none;" />
-          
+
           <label for="nicknameInput" style="display:block; margin-bottom: 8px; font-weight: bold; color: var(--muted);">你的昵称</label>
-          <input type="text" id="nicknameInput" placeholder="例如: 小番茄" style="width: 100%; padding: 14px; border: 1px solid var(--line); border-radius: 8px; margin-bottom: 32px; font-size: 16px; outline: none;" />
-          
+          <input type="text" id="nicknameInput" placeholder="例如：小番茄" style="width: 100%; padding: 14px; border: 1px solid var(--line); border-radius: 8px; margin-bottom: 32px; font-size: 16px; outline: none;" />
+
           <button class="primary-button wide" id="confirmLoginBtn" type="button" style="height: 52px; font-size: 16px;">进入岛屿</button>
         </div>
       </div>
@@ -232,18 +220,10 @@
           <p class="eyebrow">Demo Workspace</p>
           <h1 data-i18n="workspaceTitle">Pomoland Demo</h1>
         </div>
-        <div style="display: flex; gap: 12px; align-items: center;">
-          <div id="userProfile" style="display: none; align-items: center; gap: 8px; margin-right: 12px; cursor: pointer;">
-            <div id="userAvatarDisplay" style="width: 32px; height: 32px; border-radius: 50%; background: var(--sea); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;"></div>
-            <span id="userNameDisplay" style="font-weight: 800; color: var(--sea-dark);"></span>
-            <button class="small-button ghost" id="logoutBtn" type="button" style="margin-left: 8px;">退出</button>
-          </div>
-          <button class="secondary-button" type="button" id="demoNextDay" style="color: var(--tomato-dark); border-color: var(--tomato); background: #fff5f3;">⏩ 模拟下一天 (测试衰减)</button>
-          <div class="language-switcher" aria-label="Language switcher">
-            <button class="language-button is-active" type="button" data-lang="zh-CN">简</button>
-            <button class="language-button" type="button" data-lang="zh-HK">繁</button>
-            <button class="language-button" type="button" data-lang="en">EN</button>
-          </div>
+        <div class="language-switcher" aria-label="Language switcher">
+          <button class="language-button is-active" type="button" data-lang="zh-CN">简</button>
+          <button class="language-button" type="button" data-lang="zh-HK">繁</button>
+          <button class="language-button" type="button" data-lang="en">EN</button>
         </div>
       </header>
 
@@ -320,17 +300,13 @@
                 <div class="water-channel"></div>
                 <div class="large-house"></div>
                 <div class="large-pet">
-                  <div class="entity-status"><div class="entity-status-fill satiety" id="petStatusBar" style="width: 100%;"></div></div>
                   <span class="pet-eye eye-left"></span>
                   <span class="pet-eye eye-right"></span>
                   <span class="pet-mouth"></span>
                   <span class="pet-tail"></span>
                 </div>
                 <div class="pet-bowl"></div>
-                <div class="large-plant plant-one">
-                  <div class="entity-status"><div class="entity-status-fill" id="plantStatusBar" style="width: 100%;"></div></div>
-                  <span class="plant-flower"></span><span class="plant-fruit"></span>
-                </div>
+                <div class="large-plant plant-one"><span class="plant-flower"></span><span class="plant-fruit"></span></div>
                 <div class="large-plant plant-two"><span class="plant-flower"></span><span class="plant-fruit"></span></div>
                 <div class="large-plant plant-three"><span class="plant-flower"></span><span class="plant-fruit"></span></div>
                 <div class="large-plant plant-four"><span class="plant-flower"></span><span class="plant-fruit"></span></div>
@@ -400,66 +376,22 @@
           </article>
           <article class="metric">
             <span data-i18n="protection">连胜保护卡</span>
-            <strong id="protectionCards">1</strong>
+            <strong>1</strong>
           </article>
-          <article class="metric" style="display: flex; flex-direction: column; justify-content: center; padding: 12px;">
-            <button class="secondary-button" type="button" id="buyProtection" style="width: 100%; border-color: var(--tomato); color: var(--tomato-dark);"><span data-i18n="buyProtectionBtn" style="color: inherit; font-size: 14px; font-weight: 800; display: inline;">购买保护卡 (30金币)</span></button>
+          <article class="metric">
+            <span data-i18n="milestone">里程碑奖励</span>
+            <strong>7 / 30 / 100</strong>
           </article>
         </div>
         <div class="calendar-grid" id="checkInGrid"></div>
       </section>
 
       <section class="workspace-panel" data-panel="friends" hidden>
-        <div class="panel-layout two-column">
-          <div>
-            <div class="panel-heading" style="display: flex; justify-content: space-between; align-items: center;">
-              <div>
-                <p class="eyebrow">Friends & Social</p>
-                <h2 data-i18n="friendsTitle">好友岛屿</h2>
-              </div>
-              <button class="primary-button" type="button" id="addFriendBtn" data-i18n="addFriend">添加好友 (ID)</button>
-            </div>
-            <div class="friend-grid" id="friendGrid"></div>
-
-            <div class="panel-heading" style="margin-top: 48px;">
-              <p class="eyebrow">Multiplayer</p>
-              <h2 data-i18n="teamBossTitle">小队 Boss 战 (Beta)</h2>
-            </div>
-            <div class="boss-panel">
-              <div class="boss-info">
-                <h3>本周目标：击退拖延怪兽</h3>
-                <p>3人组队，队伍总专注时长达到 500 分钟即可获得稀有装饰【魔法喷泉】！</p>
-                <div class="boss-progress-bar">
-                  <div class="boss-progress-fill" id="teamProgressFill" style="width: 20%;"></div>
-                </div>
-                <div style="display: flex; justify-content: space-between; margin-top: 8px;">
-                  <small style="color: var(--muted);" id="teamProgressText">100 / 500 分钟</small>
-                  <button class="small-button" type="button" id="teamContributeBtn">贡献今日专注</button>
-                </div>
-              </div>
-              <div class="boss-monster"></div>
-            </div>
-          </div>
-          
-          <div class="tool-panel chat-panel">
-            <div class="chat-header">
-              <strong id="chatTargetName">小队频道</strong>
-            </div>
-            <div class="chat-messages" id="chatMessages">
-              <div class="chat-msg received">
-                <div class="chat-avatar">M</div>
-                <div class="chat-bubble">大家今天冲刺雅思吗？</div>
-              </div>
-              <div class="chat-msg sent">
-                <div class="chat-bubble">冲！我等下开启一个 45 分钟番茄钟。</div>
-              </div>
-            </div>
-            <div class="chat-input-area">
-              <input type="text" id="chatInput" placeholder="发送消息..." />
-              <button class="small-button" id="sendChatBtn" type="button">发送</button>
-            </div>
-          </div>
+        <div class="panel-heading">
+          <p class="eyebrow">Friends</p>
+          <h2 data-i18n="friendsTitle">好友岛屿</h2>
         </div>
+        <div class="friend-grid" id="friendGrid"></div>
       </section>
 
       <section class="workspace-panel" data-panel="report" hidden>
@@ -527,20 +459,6 @@
     </div>
   </div>
 
-  <div class="modal-backdrop" id="streakModal" hidden>
-    <div class="bonus-modal" role="dialog" aria-modal="true">
-      <button class="modal-close" id="closeStreakModal" type="button" aria-label="Close">×</button>
-      <p class="eyebrow" style="color: var(--tomato-dark);">Streak Warning</p>
-      <h2 data-i18n="streakWarningTitle">连胜即将中断！</h2>
-      <p data-i18n="streakWarningDesc" style="color: var(--muted); margin-top: 12px;">你今天还没有专注哦，再不打卡就会失去 5 天的连胜记录啦。是否消耗 1 张保护卡？</p>
-      <div style="display: flex; gap: 12px; margin-top: 24px;">
-        <button class="primary-button wide" id="useProtectionBtn" type="button" data-i18n="useProtection">使用保护卡</button>
-        <button class="secondary-button wide" id="acceptBreakBtn" type="button" data-i18n="acceptBreak">断签</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Removed old loginModal -->
-
   <script src="app.js"></script>
 </body>
+</html>

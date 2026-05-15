@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pomoland 视觉方向选择</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+      color: #18211b;
+      background: #f5f7f1;
+    }
+
+    main {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 36px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 32px;
+      font-weight: 760;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 0 0 28px;
+      color: #5b685f;
+      font-size: 16px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .option {
+      overflow: hidden;
+      border: 1px solid #d7ded2;
+      border-radius: 8px;
+      background: #ffffff;
+      box-shadow: 0 18px 48px rgba(35, 58, 42, 0.08);
+    }
+
+    .preview {
+      min-height: 360px;
+      padding: 18px;
+    }
+
+    .caption {
+      min-height: 118px;
+      padding: 18px;
+      border-top: 1px solid #e3e7df;
+      background: #ffffff;
+    }
+
+    .caption h2 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    .caption p {
+      margin: 0;
+      color: #667068;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .mock-shell {
+      overflow: hidden;
+      height: 324px;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      background: #fff;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 44px;
+      padding: 0 14px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .nav span {
+      opacity: 0.72;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .title {
+      font-size: 22px;
+      font-weight: 780;
+      line-height: 1.1;
+    }
+
+    .copy {
+      margin-top: 8px;
+      font-size: 10px;
+      line-height: 1.55;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      margin-top: 14px;
+      padding: 8px 11px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 750;
+    }
+
+    .panel {
+      min-height: 124px;
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .timer {
+      display: grid;
+      place-items: center;
+      width: 82px;
+      height: 82px;
+      margin: 8px auto;
+      border-radius: 50%;
+      font-size: 19px;
+      font-weight: 780;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      padding: 0 16px 16px;
+    }
+
+    .tile {
+      min-height: 72px;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 10px;
+      line-height: 1.4;
+    }
+
+    .tile strong {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 12px;
+    }
+
+    .garden {
+      background: linear-gradient(180deg, #fff6df, #eaf4dc);
+    }
+
+    .garden .nav {
+      color: #3e5a2f;
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    .garden .title {
+      color: #253c21;
+    }
+
+    .garden .copy {
+      color: #5f7058;
+    }
+
+    .garden .button {
+      color: #ffffff;
+      background: #4f8f45;
+    }
+
+    .garden .panel {
+      background: #fdf1c8;
+      border: 1px solid #e8ce87;
+    }
+
+    .garden .timer {
+      color: #3e5a2f;
+      background: conic-gradient(#ffb84d 0 68%, #f8df9d 68% 100%);
+    }
+
+    .garden .tile {
+      background: rgba(255, 255, 255, 0.72);
+      color: #52644e;
+    }
+
+    .island {
+      background: linear-gradient(160deg, #e5fbff, #fff3d2 62%, #e9f5d7);
+    }
+
+    .island .nav {
+      color: #165569;
+      background: rgba(255, 255, 255, 0.76);
+    }
+
+    .island .title {
+      color: #12495a;
+    }
+
+    .island .copy {
+      color: #4f6f75;
+    }
+
+    .island .button {
+      color: #083f4f;
+      background: #ffd166;
+    }
+
+    .island .panel {
+      position: relative;
+      background: #83d6cf;
+      border: 1px solid #3aa8a3;
+    }
+
+    .island .panel::before {
+      content: "";
+      position: absolute;
+      right: 14px;
+      bottom: 10px;
+      width: 72px;
+      height: 38px;
+      border-radius: 50% 50% 8px 8px;
+      background: #8dc45f;
+      box-shadow: -42px 10px 0 #eecf77;
+    }
+
+    .island .timer {
+      position: relative;
+      z-index: 1;
+      color: #ffffff;
+      background: #ff6b5a;
+    }
+
+    .island .tile {
+      background: rgba(255, 255, 255, 0.78);
+      color: #47676b;
+    }
+
+    .focus {
+      background: #f7f8fb;
+    }
+
+    .focus .nav {
+      color: #263238;
+      background: #ffffff;
+      border-bottom: 1px solid #e3e7eb;
+    }
+
+    .focus .title {
+      color: #182126;
+    }
+
+    .focus .copy {
+      color: #65707a;
+    }
+
+    .focus .button {
+      color: #ffffff;
+      background: #2f6f73;
+    }
+
+    .focus .panel {
+      background: #ffffff;
+      border: 1px solid #dfe5e7;
+      box-shadow: 0 12px 24px rgba(29, 45, 48, 0.06);
+    }
+
+    .focus .timer {
+      color: #2f6f73;
+      background: conic-gradient(#2f6f73 0 68%, #e6edef 68% 100%);
+    }
+
+    .focus .tile {
+      background: #ffffff;
+      color: #5e6971;
+      border: 1px solid #e4e9ec;
+    }
+
+    @media (max-width: 980px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Pomoland / 番茄岛：视觉方向选择</h1>
+    <p class="subtitle">请重点看课堂投屏时的第一印象：可爱程度、信息清晰度、是否符合“番茄钟 + 养成 + AI 任务”的产品气质。</p>
+
+    <section class="grid">
+      <article class="option">
+        <div class="preview garden">
+          <div class="mock-shell">
+            <div class="nav"><strong>Pomoland</strong><span>Tasks Garden Friends</span></div>
+            <div class="hero">
+              <div>
+                <div class="title">把专注时间种成一座花园</div>
+                <div class="copy">AI 拆解目标，番茄钟完成专注，奖励水滴、种子和家园装饰。</div>
+                <div class="button">开始今日专注</div>
+              </div>
+              <div class="panel">
+                <div class="timer">25:00</div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="tile"><strong>AI 任务</strong>六级备考拆成 4 个小目标</div>
+              <div class="tile"><strong>虚拟家园</strong>番茄苗需要浇水</div>
+              <div class="tile"><strong>连续打卡</strong>第 7 天奖励稀有种子</div>
+            </div>
+          </div>
+        </div>
+        <div class="caption">
+          <h2>A. 温暖花园风</h2>
+          <p>最安全亲和，适合“专注养成”。整体偏温柔、轻松，课堂展示容易理解，但游戏感稍弱。</p>
+        </div>
+      </article>
+
+      <article class="option">
+        <div class="preview island">
+          <div class="mock-shell">
+            <div class="nav"><strong>Pomoland</strong><span>Island Focus Squad</span></div>
+            <div class="hero">
+              <div>
+                <div class="title">完成番茄钟，扩建你的番茄岛</div>
+                <div class="copy">每次专注都会掉落奖励：金币、种子、水滴，或一次好友互动机会。</div>
+                <div class="button">进入番茄岛</div>
+              </div>
+              <div class="panel">
+                <div class="timer">30:00</div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="tile"><strong>随机宝箱</strong>完成后开出游戏机会</div>
+              <div class="tile"><strong>好友互助</strong>帮好友浇水得金币</div>
+              <div class="tile"><strong>小队挑战</strong>3 人一起打 Boss</div>
+            </div>
+          </div>
+        </div>
+        <div class="caption">
+          <h2>B. 明亮岛屿风</h2>
+          <p>更贴合“番茄岛”，有年轻、游戏化、记忆点强的感觉。适合课程展示，也便于做奖励和社交演示。</p>
+        </div>
+      </article>
+
+      <article class="option">
+        <div class="preview focus">
+          <div class="mock-shell">
+            <div class="nav"><strong>Pomoland</strong><span>Dashboard Insights AI</span></div>
+            <div class="hero">
+              <div>
+                <div class="title">AI 规划任务，专注进度可视化</div>
+                <div class="copy">将长期目标拆成每日任务，用打卡、报告和奖励推动持续行动。</div>
+                <div class="button">查看今日计划</div>
+              </div>
+              <div class="panel">
+                <div class="timer">45:00</div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="tile"><strong>目标拆解</strong>每周子任务和建议时长</div>
+              <div class="tile"><strong>专注报告</strong>7 天趋势和雷达图</div>
+              <div class="tile"><strong>连胜保护</strong>金币兑换免断卡</div>
+            </div>
+          </div>
+        </div>
+        <div class="caption">
+          <h2>C. 清爽效率风</h2>
+          <p>更像成熟效率工具，信息清晰、投屏稳重。缺点是养成系统和轻竞技的趣味感会被削弱。</p>
+        </div>
+      </article>
+    </section>
+  </main>
+</body>
+</html>
