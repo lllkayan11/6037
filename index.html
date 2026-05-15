@@ -334,420 +334,219 @@
           <div class="island-header-stats">
             <span class="level-badge" id="islandLevel">Lv.1</span>
             <span class="exp-bar"><span class="exp-fill" id="expFill"></span></span>
-            <span class="resource-item coins-display">💰 <span id="coinsCount">0</span></span>
-            <span class="resource-item water-display">💧 <span id="waterCount">10</span></span>
-            <span class="resource-item sunlight-display">☀️ <span id="sunlightCount">10</span></span>
-            <span class="resource-item help-display">🤝 <span id="helpCount">5</span></span>
+            <span class="resource-item">💰 <span id="coinsCount">0</span></span>
+            <span class="resource-item">💧 <span id="waterCount">10</span></span>
+            <span class="resource-item">☀️ <span id="sunlightCount">10</span></span>
+            <span class="resource-item">🤝 <span id="helpCount">5</span></span>
           </div>
         </div>
 
-        <div class="island-main-layout">
-          <!-- 岛屿场景 -->
-          <div class="island-scene-container">
-            <div class="garden-island" id="gardenIsland" data-level="1" data-theme="sunny" data-season="spring">
-              <!-- 天空层 -->
-              <div class="sky-layer">
-                <div class="sun"></div>
-                <div class="clouds">
-                  <div class="cloud cloud-1"></div>
-                  <div class="cloud cloud-2"></div>
-                  <div class="cloud cloud-3"></div>
+        <div class="island-layout">
+          <!-- 主岛区域 -->
+          <div class="island-main-area">
+            <div class="island-scene" id="islandScene">
+              <!-- 岛屿背景 -->
+              <div class="island-background">
+                <div class="sky">
+                  <div class="sun">☀️</div>
+                  <div class="cloud">☁️</div>
                 </div>
-                <div class="birds">
-                  <div class="bird bird-1"></div>
-                  <div class="bird bird-2"></div>
+                <div class="sea">🌊</div>
+                <div class="island"></div>
+              </div>
+
+              <!-- 农田区域 -->
+              <div class="farm-section">
+                <h3 class="section-title">🌱 农田</h3>
+                <div class="plots-grid">
+                  <div class="plot" data-plot="plot1">
+                    <div class="plot-icon" id="plot1Icon"></div>
+                    <div class="plot-info">
+                      <span class="plot-name" id="plot1Name">空地块</span>
+                      <span class="plot-status" id="plot1Status">点击种植</span>
+                    </div>
+                    <div class="plot-progress" id="plot1Progress">
+                      <div class="progress-bar"></div>
+                    </div>
+                    <div class="plot-need" id="plot1Need">💧</div>
+                  </div>
+                  <div class="plot" data-plot="plot2">
+                    <div class="plot-icon" id="plot2Icon"></div>
+                    <div class="plot-info">
+                      <span class="plot-name" id="plot2Name">空地块</span>
+                      <span class="plot-status" id="plot2Status">点击种植</span>
+                    </div>
+                    <div class="plot-progress" id="plot2Progress">
+                      <div class="progress-bar"></div>
+                    </div>
+                    <div class="plot-need" id="plot2Need">💧</div>
+                  </div>
+                  <div class="plot" data-plot="plot3">
+                    <div class="plot-icon" id="plot3Icon"></div>
+                    <div class="plot-info">
+                      <span class="plot-name" id="plot3Name">空地块</span>
+                      <span class="plot-status" id="plot3Status">点击种植</span>
+                    </div>
+                    <div class="plot-progress" id="plot3Progress">
+                      <div class="progress-bar"></div>
+                    </div>
+                    <div class="plot-need" id="plot3Need">💧</div>
+                  </div>
+                  <div class="plot" data-plot="plot4">
+                    <div class="plot-icon" id="plot4Icon"></div>
+                    <div class="plot-info">
+                      <span class="plot-name" id="plot4Name">空地块</span>
+                      <span class="plot-status" id="plot4Status">点击种植</span>
+                    </div>
+                    <div class="plot-progress" id="plot4Progress">
+                      <div class="progress-bar"></div>
+                    </div>
+                    <div class="plot-need" id="plot4Need">💧</div>
+                  </div>
+                  <div class="plot" data-plot="plot5">
+                    <div class="plot-icon" id="plot5Icon"></div>
+                    <div class="plot-info">
+                      <span class="plot-name" id="plot5Name">空地块</span>
+                      <span class="plot-status" id="plot5Status">点击种植</span>
+                    </div>
+                    <div class="plot-progress" id="plot5Progress">
+                      <div class="progress-bar"></div>
+                    </div>
+                    <div class="plot-need" id="plot5Need">💧</div>
+                  </div>
+                  <div class="plot" data-plot="plot6">
+                    <div class="plot-icon" id="plot6Icon"></div>
+                    <div class="plot-info">
+                      <span class="plot-name" id="plot6Name">空地块</span>
+                      <span class="plot-status" id="plot6Status">点击种植</span>
+                    </div>
+                    <div class="plot-progress" id="plot6Progress">
+                      <div class="progress-bar"></div>
+                    </div>
+                    <div class="plot-need" id="plot6Need">💧</div>
+                  </div>
                 </div>
               </div>
 
-              <!-- 海洋层 -->
-              <div class="sea-layer">
-                <div class="waves">
-                  <div class="wave wave-1"></div>
-                  <div class="wave wave-2"></div>
-                  <div class="wave wave-3"></div>
-                </div>
-                <div class="sea-creatures">
-                  <div class="fish fish-1"></div>
-                  <div class="fish fish-2"></div>
-                  <div class="duck duck-1"></div>
+              <!-- 宠物区域 -->
+              <div class="pet-section">
+                <h3 class="section-title">🐾 宠物</h3>
+                <div class="pet-container">
+                  <div class="pet-display">
+                    <div class="pet-icon" id="petIcon">🐰</div>
+                    <div class="pet-name" id="petName">小白</div>
+                  </div>
+                  <div class="pet-status">
+                    <div class="status-item">
+                      <span class="status-label">心情</span>
+                      <div class="status-bar">
+                        <div class="status-fill" id="petHappiness"></div>
+                      </div>
+                    </div>
+                    <div class="status-item">
+                      <span class="status-label">饥饿</span>
+                      <div class="status-bar">
+                        <div class="status-fill hunger" id="petHunger"></div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <!-- 岛屿主体 -->
-              <div class="island-main">
-                <!-- 草地背景 -->
-                <div class="grass-background">
-                  <div class="grass-patch patch-1"></div>
-                  <div class="grass-patch patch-2"></div>
-                  <div class="grass-patch patch-3"></div>
-                  <div class="flowers">
-                    <div class="flower flower-1">🌸</div>
-                    <div class="flower flower-2">🌼</div>
-                    <div class="flower flower-3">🌺</div>
-                    <div class="flower flower-4">💐</div>
-                    <div class="flower flower-5">🌷</div>
+              <!-- 装饰区域 -->
+              <div class="decoration-section">
+                <h3 class="section-title">🎨 装饰</h3>
+                <div class="decorations-grid" id="decorationsGrid">
+                  <div class="decoration-slot empty" data-slot="1">
+                    <span class="slot-plus">+</span>
+                  </div>
+                  <div class="decoration-slot empty" data-slot="2">
+                    <span class="slot-plus">+</span>
+                  </div>
+                  <div class="decoration-slot empty" data-slot="3">
+                    <span class="slot-plus">+</span>
+                  </div>
+                  <div class="decoration-slot empty" data-slot="4">
+                    <span class="slot-plus">+</span>
                   </div>
                 </div>
-
-                <!-- 农田区域 -->
-                <div class="farm-area">
-                  <div class="farm-section-title">
-                    <span class="farm-icon">🌱</span>
-                    <h3>我的农场</h3>
-                  </div>
-                  <div class="farm-plots-container" id="farmPlotsContainer">
-                    <!-- 农田行1 -->
-                    <div class="farm-row">
-                      <div class="farm-plot" data-plot="plot1">
-                        <div class="plot-soil">
-                          <div class="soil-texture"></div>
-                        </div>
-                        <div class="plot-content">
-                          <div class="crop-display" id="plot1Crop"></div>
-                          <div class="growth-stage" id="plot1Stage"></div>
-                        </div>
-                        <div class="plot-indicators">
-                          <div class="water-need" id="plot1WaterNeed">💧</div>
-                          <div class="harvest-ready" id="plot1Harvest">✨</div>
-                        </div>
-                        <div class="plot-progress">
-                          <div class="progress-bar" id="plot1Progress">
-                            <div class="progress-fill"></div>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="farm-plot" data-plot="plot2">
-                        <div class="plot-soil">
-                          <div class="soil-texture"></div>
-                        </div>
-                        <div class="plot-content">
-                          <div class="crop-display" id="plot2Crop"></div>
-                          <div class="growth-stage" id="plot2Stage"></div>
-                        </div>
-                        <div class="plot-indicators">
-                          <div class="water-need" id="plot2WaterNeed">💧</div>
-                          <div class="harvest-ready" id="plot2Harvest">✨</div>
-                        </div>
-                        <div class="plot-progress">
-                          <div class="progress-bar" id="plot2Progress">
-                            <div class="progress-fill"></div>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="farm-plot" data-plot="plot3">
-                        <div class="plot-soil">
-                          <div class="soil-texture"></div>
-                        </div>
-                        <div class="plot-content">
-                          <div class="crop-display" id="plot3Crop"></div>
-                          <div class="growth-stage" id="plot3Stage"></div>
-                        </div>
-                        <div class="plot-indicators">
-                          <div class="water-need" id="plot3WaterNeed">💧</div>
-                          <div class="harvest-ready" id="plot3Harvest">✨</div>
-                        </div>
-                        <div class="plot-progress">
-                          <div class="progress-bar" id="plot3Progress">
-                            <div class="progress-fill"></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- 农田行2 -->
-                    <div class="farm-row">
-                      <div class="farm-plot" data-plot="plot4">
-                        <div class="plot-soil">
-                          <div class="soil-texture"></div>
-                        </div>
-                        <div class="plot-content">
-                          <div class="crop-display" id="plot4Crop"></div>
-                          <div class="growth-stage" id="plot4Stage"></div>
-                        </div>
-                        <div class="plot-indicators">
-                          <div class="water-need" id="plot4WaterNeed">💧</div>
-                          <div class="harvest-ready" id="plot4Harvest">✨</div>
-                        </div>
-                        <div class="plot-progress">
-                          <div class="progress-bar" id="plot4Progress">
-                            <div class="progress-fill"></div>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="farm-plot" data-plot="plot5">
-                        <div class="plot-soil">
-                          <div class="soil-texture"></div>
-                        </div>
-                        <div class="plot-content">
-                          <div class="crop-display" id="plot5Crop"></div>
-                          <div class="growth-stage" id="plot5Stage"></div>
-                        </div>
-                        <div class="plot-indicators">
-                          <div class="water-need" id="plot5WaterNeed">💧</div>
-                          <div class="harvest-ready" id="plot5Harvest">✨</div>
-                        </div>
-                        <div class="plot-progress">
-                          <div class="progress-bar" id="plot5Progress">
-                            <div class="progress-fill"></div>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="farm-plot" data-plot="plot6">
-                        <div class="plot-soil">
-                          <div class="soil-texture"></div>
-                        </div>
-                        <div class="plot-content">
-                          <div class="crop-display" id="plot6Crop"></div>
-                          <div class="growth-stage" id="plot6Stage"></div>
-                        </div>
-                        <div class="plot-indicators">
-                          <div class="water-need" id="plot6WaterNeed">💧</div>
-                          <div class="harvest-ready" id="plot6Harvest">✨</div>
-                        </div>
-                        <div class="plot-progress">
-                          <div class="progress-bar" id="plot6Progress">
-                            <div class="progress-fill"></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 水源区域 -->
-                <div class="water-area">
-                  <div class="pond">
-                    <div class="pond-water">
-                      <div class="water-ripple ripple-1"></div>
-                      <div class="water-ripple ripple-2"></div>
-                    </div>
-                    <div class="pond-decoration">
-                      <div class="lily-pad lily-1">🪷</div>
-                      <div class="lily-pad lily-2">🪷</div>
-                      <div class="duck-pond">🦆</div>
-                    </div>
-                  </div>
-                  <div class="well">
-                    <div class="well-roof">🏠</div>
-                    <div class="well-bucket">🪣</div>
-                    <div class="well-stone"></div>
-                  </div>
-                </div>
-
-                <!-- 宠物区域 -->
-                <div class="pet-area">
-                  <div class="pet-house">
-                    <div class="pet-house-roof">🏡</div>
-                    <div class="pet-house-body"></div>
-                  </div>
-                  <div class="pet-pen">
-                    <div class="pet-container" id="petContainer">
-                      <div class="pet-sprite" id="petSprite">🐰</div>
-                      <div class="pet-name" id="petName">小白</div>
-                    </div>
-                    <div class="pet-food-bowl">
-                      <div class="bowl">🥣</div>
-                      <div class="food-fill" id="foodFill"></div>
-                    </div>
-                    <div class="pet-status">
-                      <div class="happiness-bar">
-                        <span class="status-label">😊</span>
-                        <div class="happiness-fill" id="petHappinessFill"></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 果树区域 -->
-                <div class="orchard-area">
-                  <div class="fruit-tree tree-1">
-                    <div class="tree-trunk"></div>
-                    <div class="tree-leaves">
-                      <div class="fruit fruit-apple">🍎</div>
-                      <div class="fruit fruit-apple">🍎</div>
-                      <div class="fruit fruit-apple">🍎</div>
-                    </div>
-                  </div>
-                  <div class="fruit-tree tree-2">
-                    <div class="tree-trunk"></div>
-                    <div class="tree-leaves">
-                      <div class="fruit fruit-orange">🍊</div>
-                      <div class="fruit fruit-orange">🍊</div>
-                      <div class="fruit fruit-orange">🍊</div>
-                    </div>
-                  </div>
-                  <div class="fruit-tree tree-3">
-                    <div class="tree-trunk"></div>
-                    <div class="tree-leaves">
-                      <div class="fruit fruit-watermelon">🍉</div>
-                      <div class="fruit fruit-watermelon">🍉</div>
-                      <div class="fruit fruit-watermelon">🍉</div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 装饰区域 -->
-                <div class="decorations-area" id="decorationsArea">
-                  <div class="fence fence-left">🪜</div>
-                  <div class="fence fence-right">🪜</div>
-                  <div class="garden-path">
-                    <div class="path-stone stone-1"></div>
-                    <div class="path-stone stone-2"></div>
-                    <div class="path-stone stone-3"></div>
-                    <div class="path-stone stone-4"></div>
-                  </div>
-                  <div class="garden-bench">🪑</div>
-                  <div class="garden-lamp">🪔</div>
-                  <div class="butterfly">🦋</div>
-                  <div class="ladybug">🐞</div>
-                </div>
-
-                <!-- 中央角色 -->
-                <div class="character-center">
-                  <div class="character">
-                    <div class="character-body">
-                      <div class="character-face">
-                        <div class="eye eye-left">👁️</div>
-                        <div class="eye eye-right">👁️</div>
-                        <div class="mouth">😊</div>
-                      </div>
-                    </div>
-                    <div class="character-shadow"></div>
-                  </div>
-                  <div class="character-bubble" id="characterBubble">
-                    <span class="bubble-text">欢迎来到我的花园！</span>
-                  </div>
-                </div>
-
-                <!-- 天气效果 -->
-                <div class="weather-effects">
-                  <div class="sun-rays"></div>
-                  <div class="sparkles">
-                    <span class="sparkle sparkle-1">✨</span>
-                    <span class="sparkle sparkle-2">✨</span>
-                    <span class="sparkle sparkle-3">✨</span>
-                    <span class="sparkle sparkle-4">✨</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- 岛屿信息栏 -->
-            <div class="island-info-bar">
-              <div class="island-message" id="islandMessage">开始种植，打造你的专属花园！</div>
-              <div class="quick-actions">
-                <button class="quick-action-btn" data-action="inventory" title="查看背包">
-                  <span>🎒</span>
-                  <span>背包</span>
-                </button>
-                <button class="quick-action-btn" data-action="shop" title="商店">
-                  <span>🏪</span>
-                  <span>商店</span>
-                </button>
-                <button class="quick-action-btn" data-action="guide" title="种植指南">
-                  <span>📖</span>
-                  <span>指南</span>
-                </button>
               </div>
             </div>
           </div>
 
           <!-- 工具面板 -->
-          <div class="island-tool-panel">
-            <div class="tool-section active">
-              <h3 class="tool-title">
-                <span class="tool-icon">🌱</span>
-                农场工具
-              </h3>
-              <div class="tools-grid">
-                <button class="tool-btn" data-tool="plant" title="种植">
-                  <span class="tool-emoji">🌱</span>
-                  <span class="tool-name">种植</span>
-                  <span class="tool-hint">选择种子种植</span>
+          <div class="island-tools">
+            <div class="tool-group">
+              <h4 class="tool-group-title">农场工具</h4>
+              <div class="tool-buttons">
+                <button class="tool-btn" data-tool="plant">
+                  <span class="tool-icon">🌱</span>
+                  <span>种植</span>
                 </button>
-                <button class="tool-btn" data-tool="water" title="浇水">
-                  <span class="tool-emoji">💧</span>
-                  <span class="tool-name">浇水</span>
-                  <span class="tool-hint">加速作物生长</span>
+                <button class="tool-btn" data-tool="water">
+                  <span class="tool-icon">💧</span>
+                  <span>浇水</span>
                 </button>
-                <button class="tool-btn" data-tool="harvest" title="收获">
-                  <span class="tool-emoji">🌾</span>
-                  <span class="tool-name">收获</span>
-                  <span class="tool-hint">收集成熟作物</span>
+                <button class="tool-btn" data-tool="harvest">
+                  <span class="tool-icon">🌾</span>
+                  <span>收获</span>
                 </button>
               </div>
             </div>
 
-            <div class="tool-section">
-              <h3 class="tool-title">
-                <span class="tool-icon">🐾</span>
-                宠物照料
-              </h3>
-              <div class="tools-grid">
-                <button class="tool-btn" data-tool="feed" title="喂养">
-                  <span class="tool-emoji">🍖</span>
-                  <span class="tool-name">喂养</span>
-                  <span class="tool-hint">喂食宠物</span>
+            <div class="tool-group">
+              <h4 class="tool-group-title">宠物照料</h4>
+              <div class="tool-buttons">
+                <button class="tool-btn" data-tool="feed">
+                  <span class="tool-icon">🍖</span>
+                  <span>喂养</span>
                 </button>
-                <button class="tool-btn" data-tool="pet-shop" title="宠物商店">
-                  <span class="tool-emoji">🐾</span>
-                  <span class="tool-name">宠物商店</span>
-                  <span class="tool-hint">购买新宠物</span>
+                <button class="tool-btn" data-tool="pet-shop">
+                  <span class="tool-icon">🐾</span>
+                  <span>宠物商店</span>
                 </button>
               </div>
             </div>
 
-            <div class="tool-section">
-              <h3 class="tool-title">
-                <span class="tool-icon">🤝</span>
-                社交互动
-              </h3>
-              <div class="tools-grid">
-                <button class="tool-btn" data-tool="visit" title="参观好友">
-                  <span class="tool-emoji">🚢</span>
-                  <span class="tool-name">参观好友</span>
-                  <span class="tool-hint">访问好友岛屿</span>
+            <div class="tool-group">
+              <h4 class="tool-group-title">社交</h4>
+              <div class="tool-buttons">
+                <button class="tool-btn" data-tool="visit">
+                  <span class="tool-icon">🚢</span>
+                  <span>参观好友</span>
                 </button>
-                <button class="tool-btn" data-tool="help" title="帮助好友">
-                  <span class="tool-emoji">🤝</span>
-                  <span class="tool-name">帮助浇水</span>
-                  <span class="tool-hint">帮助好友农场</span>
+                <button class="tool-btn" data-tool="help">
+                  <span class="tool-icon">🤝</span>
+                  <span>帮助浇水</span>
                 </button>
               </div>
             </div>
 
-            <!-- 快速库存概览 -->
-            <div class="tool-section inventory-section">
-              <h3 class="tool-title">
-                <span class="tool-icon">🎒</span>
-                背包概览
-              </h3>
-              <div class="inventory-quick-view" id="inventoryQuickView">
-                <div class="inv-item" data-item="seed-tomato">
+            <div class="tool-group inventory-group">
+              <h4 class="tool-group-title">背包</h4>
+              <div class="inventory-list" id="inventoryList">
+                <div class="inv-item">
                   <span class="inv-icon">🍅</span>
-                  <div class="inv-details">
-                    <span class="inv-name">番茄种子</span>
-                    <span class="inv-count" id="quickSeedTomato">3</span>
-                  </div>
+                  <span class="inv-name">番茄种子</span>
+                  <span class="inv-count" id="invTomatoSeed">3</span>
                 </div>
-                <div class="inv-item" data-item="seed-strawberry">
+                <div class="inv-item">
                   <span class="inv-icon">🍓</span>
-                  <div class="inv-details">
-                    <span class="inv-name">草莓种子</span>
-                    <span class="inv-count" id="quickSeedStrawberry">2</span>
-                  </div>
+                  <span class="inv-name">草莓种子</span>
+                  <span class="inv-count" id="invStrawberrySeed">2</span>
                 </div>
-                <div class="inv-item" data-item="harvest-tomato">
+                <div class="inv-item">
                   <span class="inv-icon">🍅</span>
-                  <div class="inv-details">
-                    <span class="inv-name">番茄</span>
-                    <span class="inv-count" id="quickHarvestTomato">0</span>
-                  </div>
+                  <span class="inv-name">番茄</span>
+                  <span class="inv-count" id="invTomato">0</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
+
+        <!-- 提示消息 -->
+        <div class="island-message" id="islandMessage">选择地块开始种植</div>
       </section>
 
       <section class="workspace-panel" data-panel="checkin" hidden>

@@ -3250,1237 +3250,369 @@ a {
 }
 
 /* ============================================================
-   Island Garden Styles - Enhanced Garden Farm Design
+   Clean Island Garden Styles
    ============================================================ */
 
 /* Island Header Stats */
 .island-header-stats {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-top: 12px;
+  gap: 16px;
+  margin-top: 16px;
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
   flex-wrap: wrap;
-  padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
-  backdrop-filter: blur(10px);
 }
 
 .level-badge {
   background: linear-gradient(135deg, #FFD700, #FFA500);
   color: #fff;
-  padding: 6px 16px;
-  border-radius: 20px;
+  padding: 8px 20px;
+  border-radius: 24px;
   font-weight: 700;
-  font-size: 15px;
-  box-shadow: 0 4px 12px rgba(255, 165, 0, 0.4);
-  letter-spacing: 0.5px;
+  font-size: 16px;
 }
 
 .exp-bar {
-  width: 140px;
-  height: 10px;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 10px;
+  width: 150px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .exp-fill {
   height: 100%;
-  background: linear-gradient(90deg, #4CAF50, #8BC34A, #AED581);
-  border-radius: 10px;
-  transition: width 0.5s ease;
-  box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+  background: linear-gradient(90deg, #4CAF50, #8BC34A);
+  border-radius: 12px;
+  transition: width 0.3s ease;
 }
 
 .resource-item {
   display: flex;
   align-items: center;
   gap: 6px;
+  font-size: 15px;
   font-weight: 600;
-  font-size: 14px;
-  color: #fff;
-  padding: 4px 10px;
-  background: rgba(255, 255, 255, 0.1);
+  color: #E8F5E9;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 12px;
-  transition: all 0.2s ease;
 }
 
-.resource-item:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: scale(1.05);
-}
-
-/* Island Main Layout */
-.island-main-layout {
+/* Island Layout */
+.island-layout {
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 24px;
-  margin-top: 20px;
+  margin-top: 24px;
 }
 
-.island-scene-container {
+.island-main-area {
+  background: linear-gradient(135deg, #66BB6A, #81C784);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* Island Scene */
+.island-scene {
   position: relative;
-  background: linear-gradient(180deg, #87CEEB 0%, #98D8C8 50%, #F0E68C 100%);
-  border-radius: 24px;
-  overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
-/* Garden Island Design */
-.garden-island {
+.island-background {
   position: relative;
-  width: 100%;
-  height: 600px;
+  height: 200px;
+  background: linear-gradient(180deg, #87CEEB 0%, #E0F7FA 50%, #A5D6A7 100%);
+  border-radius: 16px;
+  margin-bottom: 24px;
   overflow: hidden;
 }
 
-/* Sky Layer */
-.sky-layer {
+.sky {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: 40%;
-  background: linear-gradient(180deg, #87CEEB 0%, #B0E0E6 50%, #E0F7FA 100%);
-  z-index: 1;
+  height: 60%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px;
 }
 
 .sun {
-  position: absolute;
-  top: 20px;
-  right: 40px;
-  width: 80px;
-  height: 80px;
-  background: radial-gradient(circle, #FFD700 0%, #FFA500 50%, #FF8C00 100%);
-  border-radius: 50%;
-  box-shadow: 0 0 60px rgba(255, 215, 0, 0.8), 0 0 120px rgba(255, 165, 0, 0.4);
-  animation: sunPulse 4s ease-in-out infinite;
+  font-size: 48px;
+  animation: sunGlow 3s ease-in-out infinite;
 }
 
-@keyframes sunPulse {
-  0%, 100% { transform: scale(1); box-shadow: 0 0 60px rgba(255, 215, 0, 0.8), 0 0 120px rgba(255, 165, 0, 0.4); }
-  50% { transform: scale(1.05); box-shadow: 0 0 80px rgba(255, 215, 0, 0.9), 0 0 150px rgba(255, 165, 0, 0.5); }
-}
-
-.clouds {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+@keyframes sunGlow {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
 }
 
 .cloud {
-  position: absolute;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 50%;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.cloud::before,
-.cloud::after {
-  content: '';
-  position: absolute;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 50%;
-}
-
-.cloud-1 {
-  width: 100px;
-  height: 40px;
-  top: 40px;
-  left: 10%;
-  animation: cloudFloat 20s linear infinite;
-}
-
-.cloud-1::before {
-  width: 50px;
-  height: 50px;
-  top: -25px;
-  left: 15px;
-}
-
-.cloud-1::after {
-  width: 40px;
-  height: 40px;
-  top: -20px;
-  right: 15px;
-}
-
-.cloud-2 {
-  width: 80px;
-  height: 30px;
-  top: 80px;
-  left: 60%;
-  animation: cloudFloat 25s linear infinite reverse;
-}
-
-.cloud-2::before {
-  width: 40px;
-  height: 40px;
-  top: -20px;
-  left: 10px;
-}
-
-.cloud-2::after {
-  width: 30px;
-  height: 30px;
-  top: -15px;
-  right: 10px;
-}
-
-.cloud-3 {
-  width: 60px;
-  height: 25px;
-  top: 120px;
-  left: 30%;
-  animation: cloudFloat 18s linear infinite;
-}
-
-.cloud-3::before {
-  width: 30px;
-  height: 30px;
-  top: -15px;
-  left: 8px;
-}
-
-@keyframes cloudFloat {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(100px); }
-}
-
-.birds {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.bird {
-  position: absolute;
-  font-size: 24px;
-  animation: birdFly 15s linear infinite;
-}
-
-.bird-1 {
-  top: 60px;
-  left: -5%;
-  animation-delay: 0s;
-}
-
-.bird-2 {
-  top: 90px;
-  left: -10%;
-  animation-delay: 5s;
-  font-size: 20px;
-}
-
-@keyframes birdFly {
-  0% { transform: translateX(0) translateY(0); }
-  25% { transform: translateX(30vw) translateY(-20px); }
-  50% { transform: translateX(60vw) translateY(10px); }
-  75% { transform: translateX(90vw) translateY(-15px); }
-  100% { transform: translateX(110vw) translateY(0); }
-}
-
-/* Sea Layer */
-.sea-layer {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 35%;
-  background: linear-gradient(180deg, #4FC3F7 0%, #29B6F6 30%, #03A9F4 60%, #0288D1 100%);
-  z-index: 2;
-}
-
-.waves {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 30px;
-  overflow: hidden;
-}
-
-.wave {
-  position: absolute;
-  width: 200%;
-  height: 100%;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120'%3E%3Cpath fill='%2381D4FA' d='M0,60 C150,120 350,0 600,60 C850,120 1050,0 1200,60 L1200,120 L0,120 Z'/%3E%3C/svg%3E");
-  background-size: 600px 30px;
-  animation: waveMove 3s linear infinite;
-}
-
-.wave-1 {
-  opacity: 0.7;
-  top: 0;
-  animation-duration: 3s;
-}
-
-.wave-2 {
-  opacity: 0.5;
-  top: 5px;
-  animation-duration: 4s;
-  animation-direction: reverse;
-}
-
-.wave-3 {
-  opacity: 0.3;
-  top: 10px;
-  animation-duration: 5s;
-}
-
-@keyframes waveMove {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-.sea-creatures {
-  position: absolute;
-  bottom: 20px;
-  left: 0;
-  width: 100%;
-  height: 60px;
-}
-
-.fish {
-  position: absolute;
-  font-size: 20px;
-  animation: fishSwim 8s ease-in-out infinite;
-}
-
-.fish-1 {
-  bottom: 10px;
-  left: 10%;
-  animation-delay: 0s;
-}
-
-.fish-2 {
-  bottom: 25px;
-  left: 70%;
-  animation-delay: 3s;
-  font-size: 16px;
-}
-
-@keyframes fishSwim {
-  0%, 100% { transform: translateX(0) scaleX(1); }
-  50% { transform: translateX(50px) scaleX(-1); }
-}
-
-.duck {
-  position: absolute;
-  font-size: 28px;
-  animation: duckFloat 6s ease-in-out infinite;
-}
-
-.duck-1 {
-  bottom: 15px;
-  left: 40%;
-}
-
-@keyframes duckFloat {
-  0%, 100% { transform: translateY(0) rotate(-5deg); }
-  50% { transform: translateY(-8px) rotate(5deg); }
-}
-
-/* Island Main */
-.island-main {
-  position: absolute;
-  bottom: 25%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 90%;
-  height: 50%;
-  background: radial-gradient(ellipse at center, #90EE90 0%, #7CCD7C 30%, #6B8E23 60%, #556B2F 100%);
-  border-radius: 50%;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), inset 0 -5px 20px rgba(0, 0, 0, 0.2);
-  z-index: 3;
-  overflow: hidden;
-}
-
-/* Grass Background */
-.grass-background {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.grass-patch {
-  position: absolute;
-  background: radial-gradient(ellipse, #7CFC00 0%, #32CD32 50%, #228B22 100%);
-  border-radius: 50%;
-  opacity: 0.6;
-}
-
-.patch-1 {
-  width: 200px;
-  height: 100px;
-  top: 20%;
-  left: 10%;
-}
-
-.patch-2 {
-  width: 150px;
-  height: 80px;
-  top: 40%;
-  right: 15%;
-}
-
-.patch-3 {
-  width: 180px;
-  height: 90px;
-  bottom: 20%;
-  left: 30%;
-}
-
-.flowers {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.flower {
-  position: absolute;
-  font-size: 24px;
-  animation: flowerBloom 4s ease-in-out infinite;
-}
-
-.flower-1 { top: 15%; left: 8%; animation-delay: 0s; }
-.flower-2 { top: 35%; right: 12%; animation-delay: 1s; }
-.flower-3 { bottom: 25%; left: 25%; animation-delay: 2s; }
-.flower-4 { top: 45%; left: 60%; animation-delay: 0.5s; }
-.flower-5 { bottom: 15%; right: 30%; animation-delay: 1.5s; }
-
-@keyframes flowerBloom {
-  0%, 100% { transform: scale(1) rotate(0deg); }
-  50% { transform: scale(1.1) rotate(5deg); }
-}
-
-/* Farm Area */
-.farm-area {
-  position: absolute;
-  top: 15%;
-  left: 5%;
-  width: 60%;
-  height: 35%;
-  background: linear-gradient(135deg, #DEB887 0%, #D2B48C 50%, #C4A574 100%);
-  border-radius: 20px;
-  padding: 15px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 2px 4px rgba(255, 255, 255, 0.3);
-  border: 3px solid #8B4513;
-}
-
-.farm-section-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.farm-icon {
-  font-size: 24px;
-}
-
-.farm-section-title h3 {
-  color: #2E7D32;
-  font-size: 18px;
-  margin: 0;
-  font-weight: 700;
-  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
-}
-
-.farm-plots-container {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.farm-row {
-  display: flex;
-  gap: 12px;
-}
-
-.farm-plot {
-  flex: 1;
-  height: 90px;
-  background: linear-gradient(135deg, #8B4513 0%, #A0522D 50%, #CD853F 100%);
-  border-radius: 12px;
-  position: relative;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.2);
-  overflow: hidden;
-}
-
-.farm-plot:hover {
-  transform: scale(1.05);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3), 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.plot-soil {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.soil-texture {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image:
-    radial-gradient(circle at 20% 30%, rgba(139, 69, 19, 0.3) 2px, transparent 2px),
-    radial-gradient(circle at 60% 70%, rgba(160, 82, 45, 0.3) 2px, transparent 2px),
-    radial-gradient(circle at 80% 20%, rgba(205, 133, 63, 0.3) 2px, transparent 2px);
-  background-size: 20px 20px;
-}
-
-.plot-content {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.crop-display {
-  font-size: 36px;
-  animation: cropGrow 2s ease-in-out infinite;
-}
-
-@keyframes cropGrow {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-}
-
-.growth-stage {
-  font-size: 12px;
-  color: #2E7D32;
-  font-weight: 600;
-  margin-top: 4px;
-  background: rgba(255, 255, 255, 0.9);
-  padding: 2px 6px;
-  border-radius: 8px;
-}
-
-.plot-indicators {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  display: flex;
-  gap: 4px;
-}
-
-.water-need,
-.harvest-ready {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.water-need {
-  background: rgba(33, 150, 243, 0.9);
-  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.5);
-}
-
-.harvest-ready {
-  background: rgba(255, 215, 0, 0.9);
-  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.5);
-  animation: harvestGlow 1.5s ease-in-out infinite;
-}
-
-@keyframes harvestGlow {
-  0%, 100% { box-shadow: 0 2px 8px rgba(255, 215, 0, 0.5); }
-  50% { box-shadow: 0 2px 16px rgba(255, 215, 0, 0.8); }
-}
-
-.plot-progress {
-  position: absolute;
-  bottom: 8px;
-  left: 8px;
-  right: 8px;
-  height: 6px;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.progress-bar {
-  width: 100%;
-  height: 100%;
-}
-
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #4CAF50, #8BC34A, #AED581);
-  border-radius: 3px;
-  transition: width 0.5s ease;
-}
-
-/* Water Area */
-.water-area {
-  position: absolute;
-  bottom: 15%;
-  right: 5%;
-  width: 30%;
-  height: 25%;
-}
-
-.pond {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #4FC3F7 0%, #29B6F6 50%, #03A9F4 100%);
-  border-radius: 50%;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), inset 0 2px 8px rgba(255, 255, 255, 0.3);
-  overflow: hidden;
-}
-
-.pond-water {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.water-ripple {
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.3);
-  animation: ripple 3s ease-out infinite;
-}
-
-.ripple-1 {
-  width: 30px;
-  height: 30px;
-  top: 30%;
-  left: 40%;
-  animation-delay: 0s;
-}
-
-.ripple-2 {
-  width: 20px;
-  height: 20px;
-  top: 60%;
-  left: 60%;
-  animation-delay: 1.5s;
-}
-
-@keyframes ripple {
-  0% { transform: scale(1); opacity: 0.6; }
-  100% { transform: scale(2); opacity: 0; }
-}
-
-.pond-decoration {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.lily-pad {
-  position: absolute;
-  font-size: 24px;
-  animation: lilyFloat 4s ease-in-out infinite;
-}
-
-.lily-1 {
-  top: 20%;
-  left: 25%;
-  animation-delay: 0s;
-}
-
-.lily-2 {
-  bottom: 25%;
-  right: 20%;
-  animation-delay: 2s;
-}
-
-@keyframes lilyFloat {
-  0%, 100% { transform: translateX(0) rotate(0deg); }
-  50% { transform: translateX(5px) rotate(5deg); }
-}
-
-.duck-pond {
-  position: absolute;
-  bottom: 20%;
-  left: 40%;
-  font-size: 28px;
-  animation: duckPond 5s ease-in-out infinite;
-}
-
-@keyframes duckPond {
-  0%, 100% { transform: translateY(0) rotate(-3deg); }
-  50% { transform: translateY(-5px) rotate(3deg); }
-}
-
-.well {
-  position: absolute;
-  top: -30px;
-  right: 0;
-  width: 60px;
-  height: 70px;
-}
-
-.well-roof {
-  font-size: 24px;
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.well-bucket {
-  font-size: 20px;
-  position: absolute;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  animation: bucketSwing 3s ease-in-out infinite;
-}
-
-@keyframes bucketSwing {
-  0%, 100% { transform: translateX(-50%) rotate(0deg); }
-  50% { transform: translateX(-50%) rotate(10deg); }
-}
-
-.well-stone {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 20px;
-  background: linear-gradient(180deg, #808080 0%, #696969 100%);
-  border-radius: 5px;
-}
-
-/* Pet Area */
-.pet-area {
-  position: absolute;
-  bottom: 10%;
-  left: 10%;
-  width: 25%;
-  height: 30%;
-}
-
-.pet-house {
-  position: relative;
-  width: 100%;
-  height: 60%;
-  margin-bottom: 10px;
-}
-
-.pet-house-roof {
   font-size: 32px;
-  position: absolute;
-  top: -15px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.pet-house-body {
-  position: absolute;
-  bottom: 0;
-  left: 10%;
-  width: 80%;
-  height: 80%;
-  background: linear-gradient(135deg, #DEB887 0%, #D2B48C 100%);
-  border-radius: 0 0 10px 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.pet-pen {
-  position: relative;
-  width: 100%;
-  height: 40%;
-  background: linear-gradient(135deg, #90EE90 0%, #7CCD7C 100%);
-  border-radius: 12px;
-  padding: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.pet-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.pet-sprite {
-  font-size: 36px;
-  animation: petBounce 2s ease-in-out infinite;
-}
-
-@keyframes petBounce {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-5px) scale(1.05); }
-}
-
-@keyframes petSad {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(3px) scale(0.95); }
-}
-
-.pet-name {
-  font-size: 12px;
-  font-weight: 600;
-  color: #2E7D32;
-  margin-top: 2px;
-}
-
-.pet-food-bowl {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  margin-bottom: 8px;
-}
-
-.bowl {
-  font-size: 24px;
-}
-
-.food-fill {
-  position: absolute;
-  top: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 16px;
-  height: 8px;
-  background: linear-gradient(180deg, #8B4513 0%, #A0522D 100%);
-  border-radius: 0 0 8px 8px;
-  transition: height 0.3s ease;
-}
-
-.pet-status {
-  width: 100%;
-}
-
-.happiness-bar {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.status-label {
-  font-size: 14px;
-}
-
-.happiness-fill {
-  flex: 1;
-  height: 8px;
-  background: linear-gradient(90deg, #FF6B6B, #FFD93D, #6BCB77);
-  border-radius: 4px;
-  transition: width 0.5s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-/* Orchard Area */
-.orchard-area {
-  position: absolute;
-  top: 20%;
-  right: 8%;
-  width: 25%;
-  height: 40%;
-  display: flex;
-  justify-content: space-around;
-  align-items: flex-end;
-}
-
-.fruit-tree {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.tree-trunk {
-  width: 12px;
-  height: 40px;
-  background: linear-gradient(180deg, #8B4513 0%, #A0522D 100%);
-  border-radius: 3px;
-  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.tree-leaves {
-  position: relative;
-  width: 60px;
-  height: 60px;
-  background: radial-gradient(circle, #228B22 0%, #006400 100%);
-  border-radius: 50%;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 4px;
-  padding: 8px;
-}
-
-.fruit {
-  font-size: 18px;
-  animation: fruitBounce 3s ease-in-out infinite;
-}
-
-.fruit-apple { animation-delay: 0s; }
-.fruit-orange { animation-delay: 1s; }
-.fruit-watermelon { animation-delay: 2s; }
-
-@keyframes fruitBounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
-}
-
-/* Decorations Area */
-.decorations-area {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-
-.fence {
-  position: absolute;
-  font-size: 20px;
   opacity: 0.8;
 }
 
-.fence-left {
-  left: 2%;
-  top: 30%;
-  transform: rotate(-5deg);
-}
-
-.fence-right {
-  right: 2%;
-  top: 35%;
-  transform: rotate(5deg);
-}
-
-.garden-path {
+.sea {
   position: absolute;
-  bottom: 25%;
-  left: 20%;
-  width: 40%;
-  height: 8px;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 40%;
+  background: linear-gradient(180deg, #4FC3F7, #29B6F6);
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
+  font-size: 32px;
 }
 
-.path-stone {
-  width: 20px;
-  height: 20px;
-  background: radial-gradient(circle, #D3D3D3 0%, #A9A9A9 100%);
-  border-radius: 50%;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.garden-bench {
-  position: absolute;
-  bottom: 35%;
-  right: 20%;
-  font-size: 24px;
-}
-
-.garden-lamp {
-  position: absolute;
-  top: 25%;
-  left: 8%;
-  font-size: 22px;
-}
-
-.butterfly {
-  position: absolute;
-  top: 40%;
-  left: 45%;
-  font-size: 20px;
-  animation: butterflyFly 8s ease-in-out infinite;
-}
-
-@keyframes butterflyFly {
-  0% { transform: translate(0, 0) rotate(0deg); }
-  25% { transform: translate(30px, -20px) rotate(15deg); }
-  50% { transform: translate(60px, 0) rotate(0deg); }
-  75% { transform: translate(30px, 20px) rotate(-15deg); }
-  100% { transform: translate(0, 0) rotate(0deg); }
-}
-
-.ladybug {
-  position: absolute;
-  bottom: 40%;
-  right: 35%;
-  font-size: 16px;
-  animation: ladybugCrawl 6s linear infinite;
-}
-
-@keyframes ladybugCrawl {
-  0% { transform: translateX(0) rotate(0deg); }
-  100% { transform: translateX(40px) rotate(360deg); }
-}
-
-/* Character Center */
-.character-center {
+.island {
   position: absolute;
   bottom: 30%;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 10;
-}
-
-.character {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.character-body {
-  width: 60px;
-  height: 80px;
-  background: linear-gradient(135deg, #FFB6C1 0%, #FF69B4 50%, #FF1493 100%);
-  border-radius: 30px 30px 20px 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  animation: characterBreathe 3s ease-in-out infinite;
-}
-
-@keyframes characterBreathe {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.02); }
-}
-
-.character-face {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-
-.eye {
-  font-size: 16px;
-  margin: 0 4px;
-}
-
-.mouth {
-  font-size: 20px;
-}
-
-.character-shadow {
-  width: 40px;
-  height: 10px;
-  background: rgba(0, 0, 0, 0.2);
+  width: 80%;
+  height: 40%;
+  background: radial-gradient(ellipse, #90EE90, #7CCD7C);
   border-radius: 50%;
-  margin-top: -5px;
 }
 
-.character-bubble {
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(255, 255, 255, 0.95);
-  padding: 8px 12px;
-  border-radius: 12px;
-  margin-bottom: 10px;
-  white-space: nowrap;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  animation: bubbleFloat 4s ease-in-out infinite;
+/* Farm Section */
+.farm-section {
+  margin-bottom: 24px;
 }
 
-.character-bubble::after {
-  content: '';
-  position: absolute;
-  bottom: -6px;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 6px solid transparent;
-  border-top-color: rgba(255, 255, 255, 0.95);
-  border-bottom: 0;
-}
-
-.bubble-text {
-  font-size: 12px;
-  color: #333;
-  font-weight: 500;
-}
-
-@keyframes bubbleFloat {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50% { transform: translateX(-50%) translateY(-5px); }
-}
-
-/* Weather Effects */
-.weather-effects {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-
-.sun-rays {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 200px;
-  height: 200px;
-  background: radial-gradient(circle, rgba(255, 215, 0, 0.3) 0%, transparent 70%);
-  animation: raysRotate 20s linear infinite;
-}
-
-@keyframes raysRotate {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.sparkles {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.sparkle {
-  position: absolute;
-  font-size: 16px;
-  animation: sparkleTwinkle 2s ease-in-out infinite;
-}
-
-.sparkle-1 { top: 20%; left: 30%; animation-delay: 0s; }
-.sparkle-2 { top: 40%; right: 25%; animation-delay: 0.5s; }
-.sparkle-3 { bottom: 35%; left: 45%; animation-delay: 1s; }
-.sparkle-4 { top: 60%; left: 20%; animation-delay: 1.5s; }
-
-@keyframes sparkleTwinkle {
-  0%, 100% { opacity: 0.3; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.2); }
-}
-
-/* Island Info Bar */
-.island-info-bar {
+.section-title {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 16px 0;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-top: 16px;
-  padding: 16px 20px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+  gap: 8px;
+}
+
+.plots-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.plot {
+  background: linear-gradient(135deg, #8B4513, #A0522D);
   border-radius: 16px;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 16px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-.island-message {
-  color: #E8F5E9;
-  font-size: 15px;
-  font-weight: 500;
-  flex: 1;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+.plot:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
 
-.quick-actions {
+.plot-icon {
+  font-size: 40px;
+  text-align: center;
+  margin-bottom: 8px;
+  animation: cropFloat 2s ease-in-out infinite;
+}
+
+@keyframes cropFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.plot-info {
+  text-align: center;
+}
+
+.plot-name {
+  display: block;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.plot-status {
+  display: block;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+}
+
+.plot-progress {
+  height: 6px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
+  margin-top: 12px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #4CAF50, #8BC34A);
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+.plot-need {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 20px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.plot.needs-water .plot-need {
+  opacity: 1;
+  animation: waterPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes waterPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+/* Pet Section */
+.pet-section {
+  margin-bottom: 24px;
+}
+
+.pet-container {
   display: flex;
+  align-items: center;
+  gap: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.pet-display {
+  text-align: center;
+}
+
+.pet-icon {
+  font-size: 64px;
+  display: block;
+  animation: petBounce 2s ease-in-out infinite;
+}
+
+@keyframes petBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.pet-name {
+  display: block;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+.pet-status {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   gap: 12px;
 }
 
-.quick-action-btn {
-  padding: 10px 16px;
-  border-radius: 12px;
-  border: none;
-  background: rgba(255, 255, 255, 0.1);
-  cursor: pointer;
+.status-item {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 4px;
-  font-size: 20px;
+  gap: 12px;
+}
+
+.status-label {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  min-width: 40px;
+}
+
+.status-bar {
+  flex: 1;
+  height: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.status-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #FF6B6B, #FFD93D, #6BCB77);
+  border-radius: 6px;
+  transition: width 0.5s ease;
+}
+
+.status-fill.hunger {
+  background: linear-gradient(90deg, #FF5252, #FF8A80, #FFCDD2);
+}
+
+/* Decoration Section */
+.decoration-section {
+  margin-bottom: 0;
+}
+
+.decorations-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.decoration-slot {
+  aspect-ratio: 1;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px dashed rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
   transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
 }
 
-.quick-action-btn span:last-child {
-  font-size: 11px;
-  color: #C8E6C9;
+.decoration-slot:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
-.quick-action-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+.slot-plus {
+  font-size: 24px;
+  color: rgba(255, 255, 255, 0.5);
 }
 
-/* Island Tool Panel */
-.island-tool-panel {
+/* Island Tools */
+.island-tools {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.tool-section {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
-  border-radius: 20px;
+.tool-group {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
   padding: 20px;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.3s ease;
 }
 
-.tool-section:hover {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06));
-  transform: translateY(-2px);
-}
-
-.tool-section.active {
-  background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(139, 195, 74, 0.1));
-  border-color: rgba(76, 175, 80, 0.3);
-}
-
-.tool-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.tool-group-title {
   color: #E8F5E9;
   font-size: 16px;
-  margin: 0 0 16px 0;
   font-weight: 600;
+  margin: 0 0 16px 0;
 }
 
-.tool-icon {
-  font-size: 20px;
-}
-
-.tools-grid {
+.tool-buttons {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 12px;
 }
 
@@ -4488,55 +3620,36 @@ a {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  padding: 16px 8px;
-  border: none;
-  border-radius: 16px;
+  gap: 8px;
+  padding: 16px;
   background: rgba(255, 255, 255, 0.08);
+  border: none;
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
-  border: 1px solid transparent;
+  font-size: 14px;
+  color: #E8F5E9;
 }
 
 .tool-btn:hover {
   background: rgba(255, 255, 255, 0.15);
-  transform: translateY(-3px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
 }
 
 .tool-btn.active {
   background: linear-gradient(135deg, #4CAF50, #8BC34A);
   color: #fff;
-  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
 }
 
-.tool-emoji {
-  font-size: 32px;
+.tool-icon {
+  font-size: 28px;
 }
 
-.tool-name {
-  font-size: 13px;
-  font-weight: 600;
-  color: #C8E6C9;
+.inventory-group .tool-buttons {
+  display: block;
 }
 
-.tool-hint {
-  font-size: 10px;
-  color: #A5D6A7;
-  text-align: center;
-}
-
-.tool-btn.active .tool-name,
-.tool-btn.active .tool-hint {
-  color: #fff;
-}
-
-/* Inventory Section */
-.inventory-section {
-  background: linear-gradient(135deg, rgba(255, 193, 7, 0.1), rgba(255, 152, 0, 0.05));
-}
-
-.inventory-quick-view {
+.inventory-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -4546,507 +3659,36 @@ a {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  transition: all 0.2s ease;
-}
-
-.inv-item:hover {
-  background: rgba(255, 255, 255, 0.15);
-  transform: translateX(4px);
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
 }
 
 .inv-icon {
-  font-size: 28px;
-}
-
-.inv-details {
-  flex: 1;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  font-size: 24px;
 }
 
 .inv-name {
+  flex: 1;
+  color: #E8F5E9;
   font-size: 13px;
-  color: #C8E6C9;
-  font-weight: 500;
 }
 
 .inv-count {
-  font-size: 14px;
+  color: #FFD54F;
   font-weight: 700;
-  color: #FFD54F;
-  background: rgba(255, 213, 79, 0.2);
-  padding: 2px 8px;
-  border-radius: 8px;
-}
-
-.farm-plot.needs-water .plot-water-indicator {
-  opacity: 1;
-}
-
-.plot-growth-indicator {
-  position: absolute;
-  bottom: 4px;
-  left: 4px;
-  width: 40px;
-  height: 4px;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 2px;
-  overflow: hidden;
-}
-
-.plot-growth-indicator::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  background: linear-gradient(90deg, #4CAF50, #8BC34A);
-  width: 0%;
-  transition: width 0.5s ease;
-}
-
-/* Pet Area */
-.pet-area {
-  position: absolute;
-  bottom: 40px;
-  right: 40px;
-  width: 120px;
-  height: 120px;
-}
-
-.large-pet {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #FFB74D, #FFA726);
-  border-radius: 50%;
-  position: relative;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  animation: petBreathe 3s ease-in-out infinite;
-}
-
-@keyframes petBreathe {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-}
-
-.large-pet:hover {
-  transform: scale(1.1);
-}
-
-.pet-eye {
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  background: #333;
-  border-radius: 50%;
-  top: 40%;
-}
-
-.pet-eye.eye-left { left: 30%; }
-.pet-eye.eye-right { right: 30%; }
-
-.pet-mouth {
-  position: absolute;
-  width: 16px;
-  height: 8px;
-  border-bottom: 3px solid #333;
-  border-radius: 0 0 16px 16px;
-  bottom: 30%;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.pet-tail {
-  position: absolute;
-  width: 8px;
-  height: 20px;
-  background: #FFA726;
-  border-radius: 4px;
-  bottom: 20%;
-  right: -10px;
-  transform-origin: bottom center;
-  animation: tailWag 1s ease-in-out infinite;
-}
-
-@keyframes tailWag {
-  0%, 100% { transform: rotate(-10deg); }
-  50% { transform: rotate(10deg); }
-}
-
-.pet-bubble {
-  position: absolute;
-  top: -20px;
-  right: -10px;
-  background: rgba(255, 255, 255, 0.9);
-  padding: 4px 8px;
-  border-radius: 8px;
-  font-size: 12px;
-  color: #333;
-  opacity: 0;
-  transform: translateY(10px);
-  transition: all 0.3s ease;
-}
-
-.large-pet:hover .pet-bubble {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.pet-happiness-bar {
-  width: 120px;
-  height: 8px;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 4px;
-  overflow: hidden;
-  margin-top: 8px;
-}
-
-.happiness-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #FF6B6B, #FFD93D, #6BCB77);
-  border-radius: 4px;
-  transition: width 0.5s ease;
-}
-
-/* Inventory Grid */
-.inventory-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-}
-
-.inventory-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 8px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-  gap: 4px;
-}
-
-.item-icon {
-  font-size: 24px;
-}
-
-.item-name {
-  font-size: 11px;
-  color: #C8E6C9;
-  text-align: center;
-}
-
-.item-count {
-  font-size: 12px;
-  font-weight: 600;
-  color: #fff;
-}
-
-/* Modals */
-.planting-modal,
-.shop-modal,
-.inventory-modal,
-.friend-interaction-modal {
-  background: linear-gradient(135deg, #2E7D32, #1B5E20);
-  border-radius: 16px;
-  padding: 24px;
-  max-width: 500px;
-  width: 90%;
-  max-height: 80vh;
-  overflow-y: auto;
-}
-
-.seeds-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  margin-top: 16px;
-}
-
-.seed-option {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 16px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  gap: 4px;
-}
-
-.seed-option:hover:not(.locked) {
-  background: rgba(255, 255, 255, 0.15);
-  transform: translateY(-2px);
-}
-
-.seed-option.locked {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.seed-icon {
-  font-size: 36px;
-}
-
-.seed-name {
-  font-weight: 600;
-  color: #fff;
-}
-
-.seed-info {
-  font-size: 12px;
-  color: #C8E6C9;
-  text-align: center;
-}
-
-.seed-amount {
   font-size: 14px;
-  font-weight: 600;
-  color: #FFD54F;
 }
 
-.lock-icon {
-  font-size: 20px;
-}
-
-/* Shop Modal */
-.shop-tabs {
-  display: flex;
-  gap: 8px;
-  margin: 16px 0;
-}
-
-.shop-tab {
-  flex: 1;
-  padding: 8px;
-  border: none;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.08);
-  color: #C8E6C9;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.shop-tab.active {
-  background: linear-gradient(135deg, #4CAF50, #8BC34A);
-  color: #fff;
-}
-
-.shop-content {
-  margin-top: 16px;
-}
-
-.shop-section {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-}
-
-.shop-section.hidden {
-  display: none;
-}
-
-.shop-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+/* Island Message */
+.island-message {
+  text-align: center;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.05);
   border-radius: 12px;
-  gap: 8px;
-}
-
-.shop-item .item-icon {
-  font-size: 32px;
-}
-
-.shop-item .item-name {
+  color: #E8F5E9;
   font-size: 14px;
-  font-weight: 600;
-  color: #fff;
-}
-
-.shop-item .item-cost {
-  font-size: 12px;
-  color: #FFD54F;
-}
-
-.buy-btn {
-  padding: 6px 16px;
-  border: none;
-  border-radius: 6px;
-  background: linear-gradient(135deg, #FF9800, #F57C00);
-  color: #fff;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.2s ease;
-}
-
-.buy-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(245, 124, 0, 0.3);
-}
-
-/* Inventory Modal */
-.inventory-content {
   margin-top: 16px;
-}
-
-.inventory-section {
-  margin-bottom: 24px;
-}
-
-.inventory-section h3 {
-  color: #C8E6C9;
-  font-size: 14px;
-  margin: 0 0 12px 0;
-}
-
-.inv-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-}
-
-.inv-icon {
-  font-size: 24px;
-}
-
-.inv-name {
-  flex: 1;
-  font-size: 12px;
-  color: #C8E6C9;
-}
-
-.inv-count {
-  font-size: 14px;
-  font-weight: 600;
-  color: #fff;
-}
-
-/* Friend Interaction Modal */
-.friend-island-preview {
-  width: 100%;
-  height: 200px;
-  background: linear-gradient(135deg, #81D4FA, #4FC3F7);
-  border-radius: 12px;
-  margin: 16px 0;
-  position: relative;
-  overflow: hidden;
-}
-
-.interaction-options {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.interaction-option {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-}
-
-.action-icon {
-  font-size: 28px;
-}
-
-.action-name {
-  flex: 1;
-  font-weight: 600;
-  color: #fff;
-}
-
-.action-cost {
-  font-size: 12px;
-  color: #C8E6C9;
-  text-align: center;
-}
-
-.interaction-btn {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 6px;
-  background: linear-gradient(135deg, #4CAF50, #8BC34A);
-  color: #fff;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.2s ease;
-}
-
-.interaction-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
-}
-
-/* Decorations Container */
-.decorations-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-
-.decoration-item {
-  position: absolute;
-  font-size: 32px;
-  animation: decorationFloat 3s ease-in-out infinite;
-}
-
-@keyframes decorationFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
-}
-
-/* Mature Plants */
-.mature-plants {
-  position: absolute;
-  bottom: 60px;
-  left: 60px;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-}
-
-.large-plant {
-  position: relative;
-  width: 60px;
-  height: 60px;
-}
-
-.plant-flower {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 24px;
-}
-
-.plant-fruit {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 20px;
-  animation: fruitBounce 2s ease-in-out infinite;
-}
-
-@keyframes fruitBounce {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50% { transform: translateX(-50%) translateY(-5px); }
 }
 
 /* ============================================================

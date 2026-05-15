@@ -4771,105 +4771,63 @@ if (typeof document !== 'undefined') {
 
       // Update quick inventory
       updateQuickInventoryUI();
-
-      // Update island scene data attributes
-      const gardenIsland = document.querySelector('#gardenIsland');
-      if (gardenIsland) {
-        gardenIsland.dataset.level = islandState.level;
-        gardenIsland.dataset.theme = islandState.theme;
-
-        // Update character bubble based on island state
-        updateCharacterBubble();
-      }
     }
-
-    function updateCharacterBubble() {
-      const bubble = document.querySelector('#characterBubble .bubble-text');
-      if (!bubble) return;
-
-      const messages = [
-        '欢迎来到我的花园！🌸',
-        '今天也要好好专注哦！💪',
-        '种植的快乐，收获的喜悦！🌱',
-        '我的农场越来越美了！🎨',
-        '和小宠物一起成长吧！🐰'
-      ];
-
-      // Change message periodically
-      if (!updateCharacterBubble.messageIndex) {
-        updateCharacterBubble.messageIndex = 0;
-      }
-
-      bubble.textContent = messages[updateCharacterBubble.messageIndex];
-      updateCharacterBubble.messageIndex = (updateCharacterBubble.messageIndex + 1) % messages.length;
-    }
-
-    // Update character bubble every 10 seconds
-    setInterval(updateCharacterBubble, 10000);
 
     function updatePlotsUI() {
       islandState.plots.forEach(plot => {
         const plotElement = document.querySelector(`[data-plot="${plot.id}"]`);
         if (!plotElement) return;
 
-        const cropDisplay = document.querySelector(`#${plot.id}Crop`);
-        const growthStage = document.querySelector(`#${plot.id}Stage`);
-        const waterNeed = document.querySelector(`#${plot.id}WaterNeed`);
-        const harvestReady = document.querySelector(`#${plot.id}Harvest`);
-        const progressBar = document.querySelector(`#${plot.id}Progress .progress-fill`);
+        const plotIcon = document.querySelector(`#${plot.id}Icon`);
+        const plotName = document.querySelector(`#${plot.id}Name`);
+        const plotStatus = document.querySelector(`#${plot.id}Status`);
+        const plotProgress = document.querySelector(`#${plot.id}Progress .progress-bar`);
+        const plotNeed = document.querySelector(`#${plot.id}Need`);
 
         if (plot.crop) {
           const cropType = IslandGardenModule.CROP_TYPES[plot.crop];
           const growthProgress = IslandGardenModule.getGrowthProgress(plot);
 
           // Display crop based on growth stage
-          if (cropDisplay) {
+          if (plotIcon) {
             if (growthProgress >= 100) {
-              cropDisplay.textContent = cropType.icon;
-              plotElement.classList.add('ready-to-harvest');
+              plotIcon.textContent = cropType.icon;
+              if (plotName) plotName.textContent = cropType.name;
+              if (plotStatus) plotStatus.textContent = '可收获';
             } else if (plot.growthStage > 0) {
               const stageIcons = ['🌱', '🌿', '🪴', '🌸', '🍎'];
-              cropDisplay.textContent = stageIcons[Math.min(plot.growthStage, stageIcons.length - 1)];
+              plotIcon.textContent = stageIcons[Math.min(plot.growthStage, stageIcons.length - 1)];
+              if (plotName) plotName.textContent = cropType.name;
+              if (plotStatus) plotStatus.textContent = `${Math.floor(growthProgress)}%`;
             } else {
-              cropDisplay.textContent = '🌰';
+              plotIcon.textContent = '🌰';
+              if (plotName) plotName.textContent = cropType.name;
+              if (plotStatus) plotStatus.textContent = '种子';
             }
-          }
-
-          // Update growth stage text
-          if (growthStage && cropType) {
-            const stageNames = cropType.stages || ['种子', '幼苗', '生长中', '开花', '结果'];
-            growthStage.textContent = stageNames[Math.min(plot.growthStage, stageNames.length - 1)];
           }
 
           // Update progress bar
-          if (progressBar) {
-            progressBar.style.width = `${growthProgress}%`;
+          if (plotProgress) {
+            plotProgress.style.width = `${growthProgress}%`;
           }
 
           // Update water need indicator
-          if (waterNeed) {
+          if (plotNeed) {
             if (plot.needsWater) {
-              waterNeed.style.opacity = '1';
+              plotNeed.style.opacity = '1';
+              plotElement.classList.add('needs-water');
             } else {
-              waterNeed.style.opacity = '0';
-            }
-          }
-
-          // Update harvest ready indicator
-          if (harvestReady) {
-            if (growthProgress >= 100) {
-              harvestReady.style.opacity = '1';
-            } else {
-              harvestReady.style.opacity = '0';
+              plotNeed.style.opacity = '0';
+              plotElement.classList.remove('needs-water');
             }
           }
         } else {
-          if (cropDisplay) cropDisplay.textContent = '';
-          if (growthStage) growthStage.textContent = '';
-          if (waterNeed) waterNeed.style.opacity = '0';
-          if (harvestReady) harvestReady.style.opacity = '0';
-          if (progressBar) progressBar.style.width = '0%';
-          plotElement.classList.remove('ready-to-harvest');
+          if (plotIcon) plotIcon.textContent = '🌱';
+          if (plotName) plotName.textContent = '空地块';
+          if (plotStatus) plotStatus.textContent = '点击种植';
+          if (plotProgress) plotProgress.style.width = '0%';
+          if (plotNeed) plotNeed.style.opacity = '0';
+          plotElement.classList.remove('needs-water');
         }
       });
     }
@@ -4879,54 +4837,47 @@ if (typeof document !== 'undefined') {
       if (!activePet) return;
 
       const petType = IslandGardenModule.PET_TYPES[activePet.type];
-      const petHappinessFill = document.querySelector('#petHappinessFill');
-      const petSprite = document.querySelector('#petSprite');
+      const petHappiness = document.querySelector('#petHappiness');
+      const petHunger = document.querySelector('#petHunger');
+      const petIcon = document.querySelector('#petIcon');
       const petName = document.querySelector('#petName');
-      const foodFill = document.querySelector('#foodFill');
 
       // Update pet sprite and name
-      if (petSprite) {
-        petSprite.textContent = petType.icon;
+      if (petIcon) {
+        petIcon.textContent = petType.icon;
       }
       if (petName) {
         petName.textContent = activePet.name;
       }
 
       // Update happiness bar
-      if (petHappinessFill) {
-        petHappinessFill.style.width = `${activePet.happiness}%`;
+      if (petHappiness) {
+        petHappiness.style.width = `${activePet.happiness}%`;
       }
 
-      // Update food bowl
-      if (foodFill) {
+      // Update hunger bar
+      if (petHunger) {
         const hoursSinceFed = (Date.now() - activePet.lastFedAt) / (60 * 60 * 1000);
         const feedInterval = petType.feedInterval / (60 * 60 * 1000);
-        const foodPercent = Math.max(0, Math.min(100, (1 - hoursSinceFed / feedInterval) * 100));
-        foodFill.style.height = `${foodPercent}%`;
-      }
-
-      // Update pet mood animation
-      if (petSprite) {
-        if (activePet.happiness < 30) {
-          petSprite.style.animation = 'petSad 2s ease-in-out infinite';
-        } else if (activePet.happiness >= 80) {
-          petSprite.style.animation = 'petBounce 1s ease-in-out infinite';
-        } else {
-          petSprite.style.animation = 'petBounce 2s ease-in-out infinite';
-        }
+        const hungerPercent = Math.min(100, (hoursSinceFed / feedInterval) * 100);
+        petHunger.style.width = `${hungerPercent}%`;
       }
     }
 
     function updateInventoryUI() {
-      // Update seed counts
-      if (elements.seedTomatoCount) {
-        elements.seedTomatoCount.textContent = islandState.inventory.seeds.tomato || 0;
+      // Update seed counts in main display
+      const invTomatoSeed = document.querySelector('#invTomatoSeed');
+      const invStrawberrySeed = document.querySelector('#invStrawberrySeed');
+      const invTomato = document.querySelector('#invTomato');
+
+      if (invTomatoSeed) {
+        invTomatoSeed.textContent = islandState.inventory.seeds.tomato || 0;
       }
-      if (elements.seedStrawberryCount) {
-        elements.seedStrawberryCount.textContent = islandState.inventory.seeds.strawberry || 0;
+      if (invStrawberrySeed) {
+        invStrawberrySeed.textContent = islandState.inventory.seeds.strawberry || 0;
       }
-      if (elements.harvestTomatoCount) {
-        elements.harvestTomatoCount.textContent = islandState.inventory.harvested.tomato || 0;
+      if (invTomato) {
+        invTomato.textContent = islandState.inventory.harvested.tomato || 0;
       }
 
       // Update modal seed amounts
@@ -4943,18 +4894,18 @@ if (typeof document !== 'undefined') {
 
     function updateQuickInventoryUI() {
       // Update quick inventory view
-      const quickSeedTomato = document.querySelector('#quickSeedTomato');
-      const quickSeedStrawberry = document.querySelector('#quickSeedStrawberry');
-      const quickHarvestTomato = document.querySelector('#quickHarvestTomato');
+      const invTomatoSeed = document.querySelector('#invTomatoSeed');
+      const invStrawberrySeed = document.querySelector('#invStrawberrySeed');
+      const invTomato = document.querySelector('#invTomato');
 
-      if (quickSeedTomato) {
-        quickSeedTomato.textContent = islandState.inventory.seeds.tomato || 0;
+      if (invTomatoSeed) {
+        invTomatoSeed.textContent = islandState.inventory.seeds.tomato || 0;
       }
-      if (quickSeedStrawberry) {
-        quickSeedStrawberry.textContent = islandState.inventory.seeds.strawberry || 0;
+      if (invStrawberrySeed) {
+        invStrawberrySeed.textContent = islandState.inventory.seeds.strawberry || 0;
       }
-      if (quickHarvestTomato) {
-        quickHarvestTomato.textContent = islandState.inventory.harvested.tomato || 0;
+      if (invTomato) {
+        invTomato.textContent = islandState.inventory.harvested.tomato || 0;
       }
     }
 
