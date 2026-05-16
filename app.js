@@ -1564,50 +1564,57 @@ const IslandGardenModule = (function() {
     tomato: {
       name: '番茄',
       icon: '🍅',
-      growthTime: 4 * 60 * 60, // 4小时
+      // 价格中等：约 30 分钟成熟
+      // 注意：这里使用毫秒（ms）
+      growthTime: 30 * 60 * 1000,
       stages: ['种子', '幼苗', '生长中', '开花', '结果'],
       rewards: { water: 2, sunlight: 2, coins: 50 },
-      yield: 5
+      yield: 1
     },
     strawberry: {
       name: '草莓',
       icon: '🍓',
-      growthTime: 6 * 60 * 60,
+      // 价格更高：约 2 小时成熟
+      growthTime: 2 * 60 * 60 * 1000,
       stages: ['种子', '幼苗', '生长中', '开花', '结果'],
       rewards: { water: 3, sunlight: 3, coins: 80 },
-      yield: 8
+      yield: 1
     },
     apple: {
       name: '苹果',
       icon: '🍎',
-      growthTime: 8 * 60 * 60,
+      // 价格较高：约 6 小时成熟
+      growthTime: 6 * 60 * 60 * 1000,
       stages: ['种子', '幼苗', '小树', '大树', '结果'],
       rewards: { water: 4, sunlight: 4, coins: 120 },
-      yield: 10
+      yield: 1
     },
     orange: {
       name: '橘子',
       icon: '🍊',
-      growthTime: 10 * 60 * 60,
+      // 预留作物（当前商店未售卖）
+      growthTime: 8 * 60 * 60 * 1000,
       stages: ['种子', '幼苗', '小树', '大树', '结果'],
       rewards: { water: 5, sunlight: 5, coins: 150 },
-      yield: 12
+      yield: 1
     },
     watermelon: {
       name: '西瓜',
       icon: '🍉',
-      growthTime: 12 * 60 * 60,
+      // 最贵：约 12 小时成熟
+      growthTime: 12 * 60 * 60 * 1000,
       stages: ['种子', '幼苗', '藤蔓', '开花', '结果'],
       rewards: { water: 6, sunlight: 6, coins: 200 },
-      yield: 15
+      yield: 1
     },
     carrot: {
       name: '胡萝卜',
       icon: '🥕',
-      growthTime: 3 * 60 * 60,
+      // 最便宜：约 5 分钟成熟
+      growthTime: 5 * 60 * 1000,
       stages: ['种子', '幼苗', '生长中', '成熟'],
       rewards: { water: 2, sunlight: 2, coins: 40 },
-      yield: 6
+      yield: 1
     }
   };
 
@@ -1616,6 +1623,7 @@ const IslandGardenModule = (function() {
     rabbit: {
       name: '小兔子',
       icon: '🐰',
+      cost: 500,
       happinessDecay: 2, // 每小时减少2点
       feedBonus: { coins: 30, focusBonus: 1.1 },
       feedInterval: 4 * 60 * 60 // 4小时需要喂一次
@@ -1623,6 +1631,7 @@ const IslandGardenModule = (function() {
     cat: {
       name: '猫咪',
       icon: '🐱',
+      cost: 500,
       happinessDecay: 1.5,
       feedBonus: { coins: 40, focusBonus: 1.15 },
       feedInterval: 6 * 60 * 60
@@ -1630,6 +1639,7 @@ const IslandGardenModule = (function() {
     dog: {
       name: '小狗',
       icon: '🐶',
+      cost: 500,
       happinessDecay: 2.5,
       feedBonus: { coins: 35, focusBonus: 1.12 },
       feedInterval: 5 * 60 * 60
@@ -1637,6 +1647,7 @@ const IslandGardenModule = (function() {
     bird: {
       name: '小鸟',
       icon: '🐦',
+      cost: 500,
       happinessDecay: 3,
       feedBonus: { coins: 25, focusBonus: 1.08 },
       feedInterval: 3 * 60 * 60
@@ -1678,7 +1689,7 @@ const IslandGardenModule = (function() {
       ],
       decorations: [],
       inventory: {
-        seeds: { tomato: 3, strawberry: 2 },
+        seeds: { tomato: 3, strawberry: 2, carrot: 1, apple: 0, watermelon: 0 },
         harvested: {}
       },
       lastVisitTime: Date.now(),
@@ -1730,9 +1741,10 @@ const IslandGardenModule = (function() {
     plot.wateredAt = Date.now();
 
     // 加速生长时间
-    plot.plantedAt = Math.max(plot.plantedAt - 30 * 60 * 1000, Date.now());
+    // 浇水：让“剩余时间减少 5 分钟”
+    plot.plantedAt = Math.max(0, (plot.plantedAt || Date.now()) - 5 * 60 * 1000);
 
-    return { success: true, message: '浇水成功，作物生长加速30分钟' };
+    return { success: true, message: '浇水成功，作物生长时间减少 5 分钟' };
   }
 
   // 收获作物
@@ -1849,14 +1861,15 @@ const IslandGardenModule = (function() {
 
   // 解锁宠物
   function unlockPet(islandState, petType) {
-    if (islandState.coins < 500) return { success: false, message: '金币不足500' };
+    const cost = (PET_TYPES[petType] && PET_TYPES[petType].cost) ? PET_TYPES[petType].cost : 500;
+    if (islandState.coins < cost) return { success: false, message: `金币不足${cost}` };
 
     const existingPet = islandState.pets.find(p => p.type === petType);
     if (existingPet && existingPet.unlocked) {
       return { success: false, message: '这个宠物已经解锁了' };
     }
 
-    islandState.coins -= 500;
+    islandState.coins -= cost;
     const newPet = {
       id: `pet${Date.now()}`,
       type: petType,
@@ -2232,6 +2245,8 @@ if (typeof document !== 'undefined') {
       seedTomatoAmount: document.querySelector('#seedTomatoAmount'),
       seedStrawberryAmount: document.querySelector('#seedStrawberryAmount'),
       seedCarrotAmount: document.querySelector('#seedCarrotAmount'),
+      seedAppleAmount: document.querySelector('#seedAppleAmount'),
+      seedWatermelonAmount: document.querySelector('#seedWatermelonAmount'),
       shopModal: document.querySelector('#shopModal'),
       closeShop: document.querySelector('#closeShop'),
       shopContent: document.querySelector('#shopContent'),
@@ -4345,7 +4360,7 @@ if (typeof document !== 'undefined') {
       if (target.id === 'closePlanting') {
         if (elements.plantingModal) elements.plantingModal.hidden = true;
       }
-      if (target.id === 'closeShop') {
+      if (target.id === 'closeShop' || (target.closest && target.closest('#closeShop'))) {
         if (elements.shopModal) elements.shopModal.hidden = true;
       }
       if (target.id === 'closeInventory') {
@@ -4538,7 +4553,7 @@ if (typeof document !== 'undefined') {
         plantSelectedCrop(cropType);
       }
 
-      if (target.id === 'closeShop') {
+      if (target.id === 'closeShop' || (target.closest && target.closest('#closeShop'))) {
         if (elements.shopModal) {
           elements.shopModal.hidden = true;
         }
@@ -4800,8 +4815,35 @@ if (typeof document !== 'undefined') {
       // Update quick inventory
       updateQuickInventoryUI();
 
+      // Update decorations
+      updateDecorationsUI();
+
       // Reminders (needs water / needs feed)
       updateIslandAlerts();
+    }
+
+    function updateDecorationsUI() {
+      const grid = document.querySelector('#decorationsGrid');
+      if (!grid) return;
+      const slots = Array.from(grid.querySelectorAll('.decoration-slot'));
+      if (!slots.length) return;
+
+      const decorationTypes = IslandGardenModule.DECORATION_TYPES || {};
+      const decorations = Array.isArray(islandState.decorations) ? islandState.decorations : [];
+
+      slots.forEach((slot, index) => {
+        const deco = decorations[index];
+        if (!deco) {
+          slot.classList.add('empty');
+          slot.innerHTML = '<span class="slot-plus">+</span>';
+          return;
+        }
+        const info = decorationTypes[deco.type];
+        const icon = info?.icon || '✨';
+        const name = info?.name || deco.type;
+        slot.classList.remove('empty');
+        slot.innerHTML = `<span title="${escapeHtml(name)}" style="font-size:24px;">${icon}</span>`;
+      });
     }
 
     function updatePlotsUI() {
@@ -4896,22 +4938,31 @@ if (typeof document !== 'undefined') {
     }
 
     function updateInventoryUI() {
-      // Update seed counts in main display
-      const invTomatoSeed = document.querySelector('#invTomatoSeed');
-      const invStrawberrySeed = document.querySelector('#invStrawberrySeed');
-      const invTomato = document.querySelector('#invTomato');
+      // Update quick bag counts (right panel)
+      const seedKeys = ['tomato', 'strawberry', 'carrot', 'apple', 'watermelon'];
+      const seedIdMap = {
+        tomato: '#invTomatoSeed',
+        strawberry: '#invStrawberrySeed',
+        carrot: '#invCarrotSeed',
+        apple: '#invAppleSeed',
+        watermelon: '#invWatermelonSeed'
+      };
+      const cropIdMap = {
+        tomato: '#invTomato',
+        strawberry: '#invStrawberry',
+        carrot: '#invCarrot',
+        apple: '#invApple',
+        watermelon: '#invWatermelon'
+      };
 
-      if (invTomatoSeed) {
-        invTomatoSeed.textContent = islandState.inventory.seeds.tomato || 0;
-      }
-      if (invStrawberrySeed) {
-        invStrawberrySeed.textContent = islandState.inventory.seeds.strawberry || 0;
-      }
-      if (invTomato) {
-        invTomato.textContent = islandState.inventory.harvested.tomato || 0;
-      }
+      seedKeys.forEach((key) => {
+        const seedNode = document.querySelector(seedIdMap[key]);
+        if (seedNode) seedNode.textContent = islandState.inventory.seeds[key] || 0;
+        const cropNode = document.querySelector(cropIdMap[key]);
+        if (cropNode) cropNode.textContent = islandState.inventory.harvested[key] || 0;
+      });
 
-      // Update modal seed amounts
+      // Update planting modal seed amounts + lock/unlock
       if (elements.seedTomatoAmount) {
         elements.seedTomatoAmount.textContent = islandState.inventory.seeds.tomato || 0;
       }
@@ -4921,63 +4972,36 @@ if (typeof document !== 'undefined') {
       if (elements.seedCarrotAmount) {
         elements.seedCarrotAmount.textContent = islandState.inventory.seeds.carrot || 0;
       }
+      if (elements.seedAppleAmount) {
+        elements.seedAppleAmount.textContent = islandState.inventory.seeds.apple || 0;
+      }
+      if (elements.seedWatermelonAmount) {
+        elements.seedWatermelonAmount.textContent = islandState.inventory.seeds.watermelon || 0;
+      }
+
+      // Lock seed options when count is 0
+      document.querySelectorAll('.seed-option').forEach((node) => {
+        const crop = node.dataset.crop;
+        const count = islandState.inventory.seeds[crop] || 0;
+        node.classList.toggle('locked', count <= 0);
+      });
     }
 
     function updateQuickInventoryUI() {
-      // Update quick inventory view
-      const invTomatoSeed = document.querySelector('#invTomatoSeed');
-      const invStrawberrySeed = document.querySelector('#invStrawberrySeed');
-      const invTomato = document.querySelector('#invTomato');
-
-      if (invTomatoSeed) {
-        invTomatoSeed.textContent = islandState.inventory.seeds.tomato || 0;
-      }
-      if (invStrawberrySeed) {
-        invStrawberrySeed.textContent = islandState.inventory.seeds.strawberry || 0;
-      }
-      if (invTomato) {
-        invTomato.textContent = islandState.inventory.harvested.tomato || 0;
-      }
+      // Alias to keep old calls safe (inventory UI now handles quick bag too)
+      updateInventoryUI();
     }
 
     function handlePlotClick(plotElement) {
       const plotId = plotElement.dataset.plot;
-      const plot = islandState.plots.find(p => p.id === plotId);
-      if (!plot) return;
-
-      if (!plot.crop) {
-        // Open planting modal
-        if (elements.plantingModal) {
-          elements.plantingModal.hidden = false;
-          selectedPlot = plotId;
-          updateInventoryUI();
-        }
-      } else if (IslandGardenModule.getGrowthProgress(plot) >= 100) {
-        // Harvest crop
-        const result = IslandGardenModule.harvestCrop(islandState, plotId);
-        if (result.success) {
-          showMessage(result.message);
-          updateIslandUI();
-          persistIslandState();
-        } else {
-          showMessage(result.message);
-        }
-      } else {
-        // Show crop details or action options
-        if (plot.needsWater && currentTool === 'water') {
-          const result = IslandGardenModule.waterCrop(islandState, plotId);
-          showMessage(result.message);
-          updateIslandUI();
-          persistIslandState();
-        } else if (currentTool !== 'water') {
-          showMessage('选择工具进行操作：💧浇水或等待收获');
-        }
-      }
+      if (!plotId) return;
+      // 农田交互统一走“先选工具 → 再点地块”
+      handlePlotInteraction(plotId);
     }
 
     function handlePlotInteraction(plotId) {
       if (!currentTool) {
-        showMessage('请先选择一个工具');
+        showMessage('请先选择右侧「农场工具」中的：种植 / 浇水 / 收获');
         return;
       }
 
@@ -4986,6 +5010,10 @@ if (typeof document !== 'undefined') {
 
       switch (currentTool) {
         case 'plant':
+          if (plot.crop) {
+            showMessage('这个地块已经有作物了');
+            return;
+          }
           if (elements.plantingModal) {
             elements.plantingModal.hidden = false;
             selectedPlot = plotId;
@@ -5003,13 +5031,20 @@ if (typeof document !== 'undefined') {
           }
           break;
         case 'harvest':
-          if (plot.crop && IslandGardenModule.getGrowthProgress(plot) >= 100) {
+          if (!plot.crop) {
+            showMessage('这个地块没有作物');
+            return;
+          }
+          if (IslandGardenModule.getGrowthProgress(plot) >= 100) {
             const result = IslandGardenModule.harvestCrop(islandState, plotId);
             showMessage(result.message);
             updateIslandUI();
             persistIslandState();
           } else {
-            showMessage('作物还没成熟');
+            const cropType = IslandGardenModule.CROP_TYPES[plot.crop];
+            const remainingMs = Math.max(0, cropType.growthTime - (Date.now() - plot.plantedAt));
+            const remainingMin = Math.ceil(remainingMs / (60 * 1000));
+            showMessage(`作物还没成熟，预计还需 ${remainingMin} 分钟`);
           }
           break;
         default:
