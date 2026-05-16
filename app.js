@@ -1846,9 +1846,10 @@ const IslandGardenModule = (function() {
     if (!pet.unlocked) return { success: false, message: '宠物未解锁' };
 
     const petType = PET_TYPES[pet.type];
-    if (islandState.water < 2) return { success: false, message: '水滴不足' };
+    // 喂养消耗：游戏机会（而不是水滴）
+    if ((islandState.dailyHelpCount || 0) <= 0) return { success: false, message: '游戏机会不足' };
 
-    islandState.water -= 2;
+    islandState.dailyHelpCount -= 1;
     pet.happiness = Math.min(pet.happiness + 30, 100);
     pet.lastFedAt = Date.now();
 
@@ -1857,7 +1858,7 @@ const IslandGardenModule = (function() {
 
     return {
       success: true,
-      message: `喂养成功！${pet.name}很开心，获得${bonus.coins}金币`,
+      message: `喂养成功！消耗 1 次游戏机会，${pet.name}很开心，获得${bonus.coins}金币`,
       bonus
     };
   }
@@ -4605,6 +4606,10 @@ if (typeof document !== 'undefined') {
       const toolButton = target.closest && target.closest('[data-tool]');
       if (toolButton) {
         const tool = toolButton.dataset.tool;
+        // Farm tools are handled by direct listeners to prevent double toggles.
+        if ((tool === 'plant' || tool === 'water' || tool === 'harvest') && toolButton.dataset && toolButton.dataset.boundClick === '1') {
+          return;
+        }
         if (tool === 'plant' || tool === 'water' || tool === 'harvest') {
           currentTool = currentTool === tool ? null : tool;
           document.querySelectorAll('.tool-btn[data-tool="plant"], .tool-btn[data-tool="water"], .tool-btn[data-tool="harvest"]').forEach(btn => btn.classList.remove('active'));
@@ -4652,17 +4657,43 @@ if (typeof document !== 'undefined') {
         if (tool === 'sync-resources') {
           const oldCoins = islandState.coins;
           const oldWater = islandState.water;
+          const oldChances = islandState.dailyHelpCount;
+          const oldSeedsSnapshot = { ...(islandState.inventory?.seeds || {}) };
           if (state && state.resources) {
             islandState.coins += state.resources.coins;
             islandState.water += state.resources.water;
             islandState.sunlight += 5;
             state.resources.coins = 0;
             state.resources.water = 0;
+
+            // Sync chances (游戏机会)
+            islandState.dailyHelpCount += Number(state.resources.chances || 0);
+            state.resources.chances = 0;
+
+            // Sync seeds: randomly grant N seeds into island bag
+            const seedCount = Number(state.resources.seeds || 0);
+            const seedPool = ['carrot', 'tomato', 'strawberry', 'apple', 'watermelon'];
+            for (let i = 0; i < seedCount; i += 1) {
+              const pick = seedPool[Math.floor(Math.random() * seedPool.length)];
+              if (!islandState.inventory.seeds[pick]) islandState.inventory.seeds[pick] = 0;
+              islandState.inventory.seeds[pick] += 1;
+            }
+            state.resources.seeds = 0;
           }
           updateIslandUI();
           persistIslandState();
           persistSession();
-          showMessage(localizedText(`同步成功！+${islandState.coins - oldCoins} 金币, +${islandState.water - oldWater} 水滴`, `同步成功！+${islandState.coins - oldCoins} 金幣, +${islandState.water - oldWater} 水滴`, `Synced! +${islandState.coins - oldCoins} coins, +${islandState.water - oldWater} water`));
+          const gainedCoins = islandState.coins - oldCoins;
+          const gainedWater = islandState.water - oldWater;
+          const gainedChances = islandState.dailyHelpCount - oldChances;
+          const gainedSeeds = Object.keys(islandState.inventory.seeds || {}).reduce((sum, k) => {
+            return sum + ((islandState.inventory.seeds[k] || 0) - (oldSeedsSnapshot[k] || 0));
+          }, 0);
+          showMessage(localizedText(
+            `同步成功！+${gainedCoins} 金币, +${gainedWater} 水滴, +${gainedChances} 游戏机会, +${gainedSeeds} 粒种子`,
+            `同步成功！+${gainedCoins} 金幣, +${gainedWater} 水滴, +${gainedChances} 遊戲機會, +${gainedSeeds} 粒種子`,
+            `Synced! +${gainedCoins} coins, +${gainedWater} water, +${gainedChances} chances, +${gainedSeeds} seeds`
+          ));
         }
       }
     });
@@ -5318,7 +5349,12 @@ if (typeof document !== 'undefined') {
       document.querySelectorAll('.plot[data-plot]').forEach((plot) => {
         if (plot.dataset.boundClick === '1') return;
         plot.dataset.boundClick = '1';
-        plot.addEventListener('click', () => {
+        plot.addEventListener('click', (event) => {
+          // Avoid the global document click handler from interfering.
+          if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
           handlePlotClick(plot);
         });
       });
@@ -5326,7 +5362,12 @@ if (typeof document !== 'undefined') {
       document.querySelectorAll('.tool-btn[data-tool="plant"], .tool-btn[data-tool="water"], .tool-btn[data-tool="harvest"]').forEach((btn) => {
         if (btn.dataset.boundClick === '1') return;
         btn.dataset.boundClick = '1';
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', (event) => {
+          // Avoid the global document click handler from double-toggling the tool.
+          if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
           const tool = btn.dataset.tool;
           currentTool = currentTool === tool ? null : tool;
           document.querySelectorAll('.tool-btn[data-tool="plant"], .tool-btn[data-tool="water"], .tool-btn[data-tool="harvest"]').forEach(b => b.classList.remove('active'));
