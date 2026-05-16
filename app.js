@@ -31,7 +31,7 @@ const PomolandCore = (() => {
       featureFocus: 'Focus Mode',
       featureFocusDesc: '支持 Demo 快进和真实 25/30/45 分钟番茄钟。',
       featureIsland: 'Pomoland Island',
-      featureIslandDesc: '用水滴、种子和金币种植、浇水、喂养和装饰。',
+      featureIslandDesc: '用水滴、阳光和金币种植、浇水、喂养和装饰。',
       featureSocial: 'Friends',
       featureSocialDesc: '参观好友岛屿，帮忙浇水，或用游戏机会偷取果实。',
       featureReport: 'Report',
@@ -81,7 +81,7 @@ const PomolandCore = (() => {
       bonusLead: '这次专注转化成了新的岛屿资源。',
       claimBonus: 'Claim Bonus',
       coins: '金币',
-      seeds: '种子',
+      sunlight: '阳光',
       water: '水滴',
       chances: '游戏机会',
       plant: 'Plant',
@@ -143,7 +143,7 @@ const PomolandCore = (() => {
       waterDone: '水滴让岛屿更有活力。',
       feedDone: '宠物吃饱了，岛屿经验提升。',
       decorateDone: '贝壳灯已放到码头旁。',
-      needSeeds: '种子不足，先完成 Focus Mode 获得 Bonus。',
+      needSunlight: '阳光不足，先完成 Focus Mode 获得 Bonus。',
       needWater: '水滴不足，先完成 Focus Mode 获得 Bonus。',
       needCoins: '金币不足，先完成 Focus Mode 获得 Bonus。',
       aiFallbackEncouragement: 'AI 暂时无法使用，这里有一些默认任务！',
@@ -230,7 +230,7 @@ const PomolandCore = (() => {
       featureFocus: 'Focus Mode',
       featureFocusDesc: '支援 Demo 快進和真實 25/30/45 分鐘番茄鐘。',
       featureIsland: 'Pomoland Island',
-      featureIslandDesc: '用水滴、種子和金幣種植、澆水、餵養和裝飾。',
+      featureIslandDesc: '用水滴、陽光和金幣種植、澆水、餵養和裝飾。',
       featureSocial: 'Friends',
       featureSocialDesc: '參觀好友島嶼，幫忙澆水，或用遊戲機會偷取果實。',
       featureReport: 'Report',
@@ -280,7 +280,7 @@ const PomolandCore = (() => {
       bonusLead: '這次專注轉化成了新的島嶼資源。',
       claimBonus: 'Claim Bonus',
       coins: '金幣',
-      seeds: '種子',
+      sunlight: '陽光',
       water: '水滴',
       chances: '遊戲機會',
       plant: 'Plant',
@@ -342,7 +342,7 @@ const PomolandCore = (() => {
       waterDone: '水滴讓島嶼更有活力。',
       feedDone: '寵物吃飽了，島嶼經驗提升。',
       decorateDone: '貝殼燈已放到碼頭旁。',
-      needSeeds: '種子不足，先完成 Focus Mode 獲得 Bonus。',
+      needSunlight: '陽光不足，先完成 Focus Mode 獲得 Bonus。',
       needWater: '水滴不足，先完成 Focus Mode 獲得 Bonus。',
       needCoins: '金幣不足，先完成 Focus Mode 獲得 Bonus。',
       aiFallbackEncouragement: 'AI 暫時無法使用，這裡有一些默認任務！',
@@ -429,7 +429,7 @@ const PomolandCore = (() => {
       featureFocus: 'Focus Mode',
       featureFocusDesc: 'Supports demo fast-forward and real 25/30/45 minute focus sessions.',
       featureIsland: 'Pomoland Island',
-      featureIslandDesc: 'Spend drops, seeds, and coins to plant, water, feed, and decorate.',
+      featureIslandDesc: 'Spend drops, sunlight, and coins to plant, water, feed, and decorate.',
       featureSocial: 'Friends',
       featureSocialDesc: 'Visit islands, help water plants, or spend a chance to steal fruit.',
       featureReport: 'Report',
@@ -479,7 +479,7 @@ const PomolandCore = (() => {
       bonusLead: 'This focus session became new island resources.',
       claimBonus: 'Claim Bonus',
       coins: 'Coins',
-      seeds: 'Seeds',
+      sunlight: 'Sunlight',
       water: 'Water Drops',
       chances: 'Game Chances',
       plant: 'Plant',
@@ -541,7 +541,7 @@ const PomolandCore = (() => {
       waterDone: 'Water drops made the island brighter.',
       feedDone: 'The pet is full and the island gained experience.',
       decorateDone: 'The shell lamp is now beside the dock.',
-      needSeeds: 'Not enough seeds. Finish Focus Mode to earn a Bonus.',
+      needSunlight: 'Not enough sunlight. Finish Focus Mode to earn a Bonus.',
       needWater: 'Not enough water. Finish Focus Mode to earn a Bonus.',
       needCoins: 'Not enough coins. Finish Focus Mode to earn a Bonus.',
       aiFallbackEncouragement: 'AI is currently unavailable, here are some default tasks!',
@@ -716,7 +716,8 @@ const PomolandCore = (() => {
       selectedTask: null,
       resources: {
         coins: 120,
-        seeds: 2,
+        // Focus Mode 奖励的“阳光”（原 seeds 改名）
+        sunlight: 2,
         water: 3,
         chances: 1
       },
@@ -932,7 +933,7 @@ const PomolandCore = (() => {
   function claimReward(state, reward) {
     const next = copyState(state);
     next.resources.coins += reward.coins || 0;
-    next.resources.seeds += reward.seeds || 0;
+    next.resources.sunlight += reward.sunlight || 0;
     next.resources.water += reward.water || 0;
     next.resources.chances += reward.chances || 0;
     if (reward.decoration && !next.decorations.includes(reward.decoration)) {
@@ -1059,13 +1060,14 @@ const PomolandCore = (() => {
   function buildRewardBundle(language, totalSeconds, randomValue = Math.random) {
     const effortMinutes = Math.max(1, Math.round((Number(totalSeconds) || 1200) / 60));
     const coins = 18 + Math.round(effortMinutes * 0.8) + Math.floor(randomValue() * 10);
-    const seeds = 1 + (randomValue() > 0.55 ? 1 : 0);
+    // 原 seeds 改名为 sunlight（数值保持不变）
+    const sunlight = 1 + (randomValue() > 0.55 ? 1 : 0);
     const water = 1 + (randomValue() > 0.35 ? 1 : 0);
     const chances = effortMinutes >= 25 && randomValue() > 0.7 ? 1 : 0;
     const decoration = randomValue() > 0.72 ? t(language, 'rewardDecoration') : null;
     return {
       coins,
-      seeds,
+      sunlight,
       water,
       chances,
       decoration
@@ -1076,8 +1078,8 @@ const PomolandCore = (() => {
     const next = copyState(state);
 
     if (action === 'plant') {
-      if (next.resources.seeds <= 0) return withMessage(next, 'needSeeds');
-      next.resources.seeds -= 1;
+      if (next.resources.sunlight <= 0) return withMessage(next, 'needSunlight');
+      next.resources.sunlight -= 1;
       next.cropStage = Math.min((next.cropStage || 1) + 1, 4);
       next.islandLevel = Math.min(next.islandLevel + 1, 5);
       return withMessage(next, 'plantDone');
@@ -1213,13 +1215,13 @@ const PomolandCore = (() => {
     }
 
     const milestoneReward = {
-      7: { coins: 35, seeds: 1, water: 1, chances: 0, streakProtection: 1 },
-      30: { coins: 90, seeds: 2, water: 2, chances: 1, streakProtection: 1 },
-      100: { coins: 180, seeds: 3, water: 3, chances: 1, streakProtection: 2 }
-    }[normalizedMilestone] || { coins: 20, seeds: 1, water: 1, chances: 0, streakProtection: 0 };
+      7: { coins: 35, sunlight: 1, water: 1, chances: 0, streakProtection: 1 },
+      30: { coins: 90, sunlight: 2, water: 2, chances: 1, streakProtection: 1 },
+      100: { coins: 180, sunlight: 3, water: 3, chances: 1, streakProtection: 2 }
+    }[normalizedMilestone] || { coins: 20, sunlight: 1, water: 1, chances: 0, streakProtection: 0 };
 
     next.resources.coins += milestoneReward.coins;
-    next.resources.seeds += milestoneReward.seeds;
+    next.resources.sunlight += milestoneReward.sunlight;
     next.resources.water += milestoneReward.water;
     next.resources.chances += milestoneReward.chances;
     next.streakProtection += milestoneReward.streakProtection;
@@ -1761,6 +1763,31 @@ const IslandGardenModule = (function() {
     return { success: true, message: '浇水成功，作物生长时间减少 5 分钟' };
   }
 
+  // 阳光照射（加速生长）
+  function sunlightCrop(islandState, plotId) {
+    const plotIndex = islandState.plots.findIndex(p => p.id === plotId);
+    if (plotIndex === -1) return { success: false, message: '找不到地块' };
+
+    const plot = islandState.plots[plotIndex];
+    if (!plot.crop) return { success: false, message: '这个地块没有作物' };
+
+    // 成熟后不可继续照射（避免浪费阳光）
+    if (getGrowthProgress(plot) >= 100) {
+      plot.needsWater = false;
+      return { success: false, message: '作物已成熟，无需照射，直接收获即可' };
+    }
+
+    if ((islandState.sunlight || 0) <= 0) return { success: false, message: '阳光不足' };
+
+    islandState.sunlight -= 1;
+    // 每次阳光照射减少 10 分钟生长时间（不超过成熟上限）
+    const cropType = CROP_TYPES[plot.crop];
+    const minPlantedAt = Date.now() - cropType.growthTime; // 不会加速到“超过成熟”
+    plot.plantedAt = Math.max(minPlantedAt, (plot.plantedAt || Date.now()) - 10 * 60 * 1000);
+
+    return { success: true, message: '阳光照射成功，作物生长时间减少 10 分钟' };
+  }
+
   // 收获作物
   function harvestCrop(islandState, plotId) {
     const plotIndex = islandState.plots.findIndex(p => p.id === plotId);
@@ -2101,6 +2128,7 @@ const IslandGardenModule = (function() {
     createIslandState,
     plantCrop,
     waterCrop,
+    sunlightCrop,
     harvestCrop,
     getGrowthProgress,
     calculateYield,
@@ -2348,7 +2376,13 @@ if (typeof document !== 'undefined') {
         ...savedState,
         resources: {
           ...base.resources,
-          ...(savedState.resources || {})
+          ...(savedState.resources || {}),
+          // 兼容旧字段：seeds -> sunlight
+          sunlight: (savedState.resources && typeof savedState.resources.sunlight === 'number')
+            ? savedState.resources.sunlight
+            : (savedState.resources && typeof savedState.resources.seeds === 'number')
+              ? savedState.resources.seeds
+              : base.resources.sunlight
         },
         decorations: Array.isArray(savedState.decorations) ? savedState.decorations : [],
         milestoneClaims: Array.isArray(savedState.milestoneClaims) ? savedState.milestoneClaims : [],
@@ -2379,6 +2413,11 @@ if (typeof document !== 'undefined') {
       timerState = core.syncTimerState(readStorage(STORAGE_KEYS.timerState) || core.createTimerState(selectedDuration));
       selectedDuration = timerState.totalSeconds || selectedDuration;
       rewardReady = readStorage(STORAGE_KEYS.rewardState) || core.buildRewardBundle(language, selectedDuration);
+      // 兼容旧字段：rewardReady.seeds -> rewardReady.sunlight
+      if (rewardReady && typeof rewardReady.sunlight !== 'number' && typeof rewardReady.seeds === 'number') {
+        rewardReady = { ...rewardReady, sunlight: rewardReady.seeds };
+        delete rewardReady.seeds;
+      }
 
       const auth = readStorage(STORAGE_KEYS.authState);
       if (auth && auth.loggedIn) {
@@ -2681,9 +2720,9 @@ if (typeof document !== 'undefined') {
             ? localizedText('夜晚也被你点亮了', '夜晚也被你點亮了', 'You lit up the night')
             : localizedText('你把番茄养成啦', '你把番茄養成啦', 'You raised a joyful tomato'),
           message: localizedText(
-            `专注成功收官，番茄已经笑开花。奖励掉落：${reward.water} 水滴、${reward.coins} 金币，还有 ${reward.seeds} 颗种子在等你去建设小岛。`,
-            `專注成功收官，番茄已經笑開花。獎勵掉落：${reward.water} 水滴、${reward.coins} 金幣，還有 ${reward.seeds} 顆種子等你去建設小島。`,
-            `You finished strong and your tomato is glowing. Rewards are ready: ${reward.water} water, ${reward.coins} coins, and ${reward.seeds} seeds for your island.`
+            `专注成功收官，番茄已经笑开花。奖励掉落：${reward.water} 水滴、${reward.coins} 金币，还有 ${reward.sunlight} 点阳光在等你去照亮小岛。`,
+            `專注成功收官，番茄已經笑開花。獎勵掉落：${reward.water} 水滴、${reward.coins} 金幣，還有 ${reward.sunlight} 點陽光等你去照亮小島。`,
+            `You finished strong and your tomato is glowing. Rewards are ready: ${reward.water} water, ${reward.coins} coins, and ${reward.sunlight} sunlight for your island.`
           )
         };
       }
@@ -2822,7 +2861,7 @@ if (typeof document !== 'undefined') {
         ? [
             `+${rewardReady.water}${localizedText(' 水滴', ' 水滴', ' water')}`,
             `+${rewardReady.coins}${localizedText(' 金币', ' 金幣', ' coins')}`,
-            `+${rewardReady.seeds}${localizedText(' 种子', ' 種子', ' seeds')}`
+            `+${rewardReady.sunlight}${localizedText(' 阳光', ' 陽光', ' sunlight')}`
           ]
         : [
             localizedText('稳住节奏', '穩住節奏', 'Stay steady'),
@@ -3894,7 +3933,7 @@ if (typeof document !== 'undefined') {
     function renderBonus() {
       elements.bonusList.innerHTML = [
         `${core.t(language, 'coins')} +${rewardReady.coins}`,
-        `${core.t(language, 'seeds')} +${rewardReady.seeds}`,
+        `${core.t(language, 'sunlight')} +${rewardReady.sunlight}`,
         `${core.t(language, 'water')} +${rewardReady.water}`,
         `${core.t(language, 'chances')} +${rewardReady.chances}`,
         rewardReady.decoration
@@ -4639,12 +4678,12 @@ if (typeof document !== 'undefined') {
       if (toolButton) {
         const tool = toolButton.dataset.tool;
         // Farm tools are handled by direct listeners to prevent double toggles.
-        if ((tool === 'plant' || tool === 'water' || tool === 'harvest') && toolButton.dataset && toolButton.dataset.boundClick === '1') {
+        if ((tool === 'plant' || tool === 'water' || tool === 'sunlight' || tool === 'harvest') && toolButton.dataset && toolButton.dataset.boundClick === '1') {
           return;
         }
-        if (tool === 'plant' || tool === 'water' || tool === 'harvest') {
+        if (tool === 'plant' || tool === 'water' || tool === 'sunlight' || tool === 'harvest') {
           currentTool = currentTool === tool ? null : tool;
-          document.querySelectorAll('.tool-btn[data-tool="plant"], .tool-btn[data-tool="water"], .tool-btn[data-tool="harvest"]').forEach(btn => btn.classList.remove('active'));
+          document.querySelectorAll('.tool-btn[data-tool="plant"], .tool-btn[data-tool="water"], .tool-btn[data-tool="sunlight"], .tool-btn[data-tool="harvest"]').forEach(btn => btn.classList.remove('active'));
           if (currentTool) {
             toolButton.classList.add('active');
             showMessage(localizedText(`已选择${tool}工具，点击地块操作`, `已選擇${tool}工具，點擊地塊操作`, `Tool: ${tool}. Click a plot to use it.`));
@@ -4677,7 +4716,7 @@ if (typeof document !== 'undefined') {
           });
           state.currentView = 'friends';
         }
-        if (tool === 'pet-shop') {
+        if (tool === 'shop') {
           if (elements.shopModal) {
             elements.shopModal.hidden = false;
             handleShopTabChange(document.querySelector('[data-shop-tab="pets"]'));
@@ -4695,33 +4734,6 @@ if (typeof document !== 'undefined') {
           } else {
             showMessage(localizedText('今日帮助次数已用完', '今日幫助次數已用完', 'No help actions left today.'));
           }
-        }
-        if (tool === 'sync-resources') {
-          // v10 设计：金币/水滴/游戏机会与左下角资源保持一致（无需手动同步）
-          // “同步资源”按钮只用于把左下角的 seeds 数字兑换成具体种子类型，并放入岛屿背包。
-          const oldSeedsSnapshot = { ...(islandState.inventory?.seeds || {}) };
-          const seedCount = Number(state?.resources?.seeds || 0);
-          if (seedCount <= 0) {
-            showMessage('暂无可兑换的种子');
-            return;
-          }
-          const seedPool = ['carrot', 'tomato', 'strawberry', 'apple', 'watermelon'];
-          for (let i = 0; i < seedCount; i += 1) {
-            const pick = seedPool[Math.floor(Math.random() * seedPool.length)];
-            if (!islandState.inventory.seeds[pick]) islandState.inventory.seeds[pick] = 0;
-            islandState.inventory.seeds[pick] += 1;
-          }
-          state.resources.seeds = 0;
-
-          updateIslandUI();
-          persistIslandState();
-          renderAll();
-          persistSession();
-
-          const gainedSeeds = Object.keys(islandState.inventory.seeds || {}).reduce((sum, k) => {
-            return sum + ((islandState.inventory.seeds[k] || 0) - (oldSeedsSnapshot[k] || 0));
-          }, 0);
-          showMessage(`兑换成功：+${gainedSeeds} 粒种子已放入背包（随机分配）`);
         }
       }
     });
@@ -4823,13 +4835,13 @@ if (typeof document !== 'undefined') {
     // Island garden functions
     let lastIslandAlertAt = 0;
 
-    // ===== Shared resources sync (coins / water / chances) =====
-    // 目标：Pomoland Island 与左下角资源始终一致（不需要手动同步）
-    // 但“种子”仍走单独的“兑换/同步”逻辑（把左下角 seeds 数字随机兑换成具体种子类型）。
+    // ===== Shared resources sync (coins / water / sunlight / chances) =====
+    // 目标：Pomoland Island 与左下角资源始终一致（不需要手动同步）。
     function syncMainToIslandResources() {
       if (!state || !state.resources) return;
       islandState.coins = Number(state.resources.coins || 0);
       islandState.water = Number(state.resources.water || 0);
+      islandState.sunlight = Number(state.resources.sunlight || 0);
       islandState.dailyHelpCount = Number(state.resources.chances || 0);
     }
 
@@ -4837,15 +4849,20 @@ if (typeof document !== 'undefined') {
       if (!state || !state.resources) return;
       state.resources.coins = Number(islandState.coins || 0);
       state.resources.water = Number(islandState.water || 0);
+      state.resources.sunlight = Number(islandState.sunlight || 0);
       state.resources.chances = Number(islandState.dailyHelpCount || 0);
       // 实时刷新左下角资源，不需要切换栏目
       renderAll();
       persistSession();
     }
     function updateIslandUI() {
-      IslandGardenModule.updateIslandState(islandState);
       // 始终先把主资源同步进岛屿，保证展示一致
       syncMainToIslandResources();
+      const changed = IslandGardenModule.updateIslandState(islandState);
+      // 如果 island 内部有“时间驱动”的变化（比如每日刷新游戏机会），同步回左下角
+      if (changed) {
+        syncIslandToMainResources();
+      }
 
 
       // Update header stats
@@ -5173,7 +5190,7 @@ if (typeof document !== 'undefined') {
 
     function handlePlotInteraction(plotId) {
       if (!currentTool) {
-        showMessage('请先选择右侧「农场工具」中的：种植 / 浇水 / 收获');
+        showMessage('请先选择右侧「农场工具」中的：种植 / 浇水 / 阳光照射 / 收获');
         return;
       }
 
@@ -5195,6 +5212,17 @@ if (typeof document !== 'undefined') {
         case 'water':
           if (plot.crop) {
             const result = IslandGardenModule.waterCrop(islandState, plotId);
+            showMessage(result.message);
+            if (result.success) syncIslandToMainResources();
+            updateIslandUI();
+            persistIslandState();
+          } else {
+            showMessage('这个地块没有作物');
+          }
+          break;
+        case 'sunlight':
+          if (plot.crop) {
+            const result = IslandGardenModule.sunlightCrop(islandState, plotId);
             showMessage(result.message);
             if (result.success) syncIslandToMainResources();
             updateIslandUI();
@@ -5471,6 +5499,14 @@ if (typeof document !== 'undefined') {
     }
 
     function bindIslandDirectClicks() {
+      const toolLabel = (tool) => {
+        if (tool === 'plant') return '种植';
+        if (tool === 'water') return '浇水';
+        if (tool === 'sunlight') return '阳光照射';
+        if (tool === 'harvest') return '收获';
+        return tool;
+      };
+
       // Some environments click on nested elements may not bubble as expected;
       // bind directly to plots/tools to guarantee interaction works.
       document.querySelectorAll('.plot[data-plot]').forEach((plot) => {
@@ -5486,7 +5522,7 @@ if (typeof document !== 'undefined') {
         });
       });
 
-      document.querySelectorAll('.tool-btn[data-tool="plant"], .tool-btn[data-tool="water"], .tool-btn[data-tool="harvest"]').forEach((btn) => {
+      document.querySelectorAll('.tool-btn[data-tool="plant"], .tool-btn[data-tool="water"], .tool-btn[data-tool="sunlight"], .tool-btn[data-tool="harvest"]').forEach((btn) => {
         if (btn.dataset.boundClick === '1') return;
         btn.dataset.boundClick = '1';
         btn.addEventListener('click', (event) => {
@@ -5497,10 +5533,10 @@ if (typeof document !== 'undefined') {
           }
           const tool = btn.dataset.tool;
           currentTool = currentTool === tool ? null : tool;
-          document.querySelectorAll('.tool-btn[data-tool="plant"], .tool-btn[data-tool="water"], .tool-btn[data-tool="harvest"]').forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('.tool-btn[data-tool="plant"], .tool-btn[data-tool="water"], .tool-btn[data-tool="sunlight"], .tool-btn[data-tool="harvest"]').forEach(b => b.classList.remove('active'));
           if (currentTool) {
             btn.classList.add('active');
-            showMessage(`已选择${tool}工具，点击地块操作`);
+            showMessage(`已选择「${toolLabel(tool)}」，点击地块操作`);
           } else {
             showMessage('已取消工具选择');
           }
