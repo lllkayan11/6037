@@ -3381,6 +3381,19 @@ a {
   border-radius: 50%;
 }
 
+.island-decorations-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.island-deco {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-size: 26px;
+  filter: drop-shadow(0 10px 10px rgba(0,0,0,0.18));
+}
+
 /* Farm Section */
 .farm-section {
   margin-bottom: 24px;
@@ -3494,6 +3507,54 @@ a {
   border-radius: 16px;
   padding: 20px;
 }
+
+.pet-list {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.pet-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pet-chip.is-active {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.pet-chip .pet-chip-icon { font-size: 18px; }
+.pet-chip .pet-chip-name { font-size: 12px; }
+
+.pet-feed-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.pet-feed-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(15, 59, 72, 0.08);
+  border: 1px solid rgba(15, 59, 72, 0.12);
+}
+
+.pet-feed-item strong { font-size: 14px; }
+.pet-feed-item .pet-feed-meta { font-size: 12px; opacity: 0.75; }
 
 .pet-display {
   text-align: center;

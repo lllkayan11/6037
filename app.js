@@ -2259,6 +2259,10 @@ if (typeof document !== 'undefined') {
       shopPets: document.querySelector('#shopPets'),
       inventoryModal: document.querySelector('#inventoryModal'),
       closeInventory: document.querySelector('#closeInventory'),
+      petList: document.querySelector('#petList'),
+      petFeedModal: document.querySelector('#petFeedModal'),
+      closePetFeed: document.querySelector('#closePetFeed'),
+      petFeedList: document.querySelector('#petFeedList'),
       friendInteractionModal: document.querySelector('#friendInteractionModal'),
       closeFriendInteraction: document.querySelector('#closeFriendInteraction'),
       friendIslandPreview: document.querySelector('#friendIslandPreview')
@@ -4197,7 +4201,10 @@ if (typeof document !== 'undefined') {
     }
 
     document.addEventListener('click', (event) => {
-      const target = event.target.closest('button, a');
+      // IMPORTANT: island interactions use <div> (plots, seed options, etc.).
+      // We still want button shortcuts, but must not ignore non-button clicks.
+      const rawTarget = event.target;
+      const target = rawTarget && rawTarget.closest ? (rawTarget.closest('button, a') || rawTarget) : rawTarget;
       if (!target) return;
 
       if (target.id === 'confirmLoginBtn') {
@@ -4552,7 +4559,7 @@ if (typeof document !== 'undefined') {
         }
       }
 
-      const seedOption = target.closest && target.closest('.seed-option:not(.locked)');
+      const seedOption = (rawTarget && rawTarget.closest) ? rawTarget.closest('.seed-option:not(.locked)') : null;
       if (seedOption) {
         const cropType = seedOption.dataset.crop;
         plantSelectedCrop(cropType);
@@ -4564,12 +4571,12 @@ if (typeof document !== 'undefined') {
         }
       }
 
-      const shopTab = target.closest && target.closest('.shop-tab');
+      const shopTab = (rawTarget && rawTarget.closest) ? rawTarget.closest('.shop-tab') : null;
       if (shopTab) {
         handleShopTabChange(shopTab);
       }
 
-      const buyButton = target.closest && target.closest('.buy-btn');
+      const buyButton = (rawTarget && rawTarget.closest) ? rawTarget.closest('.buy-btn') : null;
       if (buyButton) {
         const shopItem = buyButton.closest('.shop-item');
         if (shopItem) handleShopPurchase(shopItem);
@@ -4579,6 +4586,30 @@ if (typeof document !== 'undefined') {
         if (elements.inventoryModal) {
           elements.inventoryModal.hidden = true;
         }
+      }
+
+      if (target.id === 'closePetFeed') {
+        if (elements.petFeedModal) elements.petFeedModal.hidden = true;
+      }
+
+      const feedPetButton = (rawTarget && rawTarget.closest) ? rawTarget.closest('[data-feed-pet]') : null;
+      if (feedPetButton) {
+        const petId = feedPetButton.dataset.feedPet;
+        const result = IslandGardenModule.feedPet(islandState, petId);
+        showMessage(result.message);
+        if (result.success) {
+          islandState.activePetId = petId;
+          if (elements.petFeedModal) elements.petFeedModal.hidden = true;
+          updateIslandUI();
+          persistIslandState();
+        }
+      }
+
+      const petSelectButton = (rawTarget && rawTarget.closest) ? rawTarget.closest('[data-pet-select]') : null;
+      if (petSelectButton) {
+        islandState.activePetId = petSelectButton.dataset.petSelect;
+        updateIslandUI();
+        persistIslandState();
       }
 
       if (target.matches('[data-action]')) {
@@ -4598,12 +4629,12 @@ if (typeof document !== 'undefined') {
         }
       }
 
-      const plotEl = target.closest && target.closest('[data-plot]');
+      const plotEl = (rawTarget && rawTarget.closest) ? rawTarget.closest('[data-plot]') : null;
       if (plotEl) {
         handlePlotClick(plotEl);
       }
 
-      const toolButton = target.closest && target.closest('[data-tool]');
+      const toolButton = (rawTarget && rawTarget.closest) ? rawTarget.closest('[data-tool]') : null;
       if (toolButton) {
         const tool = toolButton.dataset.tool;
         // Farm tools are handled by direct listeners to prevent double toggles.
@@ -4621,13 +4652,22 @@ if (typeof document !== 'undefined') {
           }
         }
         if (tool === 'feed') {
-          const activePet = islandState.pets.find(p => p.unlocked);
-          if (activePet) {
-            const result = IslandGardenModule.feedPet(islandState, activePet.id);
-            showMessage(result.message);
-            updateIslandUI();
-            persistIslandState();
+          const unlockedPets = islandState.pets.filter(p => p.unlocked);
+          if (!unlockedPets.length) {
+            showMessage('暂无可喂养的宠物');
+            return;
           }
+          if (unlockedPets.length === 1) {
+            const result = IslandGardenModule.feedPet(islandState, unlockedPets[0].id);
+            showMessage(result.message);
+            if (result.success) {
+              islandState.activePetId = unlockedPets[0].id;
+              updateIslandUI();
+              persistIslandState();
+            }
+            return;
+          }
+          openPetFeedModal();
         }
         if (tool === 'visit') {
           document.querySelectorAll('.workspace-panel').forEach(panel => {
@@ -4859,6 +4899,39 @@ if (typeof document !== 'undefined') {
         slot.classList.remove('empty');
         slot.innerHTML = `<span title="${escapeHtml(name)}" style="font-size:24px;">${icon}</span>`;
       });
+
+      updateDecorationsOnIsland();
+    }
+
+    function updateDecorationsOnIsland() {
+      const layer = document.querySelector('#islandDecorationsLayer');
+      if (!layer) return;
+      const decorationTypes = IslandGardenModule.DECORATION_TYPES || {};
+      const decorations = Array.isArray(islandState.decorations) ? islandState.decorations : [];
+      layer.innerHTML = '';
+      if (!decorations.length) return;
+
+      // Positions tuned for the green island ellipse in .island-background
+      const positions = [
+        { left: '50%', top: '52%' },
+        { left: '38%', top: '58%' },
+        { left: '62%', top: '58%' },
+        { left: '44%', top: '46%' },
+        { left: '56%', top: '46%' },
+        { left: '50%', top: '62%' }
+      ];
+
+      decorations.slice(0, positions.length).forEach((deco, idx) => {
+        const info = decorationTypes[deco.type];
+        const icon = info?.icon || '✨';
+        const pos = positions[idx];
+        const node = document.createElement('div');
+        node.className = 'island-deco';
+        node.style.left = pos.left;
+        node.style.top = pos.top;
+        node.textContent = icon;
+        layer.appendChild(node);
+      });
     }
 
     function updatePlotsUI() {
@@ -4953,6 +5026,53 @@ if (typeof document !== 'undefined') {
         const hungerPercent = Math.min(100, (hoursSinceFed / feedInterval) * 100);
         petHunger.style.width = `${hungerPercent}%`;
       }
+
+      updatePetListUI();
+    }
+
+    function updatePetListUI() {
+      if (!elements.petList) return;
+      const unlockedPets = islandState.pets.filter(p => p.unlocked);
+      if (!unlockedPets.length) {
+        elements.petList.innerHTML = '';
+        return;
+      }
+      const activeId = islandState.activePetId || unlockedPets[0].id;
+      elements.petList.innerHTML = unlockedPets.map(pet => {
+        const info = IslandGardenModule.PET_TYPES[pet.type];
+        const isActive = pet.id === activeId;
+        return `
+          <button class="pet-chip ${isActive ? 'is-active' : ''}" type="button" data-pet-select="${pet.id}">
+            <span class="pet-chip-icon">${info.icon}</span>
+            <span class="pet-chip-name">${escapeHtml(pet.name)}</span>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function openPetFeedModal() {
+      if (!elements.petFeedModal || !elements.petFeedList) return;
+      const unlockedPets = islandState.pets.filter(p => p.unlocked);
+      if (!unlockedPets.length) {
+        showMessage('暂无可喂养的宠物');
+        return;
+      }
+
+      const chanceLeft = islandState.dailyHelpCount || 0;
+      elements.petFeedList.innerHTML = unlockedPets.map((pet) => {
+        const info = IslandGardenModule.PET_TYPES[pet.type];
+        const canFeed = chanceLeft > 0;
+        return `
+          <div class="pet-feed-item">
+            <div>
+              <strong>${info.icon} ${escapeHtml(pet.name)}</strong>
+              <div class="pet-feed-meta">消耗 1 次游戏机会（剩余 ${chanceLeft}）</div>
+            </div>
+            <button class="primary-button" type="button" data-feed-pet="${pet.id}" ${canFeed ? '' : 'disabled'}>喂养</button>
+          </div>
+        `;
+      }).join('');
+      elements.petFeedModal.hidden = false;
     }
 
     function updateInventoryUI() {
