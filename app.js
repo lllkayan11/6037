@@ -1292,7 +1292,8 @@ const PomolandCore = (() => {
     }
 
     if (action === 'help') {
-      next.resources.coins += 10;
+      // 统一奖励：帮助浇水获得 20 金币（与 Pomoland Island 逻辑一致）
+      next.resources.coins += 20;
       next.friendMessages[friendId] = makeFriendActionMessage(friend, 'help');
     } else if (action === 'steal') {
       next.resources.coins += 8;
@@ -1967,16 +1968,18 @@ const IslandGardenModule = (function() {
       if (!pet.unlocked) return;
 
       const petType = PET_TYPES[pet.type];
-      const hoursSinceFed = (now - pet.lastFedAt) / (60 * 60 * 1000);
-
-      // 根据时间衰减快乐度
-      if (hoursSinceFed > 0) {
-        const happinessDecay = Math.floor(hoursSinceFed * petType.happinessDecay);
-        const newHappiness = Math.max(100 - happinessDecay, 0);
-        if (newHappiness !== pet.happiness) {
-          pet.happiness = newHappiness;
+      // 以增量方式衰减快乐度，避免每次刷新都“从 100 重新计算”造成观感问题
+      // 并且保证购买新宠物不会影响其他宠物的快乐度/饥饿进度。
+      const lastMoodTick = typeof pet.lastMoodTick === 'number' ? pet.lastMoodTick : pet.lastFedAt;
+      const elapsedHours = Math.max(0, (now - lastMoodTick) / (60 * 60 * 1000));
+      if (elapsedHours > 0) {
+        const decay = elapsedHours * petType.happinessDecay;
+        const nextHappiness = Math.max(0, Math.round((pet.happiness || 100) - decay));
+        if (nextHappiness !== pet.happiness) {
+          pet.happiness = nextHappiness;
           hasChanges = true;
         }
+        pet.lastMoodTick = now;
       }
     });
 
@@ -3910,6 +3913,9 @@ if (typeof document !== 'undefined') {
       state = core.claimReward(state, rewardReady);
       state = core.recordCheckIn(state, core.todayIso());
 
+      // 奖励先进入左下角资源；岛屿金币/水滴/机会与资源保持一致（即时反映）
+      syncMainToIslandResources();
+
       const nextTask = core.getNextTask(state);
       timerState = core.resetTimerState({
         ...timerState,
@@ -4594,6 +4600,7 @@ if (typeof document !== 'undefined') {
         if (result.success) {
           islandState.activePetId = petId;
           if (elements.petFeedModal) elements.petFeedModal.hidden = true;
+          syncIslandToMainResources();
           updateIslandUI();
           persistIslandState();
         }
@@ -4656,6 +4663,7 @@ if (typeof document !== 'undefined') {
             showMessage(result.message);
             if (result.success) {
               islandState.activePetId = unlockedPets[0].id;
+              syncIslandToMainResources();
               updateIslandUI();
               persistIslandState();
             }
@@ -4689,47 +4697,31 @@ if (typeof document !== 'undefined') {
           }
         }
         if (tool === 'sync-resources') {
-          const oldCoins = islandState.coins;
-          const oldWater = islandState.water;
-          const oldChances = islandState.dailyHelpCount;
+          // v10 设计：金币/水滴/游戏机会与左下角资源保持一致（无需手动同步）
+          // “同步资源”按钮只用于把左下角的 seeds 数字兑换成具体种子类型，并放入岛屿背包。
           const oldSeedsSnapshot = { ...(islandState.inventory?.seeds || {}) };
-          if (state && state.resources) {
-            islandState.coins += state.resources.coins;
-            islandState.water += state.resources.water;
-            islandState.sunlight += 5;
-            state.resources.coins = 0;
-            state.resources.water = 0;
-
-            // Sync chances (游戏机会)
-            islandState.dailyHelpCount += Number(state.resources.chances || 0);
-            state.resources.chances = 0;
-
-            // Sync seeds: randomly grant N seeds into island bag
-            const seedCount = Number(state.resources.seeds || 0);
-            const seedPool = ['carrot', 'tomato', 'strawberry', 'apple', 'watermelon'];
-            for (let i = 0; i < seedCount; i += 1) {
-              const pick = seedPool[Math.floor(Math.random() * seedPool.length)];
-              if (!islandState.inventory.seeds[pick]) islandState.inventory.seeds[pick] = 0;
-              islandState.inventory.seeds[pick] += 1;
-            }
-            state.resources.seeds = 0;
+          const seedCount = Number(state?.resources?.seeds || 0);
+          if (seedCount <= 0) {
+            showMessage('暂无可兑换的种子');
+            return;
           }
+          const seedPool = ['carrot', 'tomato', 'strawberry', 'apple', 'watermelon'];
+          for (let i = 0; i < seedCount; i += 1) {
+            const pick = seedPool[Math.floor(Math.random() * seedPool.length)];
+            if (!islandState.inventory.seeds[pick]) islandState.inventory.seeds[pick] = 0;
+            islandState.inventory.seeds[pick] += 1;
+          }
+          state.resources.seeds = 0;
+
           updateIslandUI();
           persistIslandState();
-          // 关键：同步后立即刷新左下角资源显示为 0，不需要切换页面
           renderAll();
           persistSession();
-          const gainedCoins = islandState.coins - oldCoins;
-          const gainedWater = islandState.water - oldWater;
-          const gainedChances = islandState.dailyHelpCount - oldChances;
+
           const gainedSeeds = Object.keys(islandState.inventory.seeds || {}).reduce((sum, k) => {
             return sum + ((islandState.inventory.seeds[k] || 0) - (oldSeedsSnapshot[k] || 0));
           }, 0);
-          showMessage(localizedText(
-            `同步成功！+${gainedCoins} 金币, +${gainedWater} 水滴, +${gainedChances} 游戏机会, +${gainedSeeds} 粒种子`,
-            `同步成功！+${gainedCoins} 金幣, +${gainedWater} 水滴, +${gainedChances} 遊戲機會, +${gainedSeeds} 粒種子`,
-            `Synced! +${gainedCoins} coins, +${gainedWater} water, +${gainedChances} chances, +${gainedSeeds} seeds`
-          ));
+          showMessage(`兑换成功：+${gainedSeeds} 粒种子已放入背包（随机分配）`);
         }
       }
     });
@@ -4830,8 +4822,31 @@ if (typeof document !== 'undefined') {
 
     // Island garden functions
     let lastIslandAlertAt = 0;
+
+    // ===== Shared resources sync (coins / water / chances) =====
+    // 目标：Pomoland Island 与左下角资源始终一致（不需要手动同步）
+    // 但“种子”仍走单独的“兑换/同步”逻辑（把左下角 seeds 数字随机兑换成具体种子类型）。
+    function syncMainToIslandResources() {
+      if (!state || !state.resources) return;
+      islandState.coins = Number(state.resources.coins || 0);
+      islandState.water = Number(state.resources.water || 0);
+      islandState.dailyHelpCount = Number(state.resources.chances || 0);
+    }
+
+    function syncIslandToMainResources() {
+      if (!state || !state.resources) return;
+      state.resources.coins = Number(islandState.coins || 0);
+      state.resources.water = Number(islandState.water || 0);
+      state.resources.chances = Number(islandState.dailyHelpCount || 0);
+      // 实时刷新左下角资源，不需要切换栏目
+      renderAll();
+      persistSession();
+    }
     function updateIslandUI() {
       IslandGardenModule.updateIslandState(islandState);
+      // 始终先把主资源同步进岛屿，保证展示一致
+      syncMainToIslandResources();
+
 
       // Update header stats
       if (elements.islandLevel) {
@@ -5181,6 +5196,7 @@ if (typeof document !== 'undefined') {
           if (plot.crop) {
             const result = IslandGardenModule.waterCrop(islandState, plotId);
             showMessage(result.message);
+            if (result.success) syncIslandToMainResources();
             updateIslandUI();
             persistIslandState();
           } else {
@@ -5195,6 +5211,7 @@ if (typeof document !== 'undefined') {
           if (IslandGardenModule.getGrowthProgress(plot) >= 100) {
             const result = IslandGardenModule.harvestCrop(islandState, plotId);
             showMessage(result.message);
+            if (result.success) syncIslandToMainResources();
             updateIslandUI();
             persistIslandState();
           } else {
@@ -5280,6 +5297,8 @@ if (typeof document !== 'undefined') {
         }
       }
 
+      // 购买会改变岛屿金币：同步回左下角资源
+      syncIslandToMainResources();
       updateIslandUI();
       persistIslandState();
     }
