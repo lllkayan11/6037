@@ -1687,6 +1687,7 @@ const IslandGardenModule = (function() {
       pets: [
         { id: 'pet1', type: 'rabbit', name: '小白', happiness: 100, lastFedAt: Date.now(), unlocked: true }
       ],
+      activePetId: 'pet1',
       decorations: [],
       inventory: {
         seeds: { tomato: 3, strawberry: 2, carrot: 1, apple: 0, watermelon: 0 },
@@ -1742,7 +1743,9 @@ const IslandGardenModule = (function() {
 
     // 加速生长时间
     // 浇水：让“剩余时间减少 5 分钟”
-    plot.plantedAt = Math.max(0, (plot.plantedAt || Date.now()) - 5 * 60 * 1000);
+    const cropType = CROP_TYPES[plot.crop];
+    const minPlantedAt = Date.now() - cropType.growthTime; // 不会加速到“超过成熟”
+    plot.plantedAt = Math.max(minPlantedAt, (plot.plantedAt || Date.now()) - 5 * 60 * 1000);
 
     return { success: true, message: '浇水成功，作物生长时间减少 5 分钟' };
   }
@@ -4548,8 +4551,9 @@ if (typeof document !== 'undefined') {
         }
       }
 
-      if (target.matches('.seed-option:not(.locked)')) {
-        const cropType = target.dataset.crop;
+      const seedOption = target.closest && target.closest('.seed-option:not(.locked)');
+      if (seedOption) {
+        const cropType = seedOption.dataset.crop;
         plantSelectedCrop(cropType);
       }
 
@@ -4559,15 +4563,15 @@ if (typeof document !== 'undefined') {
         }
       }
 
-      if (target.matches('.shop-tab')) {
-        handleShopTabChange(target);
+      const shopTab = target.closest && target.closest('.shop-tab');
+      if (shopTab) {
+        handleShopTabChange(shopTab);
       }
 
-      if (target.matches('.buy-btn')) {
-        const shopItem = target.closest('.shop-item');
-        if (shopItem) {
-          handleShopPurchase(shopItem);
-        }
+      const buyButton = target.closest && target.closest('.buy-btn');
+      if (buyButton) {
+        const shopItem = buyButton.closest('.shop-item');
+        if (shopItem) handleShopPurchase(shopItem);
       }
 
       if (target.id === 'closeInventory') {
@@ -4593,17 +4597,19 @@ if (typeof document !== 'undefined') {
         }
       }
 
-      if (target.matches('[data-plot]')) {
-        handlePlotClick(target);
+      const plotEl = target.closest && target.closest('[data-plot]');
+      if (plotEl) {
+        handlePlotClick(plotEl);
       }
 
-      if (target.matches('[data-tool]')) {
-        const tool = target.dataset.tool;
+      const toolButton = target.closest && target.closest('[data-tool]');
+      if (toolButton) {
+        const tool = toolButton.dataset.tool;
         if (tool === 'plant' || tool === 'water' || tool === 'harvest') {
           currentTool = currentTool === tool ? null : tool;
-          document.querySelectorAll('[data-tool]').forEach(btn => btn.classList.remove('active'));
+          document.querySelectorAll('.tool-btn[data-tool="plant"], .tool-btn[data-tool="water"], .tool-btn[data-tool="harvest"]').forEach(btn => btn.classList.remove('active'));
           if (currentTool) {
-            target.classList.add('active');
+            toolButton.classList.add('active');
             showMessage(localizedText(`已选择${tool}工具，点击地块操作`, `已選擇${tool}工具，點擊地塊操作`, `Tool: ${tool}. Click a plot to use it.`));
           } else {
             showMessage(localizedText('已取消工具选择', '已取消工具選擇', 'Tool deselected.'));
@@ -4906,31 +4912,34 @@ if (typeof document !== 'undefined') {
     }
 
     function updatePetUI() {
-      const activePet = islandState.pets.find(p => p.unlocked);
-      if (!activePet) return;
-
-      const petType = IslandGardenModule.PET_TYPES[activePet.type];
+      const activePet = islandState.activePetId
+        ? islandState.pets.find(p => p.unlocked && p.id === islandState.activePetId)
+        : null;
+      const petToShow = activePet || islandState.pets.find(p => p.unlocked);
+      if (!petToShow) return;
+      const petType = IslandGardenModule.PET_TYPES[petToShow.type];
       const petHappiness = document.querySelector('#petHappiness');
       const petHunger = document.querySelector('#petHunger');
       const petIcon = document.querySelector('#petIcon');
       const petName = document.querySelector('#petName');
+
 
       // Update pet sprite and name
       if (petIcon) {
         petIcon.textContent = petType.icon;
       }
       if (petName) {
-        petName.textContent = activePet.name;
+        petName.textContent = petToShow.name;
       }
 
       // Update happiness bar
       if (petHappiness) {
-        petHappiness.style.width = `${activePet.happiness}%`;
+        petHappiness.style.width = `${petToShow.happiness}%`;
       }
 
       // Update hunger bar
       if (petHunger) {
-        const hoursSinceFed = (Date.now() - activePet.lastFedAt) / (60 * 60 * 1000);
+        const hoursSinceFed = (Date.now() - petToShow.lastFedAt) / (60 * 60 * 1000);
         const feedInterval = petType.feedInterval / (60 * 60 * 1000);
         const hungerPercent = Math.min(100, (hoursSinceFed / feedInterval) * 100);
         petHunger.style.width = `${hungerPercent}%`;
@@ -4984,6 +4993,29 @@ if (typeof document !== 'undefined') {
         const crop = node.dataset.crop;
         const count = islandState.inventory.seeds[crop] || 0;
         node.classList.toggle('locked', count <= 0);
+      });
+
+      // Update inventory modal counts (if opened)
+      const modalSeedIdMap = {
+        tomato: '#invSeedTomato',
+        strawberry: '#invSeedStrawberry',
+        carrot: '#invSeedCarrot',
+        apple: '#invSeedApple',
+        watermelon: '#invSeedWatermelon'
+      };
+      const modalHarvestIdMap = {
+        tomato: '#invHarvestTomato',
+        strawberry: '#invHarvestStrawberry',
+        carrot: '#invHarvestCarrot',
+        apple: '#invHarvestApple',
+        watermelon: '#invHarvestWatermelon'
+      };
+
+      seedKeys.forEach((key) => {
+        const seedNode = document.querySelector(modalSeedIdMap[key]);
+        if (seedNode) seedNode.textContent = islandState.inventory.seeds[key] || 0;
+        const cropNode = document.querySelector(modalHarvestIdMap[key]);
+        if (cropNode) cropNode.textContent = islandState.inventory.harvested[key] || 0;
       });
     }
 
@@ -5097,7 +5129,7 @@ if (typeof document !== 'undefined') {
       const cost = parseInt(shopItem.dataset.cost);
 
       if (islandState.coins < cost) {
-        showMessage('金币不足！');
+        showMessage(`金币不足：需要 ${cost}，当前 ${islandState.coins}`);
         return;
       }
 
@@ -5112,11 +5144,15 @@ if (typeof document !== 'undefined') {
         if (!islandState.inventory.seeds[itemType]) {
           islandState.inventory.seeds[itemType] = 0;
         }
-        islandState.inventory.seeds[itemType] += 3;
-        showMessage(`成功购买3个${IslandGardenModule.CROP_TYPES[itemType].name}种子！`);
+        islandState.inventory.seeds[itemType] += 1;
+        showMessage(`购买成功：+1 ${IslandGardenModule.CROP_TYPES[itemType].name}种子`);
       } else if (parentSection === elements.shopPets) {
         const result = IslandGardenModule.unlockPet(islandState, itemType);
         showMessage(result.message);
+        if (result.success) {
+          const newest = [...islandState.pets].reverse().find(p => p.unlocked && p.type === itemType);
+          if (newest) islandState.activePetId = newest.id;
+        }
       }
 
       updateIslandUI();
@@ -5243,12 +5279,28 @@ if (typeof document !== 'undefined') {
       }
     }
 
+    let toastTimer = null;
     function showMessage(message) {
+      const text = String(message ?? '');
       if (elements.islandMessage) {
-        elements.islandMessage.textContent = message;
+        elements.islandMessage.textContent = text;
         setTimeout(() => {
-          elements.islandMessage.textContent = '';
+          if (elements.islandMessage && elements.islandMessage.textContent === text) {
+            elements.islandMessage.textContent = '';
+          }
         }, 3000);
+      }
+
+      const toast = document.querySelector('#toast');
+      if (toast) {
+        toast.textContent = text;
+        toast.hidden = false;
+        toast.classList.add('show');
+        if (toastTimer) window.clearTimeout(toastTimer);
+        toastTimer = window.setTimeout(() => {
+          toast.classList.remove('show');
+          toast.hidden = true;
+        }, 2600);
       }
     }
 
