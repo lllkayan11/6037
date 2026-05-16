@@ -1735,6 +1735,12 @@ const IslandGardenModule = (function() {
     const plot = islandState.plots[plotIndex];
     if (!plot.crop) return { success: false, message: '这个地块没有作物' };
 
+    // 成熟后不可继续浇水（避免浪费水滴）
+    if (getGrowthProgress(plot) >= 100) {
+      plot.needsWater = false;
+      return { success: false, message: '作物已成熟，无需浇水，直接收获即可' };
+    }
+
     if (islandState.water <= 0) return { success: false, message: '水滴不足' };
 
     islandState.water--;
@@ -3900,22 +3906,6 @@ if (typeof document !== 'undefined') {
       state = core.claimReward(state, rewardReady);
       state = core.recordCheckIn(state, core.todayIso());
 
-      // Add island garden rewards
-      const rewardAmount = Math.floor(selectedDuration / 60);
-      islandState.coins += rewardAmount * 2;
-      islandState.water += rewardAmount;
-      islandState.sunlight += Math.floor(rewardAmount * 0.5);
-
-      // Chance to get seeds
-      if (Math.random() < 0.3) {
-        const seedTypes = ['tomato', 'strawberry', 'carrot'];
-        const randomSeed = seedTypes[Math.floor(Math.random() * seedTypes.length)];
-        if (!islandState.inventory.seeds[randomSeed]) {
-          islandState.inventory.seeds[randomSeed] = 0;
-        }
-        islandState.inventory.seeds[randomSeed]++;
-      }
-
       const nextTask = core.getNextTask(state);
       timerState = core.resetTimerState({
         ...timerState,
@@ -4722,6 +4712,8 @@ if (typeof document !== 'undefined') {
           }
           updateIslandUI();
           persistIslandState();
+          // 关键：同步后立即刷新左下角资源显示为 0，不需要切换页面
+          renderAll();
           persistSession();
           const gainedCoins = islandState.coins - oldCoins;
           const gainedWater = islandState.water - oldWater;
@@ -5451,14 +5443,6 @@ if (typeof document !== 'undefined') {
           harvested: { ...islandState.inventory.harvested, ...((savedIslandState.inventory || {}).harvested || {}) }
         };
         islandState.achievements = { ...islandState.achievements, ...(savedIslandState.achievements || {}) };
-      }
-      // Sync initial resources from main state to island (only once)
-      const syncedOnce = Boolean(savedIslandState && savedIslandState.__syncedFromMain);
-      if (!syncedOnce && state && state.resources) {
-        islandState.coins += Number(state.resources.coins || 0);
-        islandState.water += Number(state.resources.water || 0);
-        islandState.sunlight += 5;
-        islandState.__syncedFromMain = true;
       }
       updateIslandUI();
     }
