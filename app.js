@@ -4665,28 +4665,6 @@ if (typeof document !== 'undefined') {
           showMessage(localizedText(`同步成功！+${islandState.coins - oldCoins} 金币, +${islandState.water - oldWater} 水滴`, `同步成功！+${islandState.coins - oldCoins} 金幣, +${islandState.water - oldWater} 水滴`, `Synced! +${islandState.coins - oldCoins} coins, +${islandState.water - oldWater} water`));
         }
       }
-
-      if (target.closest('.seed-option') && !target.closest('.locked')) {
-        const cropType = target.closest('.seed-option').dataset.crop;
-        if (cropType) {
-          plantSelectedCrop(cropType);
-        }
-      }
-
-      if (target.closest('.buy-btn')) {
-        const shopItem = target.closest('.shop-item');
-        if (shopItem) {
-          handleShopPurchase(shopItem);
-        }
-      }
-
-      if (target.closest('.shop-tab')) {
-        handleShopTabChange(target.closest('.shop-tab'));
-      }
-
-      if (target.matches('[data-tab]')) {
-        handleShopTabChange(target);
-      }
     });
 
     if (elements.goalInput) {
@@ -5334,14 +5312,44 @@ if (typeof document !== 'undefined') {
       updateIslandUI();
     }
 
+    function bindIslandDirectClicks() {
+      // Some environments click on nested elements may not bubble as expected;
+      // bind directly to plots/tools to guarantee interaction works.
+      document.querySelectorAll('.plot[data-plot]').forEach((plot) => {
+        if (plot.dataset.boundClick === '1') return;
+        plot.dataset.boundClick = '1';
+        plot.addEventListener('click', () => {
+          handlePlotClick(plot);
+        });
+      });
+
+      document.querySelectorAll('.tool-btn[data-tool="plant"], .tool-btn[data-tool="water"], .tool-btn[data-tool="harvest"]').forEach((btn) => {
+        if (btn.dataset.boundClick === '1') return;
+        btn.dataset.boundClick = '1';
+        btn.addEventListener('click', () => {
+          const tool = btn.dataset.tool;
+          currentTool = currentTool === tool ? null : tool;
+          document.querySelectorAll('.tool-btn[data-tool="plant"], .tool-btn[data-tool="water"], .tool-btn[data-tool="harvest"]').forEach(b => b.classList.remove('active'));
+          if (currentTool) {
+            btn.classList.add('active');
+            showMessage(`已选择${tool}工具，点击地块操作`);
+          } else {
+            showMessage('已取消工具选择');
+          }
+        });
+      });
+    }
+
     // Initialize island state
     restoreIslandState();
+    bindIslandDirectClicks();
 
     // Update island state periodically
     setInterval(() => {
       IslandGardenModule.updateIslandState(islandState);
       updateIslandUI();
       persistIslandState();
+      bindIslandDirectClicks();
     }, 60000); // Update every minute
   });
 }
