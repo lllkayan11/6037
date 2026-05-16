@@ -1626,7 +1626,8 @@ const IslandGardenModule = (function() {
       cost: 500,
       happinessDecay: 2, // 每小时减少2点
       feedBonus: { coins: 30, focusBonus: 1.1 },
-      feedInterval: 4 * 60 * 60 // 4小时需要喂一次
+      // 单位：毫秒（ms）
+      feedInterval: 4 * 60 * 60 * 1000 // 4小时需要喂一次
     },
     cat: {
       name: '猫咪',
@@ -1634,7 +1635,8 @@ const IslandGardenModule = (function() {
       cost: 500,
       happinessDecay: 1.5,
       feedBonus: { coins: 40, focusBonus: 1.15 },
-      feedInterval: 6 * 60 * 60
+      // 单位：毫秒（ms）
+      feedInterval: 6 * 60 * 60 * 1000
     },
     dog: {
       name: '小狗',
@@ -1642,7 +1644,8 @@ const IslandGardenModule = (function() {
       cost: 500,
       happinessDecay: 2.5,
       feedBonus: { coins: 35, focusBonus: 1.12 },
-      feedInterval: 5 * 60 * 60
+      // 单位：毫秒（ms）
+      feedInterval: 5 * 60 * 60 * 1000
     },
     bird: {
       name: '小鸟',
@@ -1650,7 +1653,8 @@ const IslandGardenModule = (function() {
       cost: 500,
       happinessDecay: 3,
       feedBonus: { coins: 25, focusBonus: 1.08 },
-      feedInterval: 3 * 60 * 60
+      // 单位：毫秒（ms）
+      feedInterval: 3 * 60 * 60 * 1000
     }
   };
 
