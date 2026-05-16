@@ -2072,6 +2072,8 @@ const IslandGardenModule = (function() {
     plantCrop,
     waterCrop,
     harvestCrop,
+    getGrowthProgress,
+    calculateYield,
     feedPet,
     unlockPet,
     buyDecoration,
@@ -3475,12 +3477,6 @@ if (typeof document !== 'undefined') {
         if (panel) {
           const isActive = (state.activeTab || 'friends-list') === panelId.replace('Panel', '').toLowerCase().replace('friendslist', 'friends-list');
           panel.hidden = !isActive;
-          if (isActive) {
-            if (panelId === 'friendsListPanel') renderFriends();
-            if (panelId === 'leaderboardPanel') renderLeaderboard();
-            if (panelId === 'challengesPanel') renderChallenges();
-            if (panelId === 'achievementsPanel') renderAchievements();
-          }
         }
       });
     }
@@ -4383,7 +4379,7 @@ if (typeof document !== 'undefined') {
       // Social module event handlers
       if (target.matches('[data-friends-tab]')) {
         state.activeTab = target.dataset.friendsTab;
-        renderSocialTabs();
+        renderAll();
         persistSession();
       }
 
@@ -4526,17 +4522,9 @@ if (typeof document !== 'undefined') {
         alert('感谢点赞！');
       }
 
-      // Island garden event handlers
-      if (target.matches('[data-tool]')) {
-        currentTool = target.dataset.tool;
-        document.querySelectorAll('.farm-tool-btn, .pet-tool-btn, .social-tool-btn').forEach(btn => {
-          btn.classList.toggle('active', btn.dataset.tool === currentTool);
-        });
-      }
-
-      if (target.matches('[data-plot]')) {
-        selectedPlot = target.dataset.plot;
-        handlePlotInteraction(selectedPlot);
+      // AI mood recommendation
+      if (target.closest && target.closest('#aiRecommendBtn')) {
+        runMoodRecommendation();
       }
 
       if (target.id === 'closePlanting') {
@@ -4775,6 +4763,7 @@ if (typeof document !== 'undefined') {
     }
 
     // Island garden functions
+    let lastIslandAlertAt = 0;
     function updateIslandUI() {
       IslandGardenModule.updateIslandState(islandState);
 
@@ -4810,6 +4799,9 @@ if (typeof document !== 'undefined') {
 
       // Update quick inventory
       updateQuickInventoryUI();
+
+      // Reminders (needs water / needs feed)
+      updateIslandAlerts();
     }
 
     function updatePlotsUI() {
@@ -5153,6 +5145,69 @@ if (typeof document !== 'undefined') {
       }
     }
 
+    function updateIslandAlerts() {
+      const needsWaterCount = islandState.plots.filter(p => p.crop && p.needsWater).length;
+      const activePet = islandState.pets.find(p => p.unlocked);
+      let petNeedsFeed = false;
+      if (activePet) {
+        const petType = IslandGardenModule.PET_TYPES[activePet.type];
+        petNeedsFeed = (Date.now() - activePet.lastFedAt) > petType.feedInterval;
+      }
+
+      if (!needsWaterCount && !petNeedsFeed) return;
+      const now = Date.now();
+      if (now - lastIslandAlertAt < 10 * 60 * 1000) return; // 10分钟提醒一次
+      lastIslandAlertAt = now;
+
+      const message = needsWaterCount && petNeedsFeed
+        ? `⏰ 提醒：${needsWaterCount} 块农田需要浇水，宠物也饿了。`
+        : needsWaterCount
+          ? `⏰ 提醒：${needsWaterCount} 块农田需要浇水。`
+          : '⏰ 提醒：宠物需要喂养。';
+
+      showMessage(message);
+      try {
+        if (navigator.vibrate) navigator.vibrate([80, 40, 80]);
+      } catch (e) {}
+      try {
+        if ('Notification' in window && Notification.permission === 'granted') {
+          new Notification('Pomoland 提醒', { body: message });
+        }
+      } catch (e) {}
+    }
+
+    function runMoodRecommendation() {
+      const mood = document.querySelector('#moodSelect')?.value || 'stressed';
+      const output = document.querySelector('#aiRecommendOutput');
+
+      const plans = {
+        stressed: { title: '压力大', decoration: 'pond', cost: 600, action: '去「社交/帮助浇水」或先做一个 20-25 分钟短专注，拿到 Bonus 再建设。' },
+        tired: { title: '疲惫', decoration: 'bench', cost: 300, action: '建议做一个 20 分钟轻专注 + 喂养宠物，优先恢复节奏。' },
+        anxious: { title: '焦虑', decoration: 'lamp', cost: 200, action: '建议先完成一个最小任务块（20-25 分钟），再用装饰把岛变“更可控”。' },
+        happy: { title: '开心', decoration: 'flower', cost: 150, action: '适合扩张：种植 + 装饰，顺便挑战 30 分钟专注。' }
+      };
+
+      const plan = plans[mood] || plans.stressed;
+      const decoName = IslandGardenModule.DECORATION_TYPES[plan.decoration]?.name || plan.decoration;
+      const canAfford = islandState.coins >= plan.cost;
+
+      const text = `心情：${plan.title}｜推荐装饰：${decoName}（💰${plan.cost}）｜${canAfford ? '你现在就买得起，可直接去商店购买。' : '金币不足，先完成一次 Focus Mode 或同步资源。'}\n建议动作：${plan.action}`;
+      if (output) output.textContent = text;
+      else showMessage(text);
+
+      if (elements.shopModal) {
+        elements.shopModal.hidden = false;
+        const decoTab = document.querySelector('[data-shop-tab="decorations"]');
+        if (decoTab) handleShopTabChange(decoTab);
+        const item = elements.shopModal.querySelector(`.shop-item[data-item="${plan.decoration}"]`);
+        if (item) {
+          item.classList.add('is-recommended');
+          try { item.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) {}
+          window.setTimeout(() => item.classList.remove('is-recommended'), 4000);
+        }
+      }
+    }
+
     function showMessage(message) {
       if (elements.islandMessage) {
         elements.islandMessage.textContent = message;
@@ -5181,11 +5236,13 @@ if (typeof document !== 'undefined') {
         };
         islandState.achievements = { ...islandState.achievements, ...(savedIslandState.achievements || {}) };
       }
-      // Sync initial resources from main state to island
-      if (state && state.resources) {
-        islandState.coins += state.resources.coins;
-        islandState.water += state.resources.water;
+      // Sync initial resources from main state to island (only once)
+      const syncedOnce = Boolean(savedIslandState && savedIslandState.__syncedFromMain);
+      if (!syncedOnce && state && state.resources) {
+        islandState.coins += Number(state.resources.coins || 0);
+        islandState.water += Number(state.resources.water || 0);
         islandState.sunlight += 5;
+        islandState.__syncedFromMain = true;
       }
       updateIslandUI();
     }

@@ -534,6 +534,23 @@
               <span class="tool-icon">🔄</span>
               <span>同步资源</span>
             </button>
+
+            <div class="tool-group ai-mood-group">
+              <h4 class="tool-group-title">AI 心情推荐</h4>
+              <div class="ai-mood-row">
+                <select id="moodSelect" aria-label="选择心情">
+                  <option value="stressed">压力大</option>
+                  <option value="tired">疲惫</option>
+                  <option value="anxious">焦虑</option>
+                  <option value="happy">开心</option>
+                </select>
+                <button class="tool-btn" id="aiRecommendBtn" type="button">
+                  <span class="tool-icon">🤖</span>
+                  <span>AI推荐</span>
+                </button>
+              </div>
+              <div class="ai-recommend-output" id="aiRecommendOutput"></div>
+            </div>
           </div>
         </div>
 

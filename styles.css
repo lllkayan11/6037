@@ -3681,6 +3681,49 @@ a {
   font-size: 22px;
 }
 
+/* AI mood recommendation */
+.ai-mood-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.ai-mood-row select {
+  flex: 1;
+  height: 44px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.08);
+  color: #E8F5E9;
+  outline: none;
+}
+
+.ai-mood-row select:focus {
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+#aiRecommendBtn {
+  flex-direction: row;
+  gap: 10px;
+  padding: 12px 14px;
+}
+
+#aiRecommendBtn .tool-icon {
+  font-size: 20px;
+}
+
+.ai-recommend-output {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(232, 245, 233, 0.92);
+  font-size: 12px;
+  line-height: 1.6;
+  min-height: 20px;
+}
+
 .inventory-list {
   display: flex;
   flex-direction: column;
@@ -3848,6 +3891,11 @@ a {
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.shop-item.is-recommended {
+  border-color: rgba(255, 213, 79, 0.7);
+  box-shadow: 0 0 0 3px rgba(255, 213, 79, 0.18), 0 10px 24px rgba(255, 213, 79, 0.12);
 }
 
 .item-icon {
