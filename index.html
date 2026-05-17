@@ -458,6 +458,7 @@
                   <div class="pet-display">
                     <div class="pet-icon" id="petIcon">🐰</div>
                     <div class="pet-name" id="petName">小白</div>
+                    <div class="pet-bonus-pill" id="petBonusLabel">宠物加成待解锁</div>
                   </div>
                   <div class="pet-status">
                     <div class="status-item">
@@ -494,6 +495,31 @@
                     <span class="slot-plus">+</span>
                   </div>
                 </div>
+                <p class="decoration-hint">拖动岛上的装饰物可自由摆放位置，点击装饰槽位可管理或替换。</p>
+              </div>
+
+              <div class="island-system-panels">
+                <section class="system-card">
+                  <div class="system-card-header">
+                    <div>
+                      <p class="system-kicker">Daily</p>
+                      <h3>每日任务</h3>
+                    </div>
+                    <span class="system-badge" id="dailyTaskProgress">0/3</span>
+                  </div>
+                  <div class="system-list" id="dailyTaskList"></div>
+                </section>
+
+                <section class="system-card">
+                  <div class="system-card-header">
+                    <div>
+                      <p class="system-kicker">Orders</p>
+                      <h3>岛屿订单</h3>
+                    </div>
+                    <span class="system-badge" id="orderBoardStatus">进行中</span>
+                  </div>
+                  <div class="system-list" id="orderBoardList"></div>
+                </section>
               </div>
             </div>
           </div>
@@ -903,6 +929,12 @@
       <div class="shop-content" id="shopContent">
         <!-- 装饰品列表 -->
         <div class="shop-section" id="shopDecorations">
+          <div class="shop-filter-row" id="decorationFilterRow">
+            <button class="shop-filter active" data-decoration-filter="all" type="button">全部</button>
+            <button class="shop-filter" data-decoration-filter="nature" type="button">自然</button>
+            <button class="shop-filter" data-decoration-filter="functional" type="button">功能</button>
+            <button class="shop-filter" data-decoration-filter="landmark" type="button">地标</button>
+          </div>
           <div class="shop-item" data-item="fence" data-cost="100">
             <span class="item-icon">🪜</span>
             <span class="item-name">栅栏</span>
@@ -1140,6 +1172,31 @@
           <span class="action-cost">消耗1次互动机会，随机获得1-3个果实</span>
           <button class="interaction-btn">偷取</button>
         </div>
+        <div class="interaction-option" data-action="gift">
+          <span class="action-icon">🎁</span>
+          <span class="action-name">赠送礼物</span>
+          <span class="action-cost">消耗1个番茄，增加好感并获得友谊奖励</span>
+          <button class="interaction-btn">赠送</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="islandGuideModal" hidden>
+    <div class="upgrade-modal island-guide-modal" role="dialog" aria-modal="true" aria-labelledby="islandGuideTitle">
+      <button class="modal-close" id="closeIslandGuide" type="button" aria-label="Close">×</button>
+      <p class="eyebrow">Island Guide</p>
+      <h2 id="islandGuideTitle">欢迎来到 Pomoland Island</h2>
+      <p class="upgrade-modal-lead" id="islandGuideLead">先了解 3 个关键玩法，再开始建设你的岛屿。</p>
+      <div class="guide-progress">
+        <span class="guide-dot active"></span>
+        <span class="guide-dot"></span>
+        <span class="guide-dot"></span>
+      </div>
+      <div class="guide-card" id="islandGuideCard"></div>
+      <div class="guide-actions">
+        <button class="secondary-button" id="skipIslandGuide" type="button">跳过引导</button>
+        <button class="primary-button" id="nextIslandGuide" type="button">下一步</button>
       </div>
     </div>
   </div>

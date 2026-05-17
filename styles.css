@@ -3449,6 +3449,16 @@ a {
   box-shadow: inset 0 -24px 60px rgba(0, 0, 0, 0.14);
 }
 
+.island-background::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(6, 13, 32, 0), rgba(15, 31, 58, 0));
+  transition: opacity 0.35s ease, background 0.35s ease;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .sky {
   position: absolute;
   top: 0;
@@ -3737,6 +3747,15 @@ a {
   width: 42px;
   height: 42px;
   filter: drop-shadow(0 10px 10px rgba(0,0,0,0.18));
+  pointer-events: auto;
+  cursor: grab;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.island-deco.is-dragging {
+  cursor: grabbing;
+  filter: drop-shadow(0 16px 18px rgba(0,0,0,0.25));
+  z-index: 3;
 }
 
 .island-deco::before,
@@ -3940,8 +3959,10 @@ a {
 }
 
 .plot-icon {
-  font-size: 40px;
-  text-align: center;
+  height: 62px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
   margin-bottom: 8px;
   animation: cropFloat 2s ease-in-out infinite;
 }
@@ -3953,6 +3974,292 @@ a {
 
 .plot-info {
   text-align: center;
+}
+
+.crop-visual {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.crop-visual::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  width: 42px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(69, 39, 18, 0.85), rgba(55, 29, 13, 0.1));
+}
+
+.crop-stem,
+.crop-leaf,
+.crop-bud,
+.crop-fruit,
+.crop-vine,
+.crop-canopy,
+.crop-root {
+  position: absolute;
+  display: block;
+}
+
+.crop-stem {
+  bottom: 10px;
+  width: 6px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #8bd56c, #3e8d31);
+}
+
+.crop-leaf {
+  bottom: 18px;
+  width: 18px;
+  height: 10px;
+  border-radius: 12px 12px 12px 0;
+  background: linear-gradient(180deg, #9de57a, #4fa246);
+}
+
+.crop-leaf.left {
+  transform: rotate(-28deg);
+  left: 10px;
+}
+
+.crop-leaf.right {
+  transform: scaleX(-1) rotate(-28deg);
+  right: 10px;
+}
+
+.crop-bud {
+  top: 12px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.crop-fruit {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+}
+
+.crop-vine {
+  bottom: 12px;
+  width: 44px;
+  height: 18px;
+  border-bottom: 4px solid #4b9a41;
+  border-radius: 50%;
+}
+
+.crop-canopy {
+  width: 30px;
+  height: 22px;
+  border-radius: 50% 50% 45% 45%;
+}
+
+.crop-root {
+  bottom: 6px;
+  width: 16px;
+  height: 18px;
+  border-radius: 10px 10px 12px 12px;
+}
+
+.crop-visual.stage-seed .crop-stem,
+.crop-visual.stage-seed .crop-leaf,
+.crop-visual.stage-seed .crop-bud,
+.crop-visual.stage-seed .crop-fruit,
+.crop-visual.stage-seed .crop-vine,
+.crop-visual.stage-seed .crop-canopy,
+.crop-visual.stage-seed .crop-root {
+  display: none;
+}
+
+.crop-visual.stage-seed::after {
+  content: "";
+  position: absolute;
+  bottom: 10px;
+  width: 12px;
+  height: 10px;
+  border-radius: 50% 50% 40% 40%;
+  background: linear-gradient(180deg, #eed39a, #9f6c33);
+}
+
+.crop-visual.stage-sprout .crop-stem {
+  height: 14px;
+}
+
+.crop-visual.stage-sprout .crop-leaf {
+  bottom: 18px;
+  width: 12px;
+  height: 8px;
+}
+
+.crop-visual.stage-grow .crop-stem {
+  height: 26px;
+}
+
+.crop-visual.stage-grow .crop-leaf {
+  width: 16px;
+  height: 10px;
+}
+
+.crop-visual.stage-bloom .crop-stem {
+  height: 30px;
+}
+
+.crop-visual.stage-bloom .crop-bud {
+  display: block;
+}
+
+.crop-visual.stage-ripe .crop-stem {
+  height: 32px;
+}
+
+.crop-visual.tomato .crop-fruit,
+.crop-visual.strawberry .crop-fruit,
+.crop-visual.watermelon .crop-fruit,
+.crop-visual.apple .crop-fruit {
+  display: none;
+}
+
+.crop-visual.tomato .crop-bud {
+  left: 22px;
+  background: radial-gradient(circle at 35% 35%, #ffe9f3, #ff9cc1 70%);
+}
+
+.crop-visual.tomato.stage-ripe .crop-fruit {
+  display: block;
+  bottom: 18px;
+  left: 16px;
+  background: radial-gradient(circle at 35% 30%, #ffb0a8, #d83d30 70%);
+  box-shadow: 14px -2px 0 0 #e84f43;
+}
+
+.crop-visual.strawberry .crop-stem {
+  height: 18px;
+}
+
+.crop-visual.strawberry .crop-leaf {
+  bottom: 14px;
+  width: 18px;
+  height: 12px;
+}
+
+.crop-visual.strawberry .crop-bud {
+  left: 22px;
+  background: radial-gradient(circle at 50% 50%, #fff6ca, #ffec80 40%, #fff 41%, #ffd4e3 72%);
+}
+
+.crop-visual.strawberry.stage-ripe .crop-fruit {
+  display: block;
+  bottom: 14px;
+  left: 20px;
+  width: 16px;
+  height: 18px;
+  border-radius: 50% 50% 45% 45%;
+  background: linear-gradient(180deg, #ff94b4, #d62b53);
+}
+
+.crop-visual.carrot .crop-stem {
+  height: 12px;
+  width: 8px;
+}
+
+.crop-visual.carrot .crop-leaf {
+  width: 12px;
+  height: 16px;
+  border-radius: 12px 12px 4px 0;
+}
+
+.crop-visual.carrot .crop-root {
+  background: linear-gradient(180deg, #ffb262, #d06b18);
+}
+
+.crop-visual.carrot.stage-sprout .crop-root,
+.crop-visual.carrot.stage-grow .crop-root {
+  display: none;
+}
+
+.crop-visual.carrot.stage-bloom .crop-root,
+.crop-visual.carrot.stage-ripe .crop-root {
+  display: block;
+  left: 20px;
+}
+
+.crop-visual.carrot.stage-ripe .crop-root {
+  height: 22px;
+}
+
+.crop-visual.apple .crop-stem,
+.crop-visual.apple .crop-canopy,
+.crop-visual.apple .crop-fruit {
+  display: none;
+}
+
+.crop-visual.apple.stage-grow .crop-stem,
+.crop-visual.apple.stage-bloom .crop-stem,
+.crop-visual.apple.stage-ripe .crop-stem {
+  display: block;
+  height: 24px;
+}
+
+.crop-visual.apple.stage-grow .crop-canopy,
+.crop-visual.apple.stage-bloom .crop-canopy,
+.crop-visual.apple.stage-ripe .crop-canopy {
+  display: block;
+  top: 10px;
+  left: 13px;
+  background: radial-gradient(circle at 35% 35%, #9fe97e, #4d9342 70%);
+}
+
+.crop-visual.apple.stage-ripe .crop-fruit {
+  display: block;
+  bottom: 24px;
+  left: 24px;
+  background: radial-gradient(circle at 30% 30%, #ffc2ad, #d34933 72%);
+  box-shadow: -12px 3px 0 0 #dd6a40;
+}
+
+.crop-visual.watermelon .crop-vine,
+.crop-visual.watermelon .crop-fruit {
+  display: none;
+}
+
+.crop-visual.watermelon.stage-grow .crop-vine,
+.crop-visual.watermelon.stage-bloom .crop-vine,
+.crop-visual.watermelon.stage-ripe .crop-vine {
+  display: block;
+}
+
+.crop-visual.watermelon.stage-bloom .crop-bud {
+  display: block;
+  left: 24px;
+  top: 16px;
+  background: radial-gradient(circle at 50% 50%, #ffefb4, #ffd24d);
+}
+
+.crop-visual.watermelon.stage-ripe .crop-fruit {
+  display: block;
+  bottom: 12px;
+  left: 17px;
+  width: 22px;
+  height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(90deg, #5dbd4b 0 14%, #3f8e36 14% 28%, #5dbd4b 28% 42%, #3f8e36 42% 56%, #5dbd4b 56% 70%, #3f8e36 70% 84%, #5dbd4b 84%);
+}
+
+.plot-stage-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 10px;
+  font-weight: 700;
 }
 
 .plot-name {
@@ -4088,6 +4395,19 @@ a {
   margin-top: 8px;
 }
 
+.pet-bonus-pill {
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff8cf;
+  font-size: 11px;
+  font-weight: 800;
+}
+
 .pet-status {
   flex: 1;
   display: flex;
@@ -4130,6 +4450,13 @@ a {
 /* Decoration Section */
 .decoration-section {
   margin-bottom: 0;
+}
+
+.decoration-hint {
+  margin: 12px 0 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(232, 245, 233, 0.76);
 }
 
 .decorations-grid {
@@ -4236,6 +4563,138 @@ a {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 16px;
   padding: 20px;
+}
+
+.island-system-panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.system-card {
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.system-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.system-card-header h3 {
+  margin: 2px 0 0;
+  color: #fff;
+  font-size: 18px;
+}
+
+.system-kicker {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.65);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.system-badge {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255, 213, 79, 0.15);
+  color: #ffe082;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.system-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.system-item {
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.system-item.is-complete {
+  border-color: rgba(129, 199, 132, 0.45);
+  background: rgba(129, 199, 132, 0.12);
+}
+
+.system-item.is-claimed {
+  opacity: 0.76;
+}
+
+.system-item-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.system-item-title {
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.system-item-meta {
+  margin-top: 8px;
+  color: rgba(232, 245, 233, 0.74);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.system-progress {
+  height: 8px;
+  margin-top: 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.24);
+  overflow: hidden;
+}
+
+.system-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #ffd54f, #81c784);
+}
+
+.system-action-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.system-reward {
+  color: #ffe082;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.system-small-btn {
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg, #ffd54f, #ffb300);
+  color: #173044;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.system-small-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 .tool-group-title {
@@ -4517,6 +4976,39 @@ a {
   gap: 12px;
 }
 
+.shop-filter-row {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.shop-filter {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.shop-filter.active {
+  background: rgba(76, 175, 80, 0.22);
+  border-color: rgba(129, 199, 132, 0.4);
+  color: #c5e1a5;
+}
+
+.shop-item.hidden-by-filter {
+  display: none;
+}
+
+.shop-meta {
+  font-size: 11px;
+  color: rgba(255,255,255,0.66);
+}
+
 .shop-section.hidden {
   display: none;
 }
@@ -4678,8 +5170,29 @@ a {
   line-height: 1.6;
 }
 
+.island-scene[data-level="1"] .island-house {
+  transform: translateX(-50%) scale(0.96);
+}
+
 .island-scene[data-level="2"] .island {
   width: 76%;
+}
+
+.island-scene[data-level="2"] .island-path {
+  width: 100px;
+}
+
+.island-scene[data-level="3"] .island {
+  width: 79%;
+  height: 30%;
+}
+
+.island-scene[data-level="3"] .island-house {
+  transform: translateX(-50%) scale(1.04);
+}
+
+.island-scene[data-level="3"] .island-dock {
+  width: 80px;
 }
 
 .island-scene[data-level="3"] .tree-c,
@@ -4697,13 +5210,60 @@ a {
   transform: translateX(-50%) scale(1.08);
 }
 
+.island-scene[data-level="4"] .island {
+  width: 82%;
+  height: 32%;
+}
+
+.island-scene[data-level="4"] .island-path {
+  width: 118px;
+}
+
+.island-scene[data-level="4"] .island-dock {
+  width: 92px;
+}
+
 .island-scene[data-level="5"] .house-window {
   box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.5), 0 0 16px rgba(255, 220, 130, 0.35);
 }
 
+.island-scene[data-level="5"] .island-background::before {
+  opacity: 1;
+  background: linear-gradient(180deg, rgba(6, 13, 32, 0.52), rgba(15, 31, 58, 0.16));
+}
+
+.island-scene[data-level="5"] .sky-glow {
+  background:
+    radial-gradient(circle at 18% 22%, rgba(255, 255, 255, 0.32), transparent 16%),
+    radial-gradient(circle at 76% 12%, rgba(255, 255, 255, 0.2), transparent 12%),
+    radial-gradient(circle at 68% 16%, rgba(255, 249, 196, 0.28) 0 1.5%, transparent 1.6%),
+    radial-gradient(circle at 14% 20%, rgba(255, 249, 196, 0.32) 0 1.4%, transparent 1.5%),
+    radial-gradient(circle at 52% 10%, rgba(255, 249, 196, 0.24) 0 1.1%, transparent 1.2%);
+}
+
+.island-scene[data-level="5"] .sun {
+  width: 44px;
+  height: 44px;
+  background: radial-gradient(circle at 35% 35%, #fffde7, #cfd8ff 60%, #9fa8da 100%);
+  box-shadow: 0 0 0 10px rgba(207, 216, 255, 0.12), 0 0 24px rgba(159, 168, 218, 0.32);
+}
+
+.island-scene[data-level="5"] .sea {
+  background: linear-gradient(180deg, #2b5f98, #143f68 70%, #0b2b47);
+}
+
+.island-scene[data-level="5"] .island {
+  width: 84%;
+  height: 34%;
+}
+
+.island-scene[data-level="5"] .island-dock {
+  width: 108px;
+}
+
+
 /* Friend interaction modal */
 .friend-interaction-modal {
-  max-width: 440px;
   width: 90%;
   background: linear-gradient(180deg, #1a2a3a, #0d1b2a);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -4807,6 +5367,74 @@ a {
   margin-bottom: 6px;
 }
 
+.friend-bonus-chip,
+.gift-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.82);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.guide-progress {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.guide-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.18);
+}
+
+.guide-dot.active {
+  background: #ffd54f;
+}
+
+.guide-card {
+  min-height: 180px;
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.guide-card h3 {
+  margin: 0 0 10px;
+  font-size: 20px;
+}
+
+.guide-card p {
+  margin: 0 0 12px;
+  color: rgba(232,245,233,0.8);
+  line-height: 1.8;
+}
+
+.guide-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.06);
+  color: #fff8d1;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.guide-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 /* ============================================================
    Responsive safety (the demo is desktop-first but stay tidy)
    ============================================================ */
@@ -4884,6 +5512,10 @@ a {
   .inventory-compact-grid,
   .inventory-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .island-system-panels {
+    grid-template-columns: 1fr;
   }
 
   .journey-guide,
