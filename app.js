@@ -1774,7 +1774,7 @@ const IslandGardenModule = (function() {
     islandState.upgradeReady = false;
     islandState.stats.decorationCount = Math.max(
       Number(islandState.stats.decorationCount || 0),
-      Array.isArray(islandState.decorations) ? islandState.decorations.length : 0
+      Array.isArray(islandState.decorations) ? islandState.decorations.filter(Boolean).length : 0
     );
 
     if (islandState.level >= MAX_ISLAND_LEVEL) {
@@ -2085,27 +2085,59 @@ const IslandGardenModule = (function() {
   }
 
   // 购买装饰品
-  function buyDecoration(islandState, decorationType) {
+  function buyDecoration(islandState, decorationType, slotIndex = null) {
     ensureIslandProgress(islandState);
     const decoration = DECORATION_TYPES[decorationType];
-    if ((islandState.decorations || []).length >= getUnlockedDecorationSlots(islandState)) {
+    const unlockedSlots = getUnlockedDecorationSlots(islandState);
+    const decorations = Array.isArray(islandState.decorations) ? islandState.decorations : [];
+    const occupiedCount = decorations.filter(Boolean).length;
+    let targetSlot = Number.isInteger(slotIndex) ? slotIndex : decorations.findIndex((item, index) => index < unlockedSlots && !item);
+    const isReplacing = Number.isInteger(slotIndex) && Boolean(decorations[slotIndex]);
+
+    if (Number.isInteger(slotIndex) && slotIndex >= unlockedSlots) {
+      return { success: false, message: '该装饰位尚未解锁' };
+    }
+    if (targetSlot === -1 && occupiedCount >= unlockedSlots) {
       return { success: false, message: '当前装饰位已满，升级岛屿可解锁更多位置' };
+    }
+    if (targetSlot === -1) {
+      targetSlot = Math.min(occupiedCount, unlockedSlots - 1);
     }
     if (islandState.coins < decoration.cost.coins) {
       return { success: false, message: '金币不足' };
     }
 
     islandState.coins -= decoration.cost.coins;
-    islandState.decorations.push({
+    islandState.decorations[targetSlot] = {
       id: `deco${Date.now()}`,
       type: decorationType,
       placedAt: Date.now()
-    });
-    islandState.stats.decorationCount = islandState.decorations.length;
+    };
+    islandState.stats.decorationCount = islandState.decorations.filter(Boolean).length;
 
     addExp(islandState, 12);
 
-    return { success: true, message: `成功购买并放置${decoration.name}！` };
+    return {
+      success: true,
+      message: `成功${isReplacing ? '替换' : '放置'}${decoration.name}！`,
+      slotIndex: targetSlot
+    };
+  }
+
+  function removeDecoration(islandState, slotIndex) {
+    ensureIslandProgress(islandState);
+    const decorations = Array.isArray(islandState.decorations) ? islandState.decorations : [];
+    if (!Number.isInteger(slotIndex) || !decorations[slotIndex]) {
+      return { success: false, message: '该装饰位没有可移除的装饰' };
+    }
+    const removed = decorations[slotIndex];
+    islandState.decorations[slotIndex] = null;
+    islandState.stats.decorationCount = islandState.decorations.filter(Boolean).length;
+    return {
+      success: true,
+      message: `已移除${DECORATION_TYPES[removed.type]?.name || '装饰'}`,
+      removed
+    };
   }
 
   // 增加经验
@@ -2347,6 +2379,7 @@ const IslandGardenModule = (function() {
     updateIslandState,
     helpFriendWater,
     stealFriendCrop,
+    removeDecoration,
     canUpgradeIsland,
     upgradeIsland,
     ensureIslandProgress,
@@ -2405,6 +2438,7 @@ if (typeof document !== 'undefined') {
     let islandState = IslandGardenModule.createIslandState();
     let currentTool = null;
     let selectedPlot = null;
+    let selectedDecorationSlot = null;
     let currentFriendId = null;
 
     const elements = {
@@ -2525,6 +2559,11 @@ if (typeof document !== 'undefined') {
       shopPets: document.querySelector('#shopPets'),
       inventoryModal: document.querySelector('#inventoryModal'),
       closeInventory: document.querySelector('#closeInventory'),
+      decorationManageModal: document.querySelector('#decorationManageModal'),
+      closeDecorationManage: document.querySelector('#closeDecorationManage'),
+      decorationManageCurrent: document.querySelector('#decorationManageCurrent'),
+      removeDecorationBtn: document.querySelector('#removeDecorationBtn'),
+      replaceDecorationBtn: document.querySelector('#replaceDecorationBtn'),
       islandUpgradeModal: document.querySelector('#islandUpgradeModal'),
       closeIslandUpgrade: document.querySelector('#closeIslandUpgrade'),
       confirmIslandUpgrade: document.querySelector('#confirmIslandUpgrade'),
@@ -4840,6 +4879,7 @@ if (typeof document !== 'undefined') {
         if (elements.shopModal) {
           elements.shopModal.hidden = true;
         }
+        selectedDecorationSlot = null;
       }
 
       const shopTab = (rawTarget && rawTarget.closest) ? rawTarget.closest('.shop-tab') : null;
@@ -4857,6 +4897,12 @@ if (typeof document !== 'undefined') {
         if (elements.inventoryModal) {
           elements.inventoryModal.hidden = true;
         }
+      }
+      if (target.id === 'closeDecorationManage') {
+        if (elements.decorationManageModal) {
+          elements.decorationManageModal.hidden = true;
+        }
+        selectedDecorationSlot = null;
       }
       if (target.id === 'upgradeIslandBtn') {
         handleIslandUpgrade();
@@ -4892,8 +4938,31 @@ if (typeof document !== 'undefined') {
         persistIslandState();
       }
 
-      if (target.matches('[data-action]')) {
-        handleQuickAction(target.dataset.action);
+      const decorationSlot = (rawTarget && rawTarget.closest) ? rawTarget.closest('.decoration-slot') : null;
+      if (decorationSlot && !decorationSlot.classList.contains('locked')) {
+        const slotIndex = Number(decorationSlot.dataset.slot) - 1;
+        openDecorationManageModal(slotIndex);
+      }
+
+      if (target.id === 'removeDecorationBtn') {
+        const result = IslandGardenModule.removeDecoration(islandState, selectedDecorationSlot);
+        showMessage(result.message);
+        if (result.success) {
+          if (elements.decorationManageModal) elements.decorationManageModal.hidden = true;
+          selectedDecorationSlot = null;
+          updateIslandUI();
+          persistIslandState();
+        }
+      }
+
+      if (target.id === 'replaceDecorationBtn') {
+        if (elements.decorationManageModal) elements.decorationManageModal.hidden = true;
+        openShopModal('decorations');
+      }
+
+      const quickAction = (rawTarget && rawTarget.closest) ? rawTarget.closest('[data-action]') : null;
+      if (quickAction) {
+        handleQuickAction(quickAction.dataset.action);
       }
 
       if (target.id === 'closeFriendInteraction') {
@@ -4957,10 +5026,7 @@ if (typeof document !== 'undefined') {
           state.currentView = 'friends';
         }
         if (tool === 'shop') {
-          if (elements.shopModal) {
-            elements.shopModal.hidden = false;
-            handleShopTabChange(document.querySelector('[data-shop-tab="pets"]'));
-          }
+          openShopModal('decorations');
         }
         if (tool === 'help') {
           if (islandState.dailyHelpCount > 0) {
@@ -5115,6 +5181,41 @@ if (typeof document !== 'undefined') {
       return Math.min(4, index + 1);
     }
 
+    function openShopModal(defaultTab = 'decorations') {
+      if (!elements.shopModal) return;
+      elements.shopModal.hidden = false;
+      const tab = document.querySelector(`[data-shop-tab="${defaultTab}"]`) || document.querySelector('[data-shop-tab="decorations"]');
+      if (tab) handleShopTabChange(tab);
+    }
+
+    function renderIslandScene() {
+      if (!elements.islandScene) return;
+      elements.islandScene.dataset.level = String(islandState.level || 1);
+    }
+
+    function openDecorationManageModal(slotIndex) {
+      const decoration = (islandState.decorations || [])[slotIndex];
+      if (!decoration) {
+        selectedDecorationSlot = slotIndex;
+        openShopModal('decorations');
+        return;
+      }
+      selectedDecorationSlot = slotIndex;
+      const info = IslandGardenModule.DECORATION_TYPES[decoration.type];
+      if (elements.decorationManageCurrent) {
+        elements.decorationManageCurrent.innerHTML = `
+          <div class="decoration-current-card">
+            <div class="decoration-current-icon">${info?.icon || '✨'}</div>
+            <div class="decoration-current-name">${escapeHtml(info?.name || decoration.type)}</div>
+            <div class="decoration-current-meta">点击“去商店替换”后，新的装饰会直接覆盖当前槽位，不需要先手动清空。</div>
+          </div>
+        `;
+      }
+      if (elements.decorationManageModal) {
+        elements.decorationManageModal.hidden = false;
+      }
+    }
+
     function renderUpgradePanel() {
       IslandGardenModule.ensureIslandProgress(islandState);
       const currentLevel = islandState.level;
@@ -5249,6 +5350,7 @@ if (typeof document !== 'undefined') {
       }
 
       renderUpgradePanel();
+      renderIslandScene();
 
       // Update plots with new structure
       updatePlotsUI();
@@ -5299,7 +5401,13 @@ if (typeof document !== 'undefined') {
         const name = info?.name || deco.type;
         slot.classList.remove('locked');
         slot.classList.remove('empty');
-        slot.innerHTML = `<span title="${escapeHtml(name)}" style="font-size:24px;">${icon}</span>`;
+        slot.innerHTML = `
+          <div class="slot-decoration">
+            <span class="slot-decoration-icon" title="${escapeHtml(name)}">${icon}</span>
+            <span class="slot-decoration-name">${escapeHtml(name)}</span>
+          </div>
+          <span class="slot-action">管理</span>
+        `;
       });
 
       updateDecorationsOnIsland();
@@ -5324,14 +5432,14 @@ if (typeof document !== 'undefined') {
       ];
 
       decorations.slice(0, positions.length).forEach((deco, idx) => {
+        if (!deco) return;
         const info = decorationTypes[deco.type];
-        const icon = info?.icon || '✨';
         const pos = positions[idx];
         const node = document.createElement('div');
-        node.className = 'island-deco';
+        node.className = `island-deco deco-${deco.type}`;
         node.style.left = pos.left;
         node.style.top = pos.top;
-        node.textContent = icon;
+        node.setAttribute('aria-label', info?.name || deco.type);
         layer.appendChild(node);
       });
     }
@@ -5363,6 +5471,7 @@ if (typeof document !== 'undefined') {
         if (plot.crop) {
           const cropType = IslandGardenModule.CROP_TYPES[plot.crop];
           const growthProgress = IslandGardenModule.getGrowthProgress(plot);
+          plotElement.classList.toggle('is-harvestable', growthProgress >= 100);
 
           // Display crop based on growth stage
           if (plotIcon) {
@@ -5404,6 +5513,7 @@ if (typeof document !== 'undefined') {
           if (plotProgress) plotProgress.style.width = '0%';
           if (plotNeed) plotNeed.style.opacity = '0';
           plotElement.classList.remove('needs-water');
+          plotElement.classList.remove('is-harvestable');
         }
       });
     }
@@ -5584,12 +5694,26 @@ if (typeof document !== 'undefined') {
           button.textContent = unlocked ? '购买' : `Lv.${IslandGardenModule.getCropUnlockLevel(crop)} 解锁`;
         }
       });
+
+      document.querySelectorAll('#shopDecorations .shop-item .buy-btn').forEach((button) => {
+        button.textContent = Number.isInteger(selectedDecorationSlot) ? '替换' : '购买';
+      });
     }
 
     function handlePlotClick(plotElement) {
       const plotId = plotElement.dataset.plot;
       if (!plotId) return;
-      // 农田交互统一走“先选工具 → 再点地块”
+      const plot = islandState.plots.find((item) => item.id === plotId);
+      if (plot && plot.crop && IslandGardenModule.getGrowthProgress(plot) >= 100) {
+        const result = IslandGardenModule.harvestCrop(islandState, plotId);
+        showMessage(result.message);
+        if (result.success) {
+          syncIslandToMainResources();
+          updateIslandUI();
+          persistIslandState();
+        }
+        return;
+      }
       handlePlotInteraction(plotId);
     }
 
@@ -5681,6 +5805,7 @@ if (typeof document !== 'undefined') {
     }
 
     function handleShopTabChange(tabElement) {
+      if (!tabElement) return;
       document.querySelectorAll('.shop-tab').forEach(tab => {
         tab.classList.remove('active');
       });
@@ -5694,6 +5819,7 @@ if (typeof document !== 'undefined') {
       switch (tabName) {
         case 'decorations':
           if (elements.shopDecorations) elements.shopDecorations.classList.remove('hidden');
+          updateShopAvailability();
           break;
         case 'seeds':
           if (elements.shopSeeds) elements.shopSeeds.classList.remove('hidden');
@@ -5717,8 +5843,14 @@ if (typeof document !== 'undefined') {
       // Handle different item types
       const parentSection = shopItem.closest('.shop-section');
       if (parentSection === elements.shopDecorations) {
-        const result = IslandGardenModule.buyDecoration(islandState, itemType);
+        const hasSlotSelection = Number.isInteger(selectedDecorationSlot);
+        const result = IslandGardenModule.buyDecoration(islandState, itemType, selectedDecorationSlot);
         showMessage(result.message);
+        if (result.success) {
+          selectedDecorationSlot = null;
+          if (elements.decorationManageModal) elements.decorationManageModal.hidden = true;
+          if (hasSlotSelection && elements.shopModal) elements.shopModal.hidden = true;
+        }
       } else if (parentSection === elements.shopSeeds) {
         if (!IslandGardenModule.isSeedUnlocked(islandState, itemType)) {
           showMessage(`Lv.${IslandGardenModule.getCropUnlockLevel(itemType)} 解锁 ${IslandGardenModule.CROP_TYPES[itemType].name}种子`);
@@ -5755,9 +5887,7 @@ if (typeof document !== 'undefined') {
           }
           break;
         case 'shop':
-          if (elements.shopModal) {
-            elements.shopModal.hidden = false;
-          }
+          openShopModal('decorations');
           break;
         case 'achievements':
           state.activeView = 'friends';

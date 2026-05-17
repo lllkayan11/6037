@@ -3441,11 +3441,12 @@ a {
 
 .island-background {
   position: relative;
-  height: 200px;
-  background: linear-gradient(180deg, #87CEEB 0%, #E0F7FA 50%, #A5D6A7 100%);
+  height: 280px;
+  background: linear-gradient(180deg, #7ac7ff 0%, #b7e7ff 42%, #7bc4dd 42%, #63b6d8 100%);
   border-radius: 16px;
   margin-bottom: 24px;
   overflow: hidden;
+  box-shadow: inset 0 -24px 60px rgba(0, 0, 0, 0.14);
 }
 
 .sky {
@@ -3454,15 +3455,28 @@ a {
   left: 0;
   width: 100%;
   height: 60%;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: 20px;
+  overflow: hidden;
+}
+
+.sky-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 18% 22%, rgba(255, 255, 255, 0.55), transparent 18%),
+    radial-gradient(circle at 76% 12%, rgba(255, 255, 255, 0.28), transparent 16%);
 }
 
 .sun {
   font-size: 48px;
   animation: sunGlow 3s ease-in-out infinite;
+  position: absolute;
+  top: 28px;
+  right: 52px;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff8c4, #ffd54f 55%, #ffb300 100%);
+  box-shadow: 0 0 0 14px rgba(255, 213, 79, 0.18), 0 0 32px rgba(255, 213, 79, 0.42);
 }
 
 @keyframes sunGlow {
@@ -3471,8 +3485,27 @@ a {
 }
 
 .cloud {
-  font-size: 32px;
-  opacity: 0.8;
+  position: absolute;
+  height: 20px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow:
+    18px -8px 0 8px rgba(255, 255, 255, 0.86),
+    40px -2px 0 12px rgba(255, 255, 255, 0.9),
+    70px 0 0 7px rgba(255, 255, 255, 0.82);
+}
+
+.cloud-a {
+  top: 44px;
+  left: 42px;
+  width: 76px;
+}
+
+.cloud-b {
+  top: 82px;
+  left: 200px;
+  width: 68px;
+  transform: scale(0.9);
 }
 
 .sea {
@@ -3481,22 +3514,215 @@ a {
   left: 0;
   width: 100%;
   height: 40%;
-  background: linear-gradient(180deg, #4FC3F7, #29B6F6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 32px;
+  background: linear-gradient(180deg, #49bce6, #168ec8 70%, #0f6a9a);
+}
+
+.wave {
+  position: absolute;
+  left: -10%;
+  width: 120%;
+  height: 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.26);
+}
+
+.wave-a {
+  top: 18px;
+  animation: waveMove 8s linear infinite;
+}
+
+.wave-b {
+  top: 42px;
+  background: rgba(255, 255, 255, 0.18);
+  animation: waveMove 10s linear infinite reverse;
+}
+
+.wave-c {
+  top: 64px;
+  background: rgba(255, 255, 255, 0.12);
+  animation: waveMove 12s linear infinite;
+}
+
+@keyframes waveMove {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(3%); }
+  100% { transform: translateX(0); }
+}
+
+.island-shore {
+  position: absolute;
+  bottom: 28%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 84%;
+  height: 32%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, #eacb8b 0%, #dfba72 62%, #d7ac61 100%);
 }
 
 .island {
   position: absolute;
-  bottom: 30%;
+  bottom: 31%;
   left: 50%;
   transform: translateX(-50%);
-  width: 80%;
-  height: 40%;
-  background: radial-gradient(ellipse, #90EE90, #7CCD7C);
+  width: 74%;
+  height: 28%;
+  background:
+    radial-gradient(circle at 20% 32%, rgba(148, 224, 135, 0.95), transparent 18%),
+    radial-gradient(circle at 74% 30%, rgba(140, 220, 134, 0.9), transparent 16%),
+    radial-gradient(ellipse at center, #8bcf6d 0%, #76bf58 70%, #5ca847 100%);
   border-radius: 50%;
+  box-shadow: inset 0 -14px 24px rgba(26, 100, 30, 0.22);
+}
+
+.island-path {
+  position: absolute;
+  bottom: 38%;
+  left: 50%;
+  width: 84px;
+  height: 30px;
+  transform: translateX(-50%) rotate(-10deg);
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(222, 195, 134, 0.9), rgba(208, 177, 119, 0.95));
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+.island-house {
+  position: absolute;
+  left: 50%;
+  bottom: 44%;
+  width: 72px;
+  height: 74px;
+  transform: translateX(-50%);
+}
+
+.house-roof,
+.house-body,
+.house-door,
+.house-window {
+  position: absolute;
+  display: block;
+}
+
+.house-roof {
+  top: 0;
+  left: 6px;
+  width: 60px;
+  height: 26px;
+  background: linear-gradient(180deg, #d96b52, #b54834);
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+  filter: drop-shadow(0 6px 6px rgba(0, 0, 0, 0.18));
+}
+
+.house-body {
+  left: 11px;
+  top: 22px;
+  width: 50px;
+  height: 38px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #fff1d6, #f0d7ab);
+  box-shadow: inset 0 -6px 0 rgba(214, 182, 132, 0.55);
+}
+
+.house-door {
+  left: 31px;
+  top: 38px;
+  width: 12px;
+  height: 22px;
+  border-radius: 4px 4px 0 0;
+  background: linear-gradient(180deg, #8d5a3b, #6b4028);
+}
+
+.house-window {
+  top: 34px;
+  width: 10px;
+  height: 10px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #d6f1ff, #8cd5ff);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.5);
+}
+
+.house-window-left {
+  left: 18px;
+}
+
+.house-window-right {
+  right: 18px;
+}
+
+.island-tree {
+  position: absolute;
+  width: 22px;
+  height: 52px;
+  bottom: 40%;
+}
+
+.island-tree::before,
+.island-tree::after {
+  content: "";
+  position: absolute;
+}
+
+.island-tree::before {
+  left: 9px;
+  bottom: 0;
+  width: 4px;
+  height: 20px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #7d4a28, #5c3218);
+}
+
+.island-tree::after {
+  left: 0;
+  top: 0;
+  width: 22px;
+  height: 28px;
+  border-radius: 50% 50% 44% 44%;
+  background: radial-gradient(circle at 30% 30%, #9ce27e, #4d9e45 72%);
+  box-shadow: 10px 2px 0 2px rgba(98, 177, 81, 0.95), -8px 4px 0 1px rgba(87, 166, 75, 0.92);
+}
+
+.tree-a {
+  left: 28%;
+}
+
+.tree-b {
+  right: 26%;
+}
+
+.tree-c {
+  right: 16%;
+  transform: scale(0.9);
+}
+
+.island-dock {
+  position: absolute;
+  left: 15%;
+  bottom: 28%;
+  width: 66px;
+  height: 12px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #9d6a41, #75502e);
+  transform: rotate(-10deg);
+  box-shadow: 0 8px 14px rgba(0, 0, 0, 0.16);
+}
+
+.island-dock::before,
+.island-dock::after {
+  content: "";
+  position: absolute;
+  bottom: -14px;
+  width: 6px;
+  height: 18px;
+  background: #6d4827;
+}
+
+.island-dock::before {
+  left: 10px;
+}
+
+.island-dock::after {
+  right: 10px;
 }
 
 .island-decorations-layer {
@@ -3508,8 +3734,142 @@ a {
 .island-deco {
   position: absolute;
   transform: translate(-50%, -50%);
-  font-size: 26px;
+  width: 42px;
+  height: 42px;
   filter: drop-shadow(0 10px 10px rgba(0,0,0,0.18));
+}
+
+.island-deco::before,
+.island-deco::after {
+  content: "";
+  position: absolute;
+}
+
+.island-deco.deco-fence::before {
+  inset: 10px 6px 8px;
+  background:
+    linear-gradient(90deg, #8b5a32 0 6px, transparent 6px 12px, #8b5a32 12px 18px, transparent 18px 24px, #8b5a32 24px 30px),
+    linear-gradient(180deg, transparent 0 10px, #d8b07a 10px 14px, transparent 14px 24px, #d8b07a 24px 28px, transparent 28px);
+}
+
+.island-deco.deco-flower::before {
+  left: 15px;
+  bottom: 7px;
+  width: 4px;
+  height: 16px;
+  background: #4caf50;
+}
+
+.island-deco.deco-flower::after {
+  left: 9px;
+  top: 8px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, #ffe082 0 24%, transparent 25%),
+    radial-gradient(circle at 50% 0, #ff7aa8 0 26%, transparent 27%),
+    radial-gradient(circle at 100% 50%, #ff7aa8 0 26%, transparent 27%),
+    radial-gradient(circle at 50% 100%, #ff7aa8 0 26%, transparent 27%),
+    radial-gradient(circle at 0 50%, #ff7aa8 0 26%, transparent 27%);
+}
+
+.island-deco.deco-lamp::before {
+  left: 18px;
+  top: 8px;
+  width: 5px;
+  height: 24px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #434343, #1f1f1f);
+}
+
+.island-deco.deco-lamp::after {
+  left: 12px;
+  top: 2px;
+  width: 17px;
+  height: 13px;
+  border-radius: 8px 8px 6px 6px;
+  background: linear-gradient(180deg, #ffeaa7, #ffc65c);
+  box-shadow: 0 0 16px rgba(255, 214, 102, 0.45);
+}
+
+.island-deco.deco-bench::before {
+  left: 8px;
+  top: 16px;
+  width: 26px;
+  height: 8px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #b57b48, #8d5a32);
+}
+
+.island-deco.deco-bench::after {
+  left: 10px;
+  top: 26px;
+  width: 22px;
+  height: 10px;
+  background:
+    linear-gradient(90deg, #704629 0 4px, transparent 4px 18px, #704629 18px 22px),
+    linear-gradient(180deg, #a0693d 0 4px, transparent 4px);
+}
+
+.island-deco.deco-fountain::before {
+  inset: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #c9f4ff 0%, #7ed2f4 55%, #4ca8d5 100%);
+  box-shadow: inset 0 0 0 4px rgba(255,255,255,0.35);
+}
+
+.island-deco.deco-fountain::after {
+  left: 18px;
+  top: 4px;
+  width: 6px;
+  height: 18px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255,255,255,0), #b7f0ff 45%, rgba(255,255,255,0));
+}
+
+.island-deco.deco-pond::before {
+  inset: 10px 6px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #bff4ff, #79cbe8 60%, #4598bc 100%);
+  box-shadow: inset 0 0 0 3px rgba(255,255,255,0.25);
+}
+
+.island-deco.deco-bridge::before {
+  left: 7px;
+  top: 18px;
+  width: 28px;
+  height: 10px;
+  border-radius: 10px 10px 6px 6px;
+  border: 3px solid #9a6238;
+  border-bottom-width: 5px;
+  background: transparent;
+}
+
+.island-deco.deco-bridge::after {
+  left: 12px;
+  top: 18px;
+  width: 18px;
+  height: 10px;
+  border-top: 3px solid #c98650;
+}
+
+.island-deco.deco-statue::before {
+  left: 14px;
+  top: 8px;
+  width: 14px;
+  height: 20px;
+  border-radius: 8px 8px 4px 4px;
+  background: linear-gradient(180deg, #d9dfe4, #8f9aa3);
+}
+
+.island-deco.deco-statue::after {
+  left: 10px;
+  bottom: 6px;
+  width: 22px;
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #b8c1c9, #7f8a93);
 }
 
 /* Farm Section */
@@ -3557,6 +3917,26 @@ a {
 .plot:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.plot.is-harvestable {
+  background: linear-gradient(135deg, #94643a, #b87434);
+  box-shadow: 0 0 0 2px rgba(255, 214, 102, 0.4), 0 10px 28px rgba(255, 193, 7, 0.2);
+}
+
+.plot.is-harvestable::after {
+  content: "点击收获";
+  position: absolute;
+  left: 50%;
+  top: 8px;
+  transform: translateX(-50%);
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 248, 225, 0.9);
+  color: #7a4b12;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
 }
 
 .plot-icon {
@@ -3768,6 +4148,8 @@ a {
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .decoration-slot:hover {
@@ -3796,6 +4178,35 @@ a {
   background: rgba(255, 255, 255, 0.08);
   color: rgba(255, 255, 255, 0.76);
   font-size: 11px;
+  font-weight: 800;
+}
+
+.slot-decoration {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.slot-decoration-icon {
+  font-size: 24px;
+}
+
+.slot-decoration-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.slot-action {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  padding: 4px 7px;
+  border-radius: 999px;
+  background: rgba(12, 24, 36, 0.55);
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 10px;
   font-weight: 800;
 }
 
@@ -3936,32 +4347,51 @@ a {
 .inventory-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+}
+
+.inventory-subtitle {
+  margin: 0;
+  color: rgba(232, 245, 233, 0.72);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.inventory-compact-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
 }
 
 .inv-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  display: grid;
+  grid-template-columns: 1fr;
+  justify-items: center;
+  text-align: center;
+  gap: 8px;
   padding: 12px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 10px;
+  min-height: 108px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .inv-icon {
-  font-size: 24px;
+  font-size: 28px;
 }
 
 .inv-name {
-  flex: 1;
   color: #E8F5E9;
-  font-size: 13px;
+  font-size: 12px;
+  line-height: 1.4;
 }
 
 .inv-count {
   color: #FFD54F;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 16px;
 }
 
 /* Island Message */
@@ -4177,7 +4607,7 @@ a {
 /* Inventory Modal */
 .inventory-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 12px;
 }
 
@@ -4192,12 +4622,14 @@ a {
 }
 
 .inv-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  border-radius: 12px;
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: 10px;
+  padding: 14px 12px;
+  border-radius: 16px;
   background: rgba(255, 255, 255, 0.06);
+  min-height: 126px;
 }
 
 .inv-card-icon {
@@ -4207,13 +4639,66 @@ a {
 .inv-card-name {
   font-size: 13px;
   font-weight: 600;
-  flex: 1;
+  line-height: 1.4;
 }
 
 .inv-card-amount {
   font-size: 15px;
   font-weight: 800;
   color: #81C784;
+}
+
+.decoration-manage-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.decoration-current-card {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.06);
+}
+
+.decoration-current-icon {
+  font-size: 34px;
+}
+
+.decoration-current-name {
+  font-weight: 800;
+}
+
+.decoration-current-meta {
+  color: rgba(232,245,233,0.76);
+  font-size: 12px;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.island-scene[data-level="2"] .island {
+  width: 76%;
+}
+
+.island-scene[data-level="3"] .tree-c,
+.island-scene[data-level="4"] .tree-c,
+.island-scene[data-level="5"] .tree-c {
+  display: block;
+}
+
+.island-scene[data-level="1"] .tree-c {
+  display: none;
+}
+
+.island-scene[data-level="4"] .island-house,
+.island-scene[data-level="5"] .island-house {
+  transform: translateX(-50%) scale(1.08);
+}
+
+.island-scene[data-level="5"] .house-window {
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.5), 0 0 16px rgba(255, 220, 130, 0.35);
 }
 
 /* Friend interaction modal */
@@ -4394,6 +4879,11 @@ a {
   .upgrade-side {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .inventory-compact-grid,
+  .inventory-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .journey-guide,
