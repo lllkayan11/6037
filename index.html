@@ -327,6 +327,21 @@
             <span class="resource-item">☀️ <span id="sunlightCount">10</span></span>
             <span class="resource-item">🤝 <span id="helpCount">5</span></span>
           </div>
+          <div class="island-upgrade-panel" id="islandUpgradePanel">
+            <div class="island-upgrade-top">
+              <div>
+                <p class="upgrade-kicker">Island Upgrade</p>
+                <h3 id="upgradeTitle">Lv.1 -> Lv.2</h3>
+                <p class="upgrade-hint" id="upgradeHint">继续专注与建设，解锁更大的 Pomoland。</p>
+              </div>
+              <div class="upgrade-side">
+                <span class="upgrade-xp" id="islandXpText">0 / 100 XP</span>
+                <button class="primary-button" id="upgradeIslandBtn" type="button">升级岛屿</button>
+              </div>
+            </div>
+            <div class="upgrade-requirement-list" id="upgradeRequirementList"></div>
+            <div class="upgrade-reward-preview" id="upgradeRewardPreview"></div>
+          </div>
         </div>
 
         <div class="island-layout">
@@ -1013,6 +1028,26 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="islandUpgradeModal" hidden>
+    <div class="upgrade-modal" role="dialog" aria-modal="true" aria-labelledby="islandUpgradeModalTitle">
+      <button class="modal-close" id="closeIslandUpgrade" type="button" aria-label="Close">×</button>
+      <p class="eyebrow">Island Level Up</p>
+      <h2 id="islandUpgradeModalTitle">Pomoland 升级成功</h2>
+      <p class="upgrade-modal-lead" id="islandUpgradeModalLead">你的岛屿变得更繁荣了。</p>
+      <div class="upgrade-modal-grid">
+        <section class="upgrade-modal-card">
+          <h3>本次成长</h3>
+          <div id="islandUpgradeSummary"></div>
+        </section>
+        <section class="upgrade-modal-card">
+          <h3>新解锁内容</h3>
+          <div id="islandUpgradeRewards"></div>
+        </section>
+      </div>
+      <button class="primary-button wide" id="confirmIslandUpgrade" type="button">继续建设</button>
     </div>
   </div>
 

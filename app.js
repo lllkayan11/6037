@@ -1673,9 +1673,133 @@ const IslandGardenModule = (function() {
     bridge: { name: '小桥', icon: '🌉', cost: { coins: 700 }, effect: 'access' }
   };
 
+  const LEVEL_UNLOCKS = {
+    1: { plots: 2, decorationSlots: 1, seeds: ['tomato', 'carrot'] },
+    2: { plots: 4, decorationSlots: 2, seeds: ['tomato', 'carrot'] },
+    3: { plots: 5, decorationSlots: 3, seeds: ['tomato', 'carrot', 'strawberry'] },
+    4: { plots: 6, decorationSlots: 4, seeds: ['tomato', 'carrot', 'strawberry', 'apple'] },
+    5: { plots: 6, decorationSlots: 4, seeds: ['tomato', 'carrot', 'strawberry', 'apple', 'watermelon'] }
+  };
+
+  const ISLAND_LEVEL_RULES = {
+    1: {
+      requiredXp: 100,
+      conditions: { plantCount: 2 },
+      rewards: { coins: 60, water: 2, sunlight: 1 },
+      unlockPreview: ['农田扩展到 4 格', '解锁第 2 个装饰位']
+    },
+    2: {
+      requiredXp: 180,
+      conditions: { harvestCount: 5 },
+      rewards: { coins: 80, water: 2, sunlight: 2, seeds: { strawberry: 2 } },
+      unlockPreview: ['解锁第 5 块农田', '解锁草莓种子', '解锁第 3 个装饰位']
+    },
+    3: {
+      requiredXp: 280,
+      conditions: { decorationCount: 1 },
+      rewards: { coins: 120, water: 3, sunlight: 2, seeds: { apple: 1 } },
+      unlockPreview: ['解锁第 6 块农田', '解锁苹果种子', '解锁第 4 个装饰位']
+    },
+    4: {
+      requiredXp: 400,
+      conditions: { friendHelpCount: 3 },
+      rewards: { coins: 160, water: 3, sunlight: 3, seeds: { watermelon: 1 } },
+      unlockPreview: ['解锁西瓜种子', '升级为成熟岛屿外观', '升级奖励资源包']
+    }
+  };
+
+  const MAX_ISLAND_LEVEL = 5;
+
+  function getLevelRule(level) {
+    return ISLAND_LEVEL_RULES[level] || null;
+  }
+
+  function getUnlockProfile(level) {
+    const safeLevel = Math.max(1, Math.min(level, MAX_ISLAND_LEVEL));
+    return LEVEL_UNLOCKS[safeLevel] || LEVEL_UNLOCKS[1];
+  }
+
+  function getCropUnlockLevel(cropType) {
+    const match = Object.entries(LEVEL_UNLOCKS).find(([, unlocks]) => unlocks.seeds.includes(cropType));
+    return match ? Number(match[0]) : 1;
+  }
+
+  function isSeedUnlocked(islandState, cropType) {
+    return getUnlockProfile(islandState.level).seeds.includes(cropType);
+  }
+
+  function getUnlockedPlotCount(islandState) {
+    return getUnlockProfile(islandState.level).plots;
+  }
+
+  function getUnlockedDecorationSlots(islandState) {
+    return getUnlockProfile(islandState.level).decorationSlots;
+  }
+
+  function getConditionValue(islandState, key) {
+    const stats = islandState.stats || {};
+    return Number(stats[key] || 0);
+  }
+
+  function getConditionEntries(rule) {
+    return Object.entries((rule && rule.conditions) || {});
+  }
+
+  function areUpgradeConditionsMet(islandState, rule) {
+    return getConditionEntries(rule).every(([key, value]) => getConditionValue(islandState, key) >= value);
+  }
+
+  function getUpgradeRewards(rule) {
+    const rewards = [];
+    if (!rule) return rewards;
+    if (rule.rewards?.coins) rewards.push(`💰 ${rule.rewards.coins} 金币`);
+    if (rule.rewards?.water) rewards.push(`💧 ${rule.rewards.water} 水滴`);
+    if (rule.rewards?.sunlight) rewards.push(`☀️ ${rule.rewards.sunlight} 阳光`);
+    Object.entries(rule.rewards?.seeds || {}).forEach(([cropType, amount]) => {
+      rewards.push(`${CROP_TYPES[cropType].icon} ${CROP_TYPES[cropType].name}种子 x${amount}`);
+    });
+    return [...rewards, ...(rule.unlockPreview || [])];
+  }
+
+  function ensureIslandProgress(islandState) {
+    islandState.level = Math.max(1, Math.min(Number(islandState.level || 1), MAX_ISLAND_LEVEL));
+    islandState.stats = {
+      plantCount: 0,
+      harvestCount: 0,
+      decorationCount: 0,
+      friendHelpCount: 0,
+      ...(islandState.stats || {})
+    };
+    islandState.lastUpgrade = islandState.lastUpgrade || null;
+    islandState.upgradeReady = false;
+    islandState.stats.decorationCount = Math.max(
+      Number(islandState.stats.decorationCount || 0),
+      Array.isArray(islandState.decorations) ? islandState.decorations.length : 0
+    );
+
+    if (islandState.level >= MAX_ISLAND_LEVEL) {
+      islandState.exp = 0;
+      islandState.maxExp = 1;
+      return islandState;
+    }
+
+    const rule = getLevelRule(islandState.level);
+    islandState.maxExp = rule ? rule.requiredXp : Math.max(100, Number(islandState.maxExp || 100));
+    islandState.exp = Math.max(0, Math.min(Number(islandState.exp || 0), islandState.maxExp));
+    islandState.upgradeReady = Boolean(rule) && islandState.exp >= islandState.maxExp && areUpgradeConditionsMet(islandState, rule);
+    return islandState;
+  }
+
+  function applySeedRewards(islandState, seeds) {
+    if (!seeds) return;
+    Object.entries(seeds).forEach(([cropType, amount]) => {
+      islandState.inventory.seeds[cropType] = Number(islandState.inventory.seeds[cropType] || 0) + Number(amount || 0);
+    });
+  }
+
   // 创建初始岛屿状态
   function createIslandState() {
-    return {
+    return ensureIslandProgress({
       level: 1,
       exp: 0,
       maxExp: 100,
@@ -1697,28 +1821,46 @@ const IslandGardenModule = (function() {
       activePetId: 'pet1',
       decorations: [],
       inventory: {
-        seeds: { tomato: 3, strawberry: 2, carrot: 1, apple: 0, watermelon: 0 },
+        seeds: { tomato: 3, strawberry: 0, carrot: 1, apple: 0, watermelon: 0 },
         harvested: {}
       },
       lastVisitTime: Date.now(),
       islandName: '我的小岛',
       theme: 'sunny',
+      stats: {
+        plantCount: 0,
+        harvestCount: 0,
+        decorationCount: 0,
+        friendHelpCount: 0
+      },
+      upgradeReady: false,
+      lastUpgrade: null,
       achievements: {
         firstHarvest: false,
         masterGardener: false,
         petLover: false,
         socialButterfly: false
       }
-    };
+    });
   }
 
   // 种植作物
   function plantCrop(islandState, plotId, cropType) {
+    ensureIslandProgress(islandState);
     const plotIndex = islandState.plots.findIndex(p => p.id === plotId);
     if (plotIndex === -1) return { success: false, message: '找不到地块' };
 
     const plot = islandState.plots[plotIndex];
     if (plot.crop) return { success: false, message: '这个地块已经有作物了' };
+
+    const unlockedPlots = getUnlockedPlotCount(islandState);
+    if (plotIndex >= unlockedPlots) {
+      return { success: false, message: `当前等级只能使用前 ${unlockedPlots} 块农田` };
+    }
+
+    if (!isSeedUnlocked(islandState, cropType)) {
+      return { success: false, message: `Lv.${getCropUnlockLevel(cropType)} 解锁 ${CROP_TYPES[cropType].name}种子` };
+    }
 
     if (!islandState.inventory.seeds[cropType] || islandState.inventory.seeds[cropType] <= 0) {
       return { success: false, message: '没有这种种子' };
@@ -1730,12 +1872,15 @@ const IslandGardenModule = (function() {
     plot.growthStage = 0;
     plot.needsWater = false;
     plot.wateredAt = null;
+    islandState.stats.plantCount += 1;
+    addExp(islandState, 12);
 
     return { success: true, message: `成功种植了${CROP_TYPES[cropType].name}` };
   }
 
   // 浇水
   function waterCrop(islandState, plotId) {
+    ensureIslandProgress(islandState);
     const plotIndex = islandState.plots.findIndex(p => p.id === plotId);
     if (plotIndex === -1) return { success: false, message: '找不到地块' };
 
@@ -1759,12 +1904,14 @@ const IslandGardenModule = (function() {
     const cropType = CROP_TYPES[plot.crop];
     const minPlantedAt = Date.now() - cropType.growthTime; // 不会加速到“超过成熟”
     plot.plantedAt = Math.max(minPlantedAt, (plot.plantedAt || Date.now()) - 5 * 60 * 1000);
+    addExp(islandState, 3);
 
     return { success: true, message: '浇水成功，作物生长时间减少 5 分钟' };
   }
 
   // 阳光照射（加速生长）
   function sunlightCrop(islandState, plotId) {
+    ensureIslandProgress(islandState);
     const plotIndex = islandState.plots.findIndex(p => p.id === plotId);
     if (plotIndex === -1) return { success: false, message: '找不到地块' };
 
@@ -1784,12 +1931,14 @@ const IslandGardenModule = (function() {
     const cropType = CROP_TYPES[plot.crop];
     const minPlantedAt = Date.now() - cropType.growthTime; // 不会加速到“超过成熟”
     plot.plantedAt = Math.max(minPlantedAt, (plot.plantedAt || Date.now()) - 10 * 60 * 1000);
+    addExp(islandState, 4);
 
     return { success: true, message: '阳光照射成功，作物生长时间减少 10 分钟' };
   }
 
   // 收获作物
   function harvestCrop(islandState, plotId) {
+    ensureIslandProgress(islandState);
     const plotIndex = islandState.plots.findIndex(p => p.id === plotId);
     if (plotIndex === -1) return { success: false, message: '找不到地块' };
 
@@ -1821,6 +1970,7 @@ const IslandGardenModule = (function() {
 
     // 增加经验
     addExp(islandState, 20);
+    islandState.stats.harvestCount += 1;
 
     // 重置地块
     plot.crop = null;
@@ -1877,6 +2027,7 @@ const IslandGardenModule = (function() {
 
   // 喂养宠物
   function feedPet(islandState, petId) {
+    ensureIslandProgress(islandState);
     const petIndex = islandState.pets.findIndex(p => p.id === petId);
     if (petIndex === -1) return { success: false, message: '找不到宠物' };
 
@@ -1893,6 +2044,7 @@ const IslandGardenModule = (function() {
 
     const bonus = petType.feedBonus;
     islandState.coins += bonus.coins;
+    addExp(islandState, 6);
 
     return {
       success: true,
@@ -1903,6 +2055,7 @@ const IslandGardenModule = (function() {
 
   // 解锁宠物
   function unlockPet(islandState, petType) {
+    ensureIslandProgress(islandState);
     const cost = (PET_TYPES[petType] && PET_TYPES[petType].cost) ? PET_TYPES[petType].cost : 500;
     if (islandState.coins < cost) return { success: false, message: `金币不足${cost}` };
 
@@ -1933,7 +2086,11 @@ const IslandGardenModule = (function() {
 
   // 购买装饰品
   function buyDecoration(islandState, decorationType) {
+    ensureIslandProgress(islandState);
     const decoration = DECORATION_TYPES[decorationType];
+    if ((islandState.decorations || []).length >= getUnlockedDecorationSlots(islandState)) {
+      return { success: false, message: '当前装饰位已满，升级岛屿可解锁更多位置' };
+    }
     if (islandState.coins < decoration.cost.coins) {
       return { success: false, message: '金币不足' };
     }
@@ -1944,25 +2101,69 @@ const IslandGardenModule = (function() {
       type: decorationType,
       placedAt: Date.now()
     });
+    islandState.stats.decorationCount = islandState.decorations.length;
 
-    addExp(islandState, 10);
+    addExp(islandState, 12);
 
     return { success: true, message: `成功购买并放置${decoration.name}！` };
   }
 
   // 增加经验
   function addExp(islandState, amount) {
-    islandState.exp += amount;
-    while (islandState.exp >= islandState.maxExp) {
-      islandState.exp -= islandState.maxExp;
-      islandState.level++;
-      islandState.maxExp = Math.floor(islandState.maxExp * 1.5);
-      islandState.dailyHelpCount += 2; // 升级增加帮助次数
+    ensureIslandProgress(islandState);
+    if (islandState.level >= MAX_ISLAND_LEVEL) return;
+    islandState.exp = Math.min(islandState.maxExp, islandState.exp + amount);
+    islandState.upgradeReady = canUpgradeIsland(islandState);
+  }
+
+  function canUpgradeIsland(islandState) {
+    ensureIslandProgress(islandState);
+    if (islandState.level >= MAX_ISLAND_LEVEL) return false;
+    const rule = getLevelRule(islandState.level);
+    if (!rule) return false;
+    return islandState.exp >= rule.requiredXp && areUpgradeConditionsMet(islandState, rule);
+  }
+
+  function upgradeIsland(islandState) {
+    ensureIslandProgress(islandState);
+    if (!canUpgradeIsland(islandState)) {
+      return { success: false, message: '升级条件尚未满足' };
     }
+
+    const currentLevel = islandState.level;
+    const rule = getLevelRule(currentLevel);
+    const fromLevel = currentLevel;
+    const toLevel = Math.min(MAX_ISLAND_LEVEL, currentLevel + 1);
+
+    islandState.level = toLevel;
+    islandState.exp = 0;
+    islandState.coins += Number(rule.rewards?.coins || 0);
+    islandState.water += Number(rule.rewards?.water || 0);
+    islandState.sunlight += Number(rule.rewards?.sunlight || 0);
+    applySeedRewards(islandState, rule.rewards?.seeds);
+    islandState.dailyHelpCount += 1;
+    islandState.lastUpgrade = {
+      fromLevel,
+      toLevel,
+      rewards: getUpgradeRewards(rule),
+      timestamp: Date.now()
+    };
+
+    ensureIslandProgress(islandState);
+
+    return {
+      success: true,
+      message: `升级成功！Pomoland 已升到 Lv.${toLevel}`,
+      fromLevel,
+      toLevel,
+      rewards: getUpgradeRewards(rule),
+      rule
+    };
   }
 
   // 更新岛屿状态
   function updateIslandState(islandState) {
+    ensureIslandProgress(islandState);
     const now = Date.now();
     let hasChanges = false;
 
@@ -2021,7 +2222,9 @@ const IslandGardenModule = (function() {
       hasChanges = true;
     }
 
-    return hasChanges;
+    const wasReady = islandState.upgradeReady;
+    ensureIslandProgress(islandState);
+    return hasChanges || wasReady !== islandState.upgradeReady;
   }
 
   // 检查收获成就
@@ -2041,12 +2244,15 @@ const IslandGardenModule = (function() {
 
   // 帮助好友浇水
   function helpFriendWater(friendId, plotId, islandState) {
+    ensureIslandProgress(islandState);
     if (islandState.dailyHelpCount <= 0) {
       return { success: false, message: '今日帮助次数已用完' };
     }
 
     islandState.dailyHelpCount--;
     islandState.coins += 20; // 帮助获得20金币
+    islandState.stats.friendHelpCount += 1;
+    addExp(islandState, 12);
 
     return {
       success: true,
@@ -2057,6 +2263,7 @@ const IslandGardenModule = (function() {
 
   // 偷取好友果实
   function stealFriendCrop(friendId, plotId, islandState) {
+    ensureIslandProgress(islandState);
     if (islandState.dailyHelpCount <= 0) {
       return { success: false, message: '今日互动次数已用完' };
     }
@@ -2072,6 +2279,7 @@ const IslandGardenModule = (function() {
       islandState.inventory.harvested[stolenType] = 0;
     }
     islandState.inventory.harvested[stolenType] += stolenAmount;
+    addExp(islandState, 6);
 
     return {
       success: true,
@@ -2086,6 +2294,7 @@ const IslandGardenModule = (function() {
       level: islandState.level,
       exp: islandState.exp,
       maxExp: islandState.maxExp,
+      upgradeReady: islandState.upgradeReady,
       coins: islandState.coins,
       water: islandState.water,
       sunlight: islandState.sunlight,
@@ -2138,6 +2347,15 @@ const IslandGardenModule = (function() {
     updateIslandState,
     helpFriendWater,
     stealFriendCrop,
+    canUpgradeIsland,
+    upgradeIsland,
+    ensureIslandProgress,
+    getLevelRule,
+    getUpgradeRewards,
+    getUnlockedPlotCount,
+    getUnlockedDecorationSlots,
+    isSeedUnlocked,
+    getCropUnlockLevel,
     getIslandInfo,
     getCropsStatus,
     getPetsStatus,
@@ -2271,6 +2489,13 @@ if (typeof document !== 'undefined') {
       // Island garden elements
       islandLevel: document.querySelector('#islandLevel'),
       expFill: document.querySelector('#expFill'),
+      islandUpgradePanel: document.querySelector('#islandUpgradePanel'),
+      upgradeTitle: document.querySelector('#upgradeTitle'),
+      upgradeHint: document.querySelector('#upgradeHint'),
+      islandXpText: document.querySelector('#islandXpText'),
+      upgradeRequirementList: document.querySelector('#upgradeRequirementList'),
+      upgradeRewardPreview: document.querySelector('#upgradeRewardPreview'),
+      upgradeIslandBtn: document.querySelector('#upgradeIslandBtn'),
       coinsCount: document.querySelector('#coinsCount'),
       waterCount: document.querySelector('#waterCount'),
       sunlightCount: document.querySelector('#sunlightCount'),
@@ -2300,6 +2525,13 @@ if (typeof document !== 'undefined') {
       shopPets: document.querySelector('#shopPets'),
       inventoryModal: document.querySelector('#inventoryModal'),
       closeInventory: document.querySelector('#closeInventory'),
+      islandUpgradeModal: document.querySelector('#islandUpgradeModal'),
+      closeIslandUpgrade: document.querySelector('#closeIslandUpgrade'),
+      confirmIslandUpgrade: document.querySelector('#confirmIslandUpgrade'),
+      islandUpgradeModalTitle: document.querySelector('#islandUpgradeModalTitle'),
+      islandUpgradeModalLead: document.querySelector('#islandUpgradeModalLead'),
+      islandUpgradeSummary: document.querySelector('#islandUpgradeSummary'),
+      islandUpgradeRewards: document.querySelector('#islandUpgradeRewards'),
       petList: document.querySelector('#petList'),
       petFeedModal: document.querySelector('#petFeedModal'),
       closePetFeed: document.querySelector('#closePetFeed'),
@@ -4626,6 +4858,14 @@ if (typeof document !== 'undefined') {
           elements.inventoryModal.hidden = true;
         }
       }
+      if (target.id === 'upgradeIslandBtn') {
+        handleIslandUpgrade();
+      }
+      if (target.id === 'closeIslandUpgrade' || target.id === 'confirmIslandUpgrade') {
+        if (elements.islandUpgradeModal) {
+          elements.islandUpgradeModal.hidden = true;
+        }
+      }
 
       if (target.id === 'closePetFeed') {
         if (elements.petFeedModal) elements.petFeedModal.hidden = true;
@@ -4855,9 +5095,131 @@ if (typeof document !== 'undefined') {
       renderAll();
       persistSession();
     }
+
+    function getConditionLabel(key, target) {
+      if (key === 'plantCount') return `累计种植 ${target} 次`;
+      if (key === 'harvestCount') return `累计收获 ${target} 次`;
+      if (key === 'decorationCount') return `放置装饰 ${target} 个`;
+      if (key === 'friendHelpCount') return `帮助好友 ${target} 次`;
+      return `${key} ${target}`;
+    }
+
+    function getPlotUnlockLevel(index) {
+      if (index < 2) return 1;
+      if (index < 4) return 2;
+      if (index < 5) return 3;
+      return 4;
+    }
+
+    function getDecorationUnlockLevel(index) {
+      return Math.min(4, index + 1);
+    }
+
+    function renderUpgradePanel() {
+      IslandGardenModule.ensureIslandProgress(islandState);
+      const currentLevel = islandState.level;
+      const rule = IslandGardenModule.getLevelRule(currentLevel);
+      const isReady = IslandGardenModule.canUpgradeIsland(islandState);
+
+      if (!rule) {
+        if (elements.upgradeTitle) elements.upgradeTitle.textContent = `Lv.${currentLevel} · 已达到最高等级`;
+        if (elements.upgradeHint) elements.upgradeHint.textContent = '你的 Pomoland 已经成长为完整岛屿，可以继续经营与收集资源。';
+        if (elements.islandXpText) elements.islandXpText.textContent = 'MAX';
+        if (elements.upgradeRequirementList) {
+          elements.upgradeRequirementList.innerHTML = '<span class="upgrade-chip is-met">已解锁全部等级内容</span>';
+        }
+        if (elements.upgradeRewardPreview) {
+          elements.upgradeRewardPreview.innerHTML = '<span class="reward-chip">继续专注可获得更多经营资源</span>';
+        }
+        if (elements.upgradeIslandBtn) {
+          elements.upgradeIslandBtn.disabled = true;
+          elements.upgradeIslandBtn.textContent = '已满级';
+        }
+        if (elements.islandUpgradePanel) {
+          elements.islandUpgradePanel.classList.remove('is-ready');
+        }
+        return;
+      }
+
+      if (elements.upgradeTitle) {
+        elements.upgradeTitle.textContent = `Lv.${currentLevel} -> Lv.${currentLevel + 1}`;
+      }
+      if (elements.upgradeHint) {
+        elements.upgradeHint.textContent = isReady
+          ? '升级条件已满足，点击按钮让岛屿扩张并领取新解锁内容。'
+          : '先积累经验并完成建设条件，再触发岛屿升级。';
+      }
+      if (elements.islandXpText) {
+        elements.islandXpText.textContent = `${islandState.exp} / ${rule.requiredXp} XP`;
+      }
+      if (elements.upgradeRequirementList) {
+        elements.upgradeRequirementList.innerHTML = IslandGardenModule
+          .getLevelRule(currentLevel)
+          ? Object.entries(rule.conditions || {}).map(([key, target]) => {
+            const value = Number((islandState.stats && islandState.stats[key]) || 0);
+            const met = value >= target;
+            return `<span class="upgrade-chip ${met ? 'is-met' : ''}">${met ? '✓' : '•'} ${escapeHtml(getConditionLabel(key, target))} (${value}/${target})</span>`;
+          }).join('')
+          : '';
+      }
+      if (elements.upgradeRewardPreview) {
+        elements.upgradeRewardPreview.innerHTML = IslandGardenModule.getUpgradeRewards(rule)
+          .map((item) => `<span class="reward-chip">${escapeHtml(item)}</span>`)
+          .join('');
+      }
+      if (elements.upgradeIslandBtn) {
+        elements.upgradeIslandBtn.disabled = !isReady;
+        elements.upgradeIslandBtn.textContent = isReady ? '升级岛屿' : '继续建设';
+      }
+      if (elements.islandUpgradePanel) {
+        elements.islandUpgradePanel.classList.toggle('is-ready', isReady);
+      }
+    }
+
+    function openIslandUpgradeModal(result) {
+      if (elements.islandUpgradeModalTitle) {
+        elements.islandUpgradeModalTitle.textContent = `Pomoland 升到 Lv.${result.toLevel}`;
+      }
+      if (elements.islandUpgradeModalLead) {
+        elements.islandUpgradeModalLead.textContent = `岛屿从 Lv.${result.fromLevel} 升级到 Lv.${result.toLevel}，新的区域和资源已经解锁。`;
+      }
+      if (elements.islandUpgradeSummary) {
+        const summaryItems = [
+          `Island XP 已达成升级阈值`,
+          ...Object.entries((result.rule && result.rule.conditions) || {}).map(([key, target]) => getConditionLabel(key, target))
+        ];
+        elements.islandUpgradeSummary.innerHTML = `<div class="upgrade-modal-list">${summaryItems.map((item) => `<div class="upgrade-modal-item">${escapeHtml(item)}</div>`).join('')}</div>`;
+      }
+      if (elements.islandUpgradeRewards) {
+        elements.islandUpgradeRewards.innerHTML = `<div class="upgrade-modal-list">${(result.rewards || []).map((item) => `<div class="upgrade-modal-item">${escapeHtml(item)}</div>`).join('')}</div>`;
+      }
+      if (elements.islandUpgradePanel) {
+        elements.islandUpgradePanel.classList.add('is-celebrating');
+        window.setTimeout(() => elements.islandUpgradePanel && elements.islandUpgradePanel.classList.remove('is-celebrating'), 900);
+      }
+      if (elements.islandScene) {
+        elements.islandScene.classList.add('level-up-scene');
+        window.setTimeout(() => elements.islandScene && elements.islandScene.classList.remove('level-up-scene'), 900);
+      }
+      if (elements.islandUpgradeModal) {
+        elements.islandUpgradeModal.hidden = false;
+      }
+    }
+
+    function handleIslandUpgrade() {
+      const result = IslandGardenModule.upgradeIsland(islandState);
+      showMessage(result.message);
+      if (!result.success) return;
+      syncIslandToMainResources();
+      updateIslandUI();
+      persistIslandState();
+      openIslandUpgradeModal(result);
+    }
+
     function updateIslandUI() {
       // 始终先把主资源同步进岛屿，保证展示一致
       syncMainToIslandResources();
+      IslandGardenModule.ensureIslandProgress(islandState);
       const changed = IslandGardenModule.updateIslandState(islandState);
       // 如果 island 内部有“时间驱动”的变化（比如每日刷新游戏机会），同步回左下角
       if (changed) {
@@ -4870,7 +5232,7 @@ if (typeof document !== 'undefined') {
         elements.islandLevel.textContent = `Lv.${islandState.level}`;
       }
       if (elements.expFill) {
-        const expPercent = (islandState.exp / islandState.maxExp) * 100;
+        const expPercent = islandState.level >= 5 ? 100 : (islandState.exp / islandState.maxExp) * 100;
         elements.expFill.style.width = `${expPercent}%`;
       }
       if (elements.coinsCount) {
@@ -4885,6 +5247,8 @@ if (typeof document !== 'undefined') {
       if (elements.helpCount) {
         elements.helpCount.textContent = islandState.dailyHelpCount;
       }
+
+      renderUpgradePanel();
 
       // Update plots with new structure
       updatePlotsUI();
@@ -4913,10 +5277,19 @@ if (typeof document !== 'undefined') {
 
       const decorationTypes = IslandGardenModule.DECORATION_TYPES || {};
       const decorations = Array.isArray(islandState.decorations) ? islandState.decorations : [];
+      const unlockedSlots = IslandGardenModule.getUnlockedDecorationSlots(islandState);
 
       slots.forEach((slot, index) => {
+        const requiredLevel = getDecorationUnlockLevel(index);
+        if (index >= unlockedSlots) {
+          slot.classList.remove('empty');
+          slot.classList.add('locked');
+          slot.innerHTML = `<span class="slot-lock">Lv.${requiredLevel} 解锁</span>`;
+          return;
+        }
         const deco = decorations[index];
         if (!deco) {
+          slot.classList.remove('locked');
           slot.classList.add('empty');
           slot.innerHTML = '<span class="slot-plus">+</span>';
           return;
@@ -4924,6 +5297,7 @@ if (typeof document !== 'undefined') {
         const info = decorationTypes[deco.type];
         const icon = info?.icon || '✨';
         const name = info?.name || deco.type;
+        slot.classList.remove('locked');
         slot.classList.remove('empty');
         slot.innerHTML = `<span title="${escapeHtml(name)}" style="font-size:24px;">${icon}</span>`;
       });
@@ -4963,7 +5337,8 @@ if (typeof document !== 'undefined') {
     }
 
     function updatePlotsUI() {
-      islandState.plots.forEach(plot => {
+      const unlockedPlots = IslandGardenModule.getUnlockedPlotCount(islandState);
+      islandState.plots.forEach((plot, index) => {
         const plotElement = document.querySelector(`[data-plot="${plot.id}"]`);
         if (!plotElement) return;
 
@@ -4973,6 +5348,18 @@ if (typeof document !== 'undefined') {
         const plotProgress = document.querySelector(`#${plot.id}Progress .progress-bar`);
         const plotNeed = document.querySelector(`#${plot.id}Need`);
 
+        if (index >= unlockedPlots) {
+          const unlockLevel = getPlotUnlockLevel(index);
+          plotElement.classList.add('locked');
+          if (plotIcon) plotIcon.textContent = '🔒';
+          if (plotName) plotName.textContent = `Lv.${unlockLevel} 解锁`;
+          if (plotStatus) plotStatus.textContent = '升级岛屿后开放';
+          if (plotProgress) plotProgress.style.width = '0%';
+          if (plotNeed) plotNeed.style.opacity = '0';
+          return;
+        }
+
+        plotElement.classList.remove('locked');
         if (plot.crop) {
           const cropType = IslandGardenModule.CROP_TYPES[plot.crop];
           const growthProgress = IslandGardenModule.getGrowthProgress(plot);
@@ -5149,7 +5536,9 @@ if (typeof document !== 'undefined') {
       document.querySelectorAll('.seed-option').forEach((node) => {
         const crop = node.dataset.crop;
         const count = islandState.inventory.seeds[crop] || 0;
-        node.classList.toggle('locked', count <= 0);
+        const unlocked = IslandGardenModule.isSeedUnlocked(islandState, crop);
+        node.classList.toggle('locked', count <= 0 || !unlocked);
+        node.title = unlocked ? '' : `Lv.${IslandGardenModule.getCropUnlockLevel(crop)} 解锁`;
       });
 
       // Update inventory modal counts (if opened)
@@ -5174,11 +5563,27 @@ if (typeof document !== 'undefined') {
         const cropNode = document.querySelector(modalHarvestIdMap[key]);
         if (cropNode) cropNode.textContent = islandState.inventory.harvested[key] || 0;
       });
+
+      updateShopAvailability();
     }
 
     function updateQuickInventoryUI() {
       // Alias to keep old calls safe (inventory UI now handles quick bag too)
       updateInventoryUI();
+    }
+
+    function updateShopAvailability() {
+      const shopItems = document.querySelectorAll('#shopSeeds .shop-item');
+      shopItems.forEach((item) => {
+        const crop = item.dataset.item;
+        const unlocked = IslandGardenModule.isSeedUnlocked(islandState, crop);
+        const button = item.querySelector('.buy-btn');
+        item.classList.toggle('locked', !unlocked);
+        if (button) {
+          button.disabled = !unlocked;
+          button.textContent = unlocked ? '购买' : `Lv.${IslandGardenModule.getCropUnlockLevel(crop)} 解锁`;
+        }
+      });
     }
 
     function handlePlotClick(plotElement) {
@@ -5196,6 +5601,11 @@ if (typeof document !== 'undefined') {
 
       const plot = islandState.plots.find(p => p.id === plotId);
       if (!plot) return;
+      const plotIndex = islandState.plots.findIndex((item) => item.id === plotId);
+      if (plotIndex >= IslandGardenModule.getUnlockedPlotCount(islandState)) {
+        showMessage(`该地块需要 Lv.${getPlotUnlockLevel(plotIndex)} 才能解锁`);
+        return;
+      }
 
       switch (currentTool) {
         case 'plant':
@@ -5287,6 +5697,7 @@ if (typeof document !== 'undefined') {
           break;
         case 'seeds':
           if (elements.shopSeeds) elements.shopSeeds.classList.remove('hidden');
+          updateShopAvailability();
           break;
         case 'pets':
           if (elements.shopPets) elements.shopPets.classList.remove('hidden');
@@ -5309,6 +5720,10 @@ if (typeof document !== 'undefined') {
         const result = IslandGardenModule.buyDecoration(islandState, itemType);
         showMessage(result.message);
       } else if (parentSection === elements.shopSeeds) {
+        if (!IslandGardenModule.isSeedUnlocked(islandState, itemType)) {
+          showMessage(`Lv.${IslandGardenModule.getCropUnlockLevel(itemType)} 解锁 ${IslandGardenModule.CROP_TYPES[itemType].name}种子`);
+          return;
+        }
         // Purchase seeds
         islandState.coins -= cost;
         if (!islandState.inventory.seeds[itemType]) {
@@ -5494,7 +5909,10 @@ if (typeof document !== 'undefined') {
           harvested: { ...islandState.inventory.harvested, ...((savedIslandState.inventory || {}).harvested || {}) }
         };
         islandState.achievements = { ...islandState.achievements, ...(savedIslandState.achievements || {}) };
+        islandState.stats = { ...(islandState.stats || {}), ...((savedIslandState.stats) || {}) };
+        islandState.lastUpgrade = savedIslandState.lastUpgrade || null;
       }
+      IslandGardenModule.ensureIslandProgress(islandState);
       updateIslandUI();
     }
 
