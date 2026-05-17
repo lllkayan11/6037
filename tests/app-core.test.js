@@ -92,13 +92,13 @@ test('claiming a reward updates resources and marks the focus session complete',
   const state = core.createInitialState();
   const next = core.claimReward(state, {
     coins: 40,
-    seeds: 1,
+    sunlight: 2,
     water: 2,
     chances: 1,
     decoration: 'Solar dock'
   });
   assert.equal(next.resources.coins, 160);
-  assert.equal(next.resources.seeds, 3);
+  assert.equal(next.resources.sunlight, 4);
   assert.equal(next.resources.water, 5);
   assert.equal(next.resources.chances, 2);
   assert.equal(next.focusCompleted, true);
@@ -137,7 +137,7 @@ test('reward bundle scales with effort and only returns supported fields', () =>
   let index = 0;
   const reward = core.buildRewardBundle('zh-CN', 1800, () => sequence[index++]);
   assert.equal(reward.coins > 0, true);
-  assert.equal(reward.seeds, 2);
+  assert.equal(reward.sunlight, 2);
   assert.equal(reward.water, 2);
   assert.equal(reward.chances, 1);
   assert.equal(reward.decoration, core.t('zh-CN', 'rewardDecoration'));
@@ -146,7 +146,7 @@ test('reward bundle scales with effort and only returns supported fields', () =>
 test('island actions spend resources and advance island progress', () => {
   const state = core.createInitialState();
   const planted = core.applyIslandAction(state, 'plant');
-  assert.equal(planted.resources.seeds, 1);
+  assert.equal(planted.resources.sunlight, 1);
   assert.equal(planted.islandLevel, 2);
   assert.equal(planted.cropStage, 2);
   assert.match(planted.lastMessage.en, /planted/i);
@@ -199,7 +199,7 @@ test('island visual state exposes clear growth and hydration stages', () => {
 test('island visual state can show fruiting crops and layered decorations', () => {
   const funded = core.claimReward(core.createInitialState(), {
     coins: 120,
-    seeds: 2,
+    sunlight: 2,
     water: 0,
     chances: 0,
     decoration: 'Solar dock'
