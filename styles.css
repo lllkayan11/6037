@@ -3702,7 +3702,7 @@ a {
 .island-deco {
   position: absolute;
   --decoration-scale-x: 1;
-  transform: translate(-50%, -50%) scaleX(var(--decoration-scale-x));
+  transform: translate(-50%, -50%);
   width: 42px;
   height: 42px;
   filter: drop-shadow(0 10px 10px rgba(0,0,0,0.18));
@@ -3713,7 +3713,7 @@ a {
 
 .island-deco.is-dragging {
   cursor: grabbing;
-  transform: translate(-50%, -50%) scaleX(var(--decoration-scale-x)) scale(1.03);
+  transform: translate(-50%, -50%) scale(1.03);
   filter: drop-shadow(0 16px 18px rgba(0,0,0,0.25));
   z-index: 3;
 }
@@ -3729,6 +3729,11 @@ a {
   height: 44px;
   background: center / contain no-repeat var(--fence-image, url("./栅栏.png"));
   filter: drop-shadow(0 10px 8px rgba(0, 0, 0, 0.2));
+  transform: translate(-50%, -50%) scaleX(var(--decoration-scale-x));
+}
+
+.island-deco.deco-fence.is-dragging {
+  transform: translate(-50%, -50%) scaleX(var(--decoration-scale-x)) scale(1.03);
 }
 
 .island-deco.deco-fence::before,
@@ -3740,6 +3745,11 @@ a {
   width: 66px;
   height: 58px;
   background: center / contain no-repeat var(--flower-image, url("./花草石礅.png"));
+  transform: translate(-50%, -50%) scaleX(var(--decoration-scale-x));
+}
+
+.island-deco.deco-flower.is-dragging {
+  transform: translate(-50%, -50%) scaleX(var(--decoration-scale-x)) scale(1.03);
 }
 
 .island-deco.deco-flower::before,
@@ -3770,6 +3780,11 @@ a {
   width: 56px;
   height: 72px;
   background: center / contain no-repeat var(--lamp-image, url("./路灯.png"));
+  transform: translate(-50%, -50%) scaleX(var(--decoration-scale-x));
+}
+
+.island-deco.deco-lamp.is-dragging {
+  transform: translate(-50%, -50%) scaleX(var(--decoration-scale-x)) scale(1.03);
 }
 
 .island-deco.deco-lamp::before,
@@ -3781,6 +3796,11 @@ a {
   width: 72px;
   height: 72px;
   background: center / contain no-repeat var(--fountain-image, url("./喷泉.png"));
+  transform: translate(-50%, -50%) scaleX(var(--decoration-scale-x));
+}
+
+.island-deco.deco-fountain.is-dragging {
+  transform: translate(-50%, -50%) scaleX(var(--decoration-scale-x)) scale(1.03);
 }
 
 .island-deco.deco-fountain::before,
@@ -4470,8 +4490,6 @@ a {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transform: scaleX(var(--decoration-scale-x, 1));
-  transform-origin: center;
 }
 
 .decoration-image-frame-fence {
@@ -4499,6 +4517,8 @@ a {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
+  transform: scaleX(var(--decoration-scale-x, 1));
+  transform-origin: center;
 }
 
 .slot-decoration-name {
@@ -5145,9 +5165,13 @@ a {
 }
 
 .decoration-flip-actions {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
   gap: 12px;
+}
+
+.decoration-flip-actions > .secondary-button {
+  flex: 1 1 0;
+  min-width: 0;
 }
 
 .decoration-current-card {
