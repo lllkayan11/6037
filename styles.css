@@ -5261,9 +5261,926 @@ a {
   width: 108px;
 }
 
+/* Island scene overhaul */
+.island-background {
+  height: 360px;
+  border-radius: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(180deg, #8fd6ff 0%, #d6f2ff 42%, #79d3ea 42%, #2ca8cb 100%);
+  box-shadow: inset 0 -30px 70px rgba(0, 0, 0, 0.16), 0 24px 48px rgba(5, 33, 48, 0.2);
+}
+
+.sky {
+  height: 58%;
+}
+
+.sun {
+  top: 30px;
+  right: 56px;
+  width: 70px;
+  height: 70px;
+  box-shadow: 0 0 0 16px rgba(255, 213, 79, 0.18), 0 0 36px rgba(255, 213, 79, 0.42);
+}
+
+.cloud-a {
+  top: 54px;
+  left: 52px;
+  width: 88px;
+}
+
+.cloud-b {
+  top: 94px;
+  left: 258px;
+  width: 74px;
+}
+
+.cloud-c {
+  position: absolute;
+  top: 36px;
+  left: 320px;
+  width: 54px;
+  transform: scale(0.72);
+}
+
+.bird {
+  position: absolute;
+  width: 16px;
+  height: 8px;
+  border-top: 2px solid rgba(27, 87, 118, 0.55);
+  border-radius: 999px 999px 0 0;
+}
+
+.bird::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: -2px;
+  width: 16px;
+  height: 8px;
+  border-top: 2px solid rgba(27, 87, 118, 0.55);
+  border-radius: 999px 999px 0 0;
+}
+
+.bird-a {
+  top: 72px;
+  right: 168px;
+}
+
+.bird-b {
+  top: 102px;
+  right: 128px;
+  transform: scale(0.86);
+}
+
+.sea {
+  height: 48%;
+  background:
+    radial-gradient(circle at 18% 22%, rgba(255, 255, 255, 0.18), transparent 10%),
+    radial-gradient(circle at 76% 18%, rgba(255, 255, 255, 0.16), transparent 11%),
+    linear-gradient(180deg, #4bd1ea, #1ba2c5 55%, #157aa0 100%);
+}
+
+.sea-sparkle {
+  position: absolute;
+  display: block;
+  width: 16px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.sparkle-a {
+  left: 18%;
+  top: 34px;
+}
+
+.sparkle-b {
+  left: 68%;
+  top: 70px;
+  width: 20px;
+}
+
+.sparkle-c {
+  left: 42%;
+  top: 98px;
+}
+
+.offshore-boat {
+  position: absolute;
+  left: 10%;
+  bottom: 20%;
+  width: 54px;
+  height: 54px;
+  z-index: 1;
+}
+
+.boat-hull,
+.boat-sail {
+  position: absolute;
+  display: block;
+}
+
+.boat-hull {
+  bottom: 8px;
+  left: 10px;
+  width: 34px;
+  height: 12px;
+  border-radius: 0 0 16px 16px;
+  background: linear-gradient(180deg, #9e6840, #71472c);
+}
+
+.boat-sail {
+  left: 23px;
+  top: 8px;
+  width: 14px;
+  height: 28px;
+  clip-path: polygon(0 0, 100% 40%, 0 100%);
+  background: linear-gradient(180deg, #fffaf0, #f7dcc8);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.12));
+}
+
+.island-shadow {
+  position: absolute;
+  left: 50%;
+  bottom: 18%;
+  width: 76%;
+  height: 26%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(0, 67, 89, 0.42), rgba(0, 67, 89, 0.02) 70%);
+}
+
+.island-cliff {
+  position: absolute;
+  left: 50%;
+  bottom: 22%;
+  width: 84%;
+  height: 30%;
+  transform: translateX(-50%);
+  border-radius: 52% 48% 44% 46% / 54% 56% 42% 44%;
+  background:
+    linear-gradient(180deg, rgba(147, 101, 63, 0) 0 24%, rgba(147, 101, 63, 0.86) 24% 34%, rgba(120, 78, 47, 0.96) 34% 100%),
+    linear-gradient(90deg, #936543 0%, #a7724b 34%, #8b5e3d 100%);
+  box-shadow: inset 0 -20px 24px rgba(94, 57, 32, 0.28);
+}
+
+.island-shore {
+  bottom: 25%;
+  height: 26%;
+  border-radius: 50% 50% 42% 44% / 54% 54% 44% 40%;
+  box-shadow: inset 0 -10px 16px rgba(171, 125, 52, 0.18);
+}
+
+.island {
+  bottom: 30%;
+  width: 76%;
+  height: 26%;
+  border-radius: 50% 50% 40% 44% / 56% 52% 44% 40%;
+  background:
+    radial-gradient(circle at 18% 30%, rgba(146, 226, 121, 0.95), transparent 16%),
+    radial-gradient(circle at 72% 28%, rgba(132, 214, 110, 0.92), transparent 14%),
+    linear-gradient(180deg, #8ad36b, #6cbc4e 72%, #58a53f 100%);
+}
+
+.island-lawn {
+  position: absolute;
+  border-radius: 50%;
+  background: linear-gradient(180deg, rgba(166, 235, 138, 0.95), rgba(112, 198, 76, 0.92));
+  box-shadow: inset 0 -10px 16px rgba(65, 126, 44, 0.18);
+}
+
+.island-lawn-main {
+  left: 19%;
+  bottom: 36%;
+  width: 30%;
+  height: 12%;
+  transform: rotate(-8deg);
+}
+
+.island-lawn-east {
+  right: 16%;
+  bottom: 38%;
+  width: 24%;
+  height: 10%;
+  transform: rotate(9deg);
+}
+
+.island-plaza {
+  position: absolute;
+  right: 28%;
+  bottom: 39%;
+  width: 24%;
+  height: 11%;
+  border-radius: 16px;
+  transform: skewX(-12deg) rotate(6deg);
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.18) 0 8%, transparent 8% 16%, rgba(255, 255, 255, 0.18) 16% 24%, transparent 24% 32%, rgba(255, 255, 255, 0.18) 32% 40%, transparent 40%),
+    linear-gradient(180deg, #e7dec8, #cec0a1);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+}
+
+.island-field-preview {
+  position: absolute;
+  border-radius: 14px;
+  background:
+    linear-gradient(90deg, transparent 0 6%, rgba(98, 69, 31, 0.32) 6% 10%, transparent 10% 18%, rgba(98, 69, 31, 0.3) 18% 22%, transparent 22%),
+    linear-gradient(180deg, #a76832, #8d5328);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.08);
+}
+
+.field-preview-a {
+  left: 28%;
+  bottom: 33%;
+  width: 15%;
+  height: 8%;
+  transform: rotate(-8deg);
+}
+
+.field-preview-b {
+  left: 43%;
+  bottom: 31%;
+  width: 12%;
+  height: 7%;
+  transform: rotate(4deg);
+}
+
+.island-path {
+  left: 49%;
+  width: 144px;
+  height: 26px;
+}
+
+.island-path.island-path-branch {
+  left: 36%;
+  bottom: 42%;
+  width: 92px;
+  height: 18px;
+  transform: rotate(26deg);
+  opacity: 0.94;
+}
+
+.flower-ribbon,
+.garden-patch {
+  position: absolute;
+}
+
+.flower-ribbon {
+  height: 10px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle, #ffef94 0 16%, transparent 17%),
+    radial-gradient(circle, #ff84b4 0 16%, transparent 17%),
+    radial-gradient(circle, #8be06a 0 16%, transparent 17%);
+  background-size: 20px 10px;
+}
+
+.flower-ribbon-a {
+  left: 24%;
+  bottom: 46%;
+  width: 90px;
+  transform: rotate(-8deg);
+}
+
+.flower-ribbon-b {
+  right: 24%;
+  bottom: 46%;
+  width: 74px;
+  transform: rotate(11deg);
+}
+
+.garden-patch {
+  border-radius: 14px;
+  background: linear-gradient(180deg, #5fa53e, #4f8d34);
+  box-shadow: inset 0 0 0 2px rgba(198, 255, 164, 0.15);
+}
+
+.garden-patch::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle, #ffb3c8 0 16%, transparent 17%),
+    radial-gradient(circle, #fff085 0 16%, transparent 17%),
+    radial-gradient(circle, #c8ff8b 0 16%, transparent 17%);
+  background-size: 18px 18px;
+}
+
+.garden-patch-a {
+  right: 30%;
+  bottom: 42%;
+  width: 54px;
+  height: 28px;
+  transform: rotate(-12deg);
+}
+
+.garden-patch-b {
+  right: 20%;
+  bottom: 38%;
+  width: 42px;
+  height: 22px;
+  transform: rotate(14deg);
+}
+
+.market-stall,
+.gazebo {
+  position: absolute;
+}
+
+.market-stall {
+  left: 25%;
+  bottom: 47%;
+  width: 54px;
+  height: 54px;
+}
+
+.stall-roof,
+.stall-body,
+.gazebo-roof,
+.gazebo-body {
+  position: absolute;
+  display: block;
+}
+
+.stall-roof {
+  left: 4px;
+  top: 8px;
+  width: 46px;
+  height: 16px;
+  border-radius: 10px 10px 0 0;
+  background:
+    linear-gradient(90deg, #ff7ca7 0 20%, #fff2dd 20% 40%, #ff7ca7 40% 60%, #fff2dd 60% 80%, #ff7ca7 80%);
+}
+
+.stall-body {
+  left: 8px;
+  top: 22px;
+  width: 38px;
+  height: 18px;
+  border-radius: 0 0 8px 8px;
+  background: linear-gradient(180deg, #f8edd9, #dbcdac);
+  box-shadow: inset 0 -4px 0 rgba(180, 155, 104, 0.35);
+}
+
+.gazebo {
+  right: 14%;
+  bottom: 44%;
+  width: 64px;
+  height: 64px;
+}
+
+.gazebo-roof {
+  left: 8px;
+  top: 4px;
+  width: 48px;
+  height: 18px;
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+  background: linear-gradient(180deg, #f5d27f, #ca9340);
+}
+
+.gazebo-body {
+  left: 13px;
+  top: 20px;
+  width: 38px;
+  height: 26px;
+  border-radius: 0 0 12px 12px;
+  background:
+    linear-gradient(90deg, #8d5a32 0 4px, transparent 4px 34px, #8d5a32 34px 38px),
+    linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.18)),
+    linear-gradient(180deg, #fff3d6, #e6cf9b);
+}
+
+.island-house {
+  left: 53%;
+  bottom: 46%;
+  width: 96px;
+  height: 92px;
+}
+
+.house-roof {
+  left: 8px;
+  width: 80px;
+  height: 34px;
+}
+
+.house-body {
+  left: 18px;
+  top: 28px;
+  width: 60px;
+  height: 46px;
+  border-radius: 14px;
+}
+
+.house-door {
+  left: 42px;
+  top: 48px;
+  width: 14px;
+  height: 26px;
+}
+
+.house-window {
+  top: 42px;
+  width: 12px;
+  height: 12px;
+}
+
+.house-window-left {
+  left: 26px;
+}
+
+.house-window-right {
+  right: 26px;
+}
+
+.island-tree {
+  width: 32px;
+  height: 72px;
+}
+
+.island-tree::before {
+  left: 13px;
+  width: 6px;
+  height: 24px;
+}
+
+.island-tree::after {
+  width: 32px;
+  height: 38px;
+  box-shadow: 14px 2px 0 3px rgba(98, 177, 81, 0.95), -10px 6px 0 2px rgba(87, 166, 75, 0.92);
+}
+
+.tree-a {
+  left: 18%;
+  bottom: 42%;
+}
+
+.tree-b {
+  right: 31%;
+  bottom: 44%;
+}
+
+.tree-c {
+  right: 16%;
+  bottom: 41%;
+}
+
+.island-bush {
+  position: absolute;
+  width: 34px;
+  height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #9de684, #4c9840 75%);
+  box-shadow: 10px 2px 0 0 rgba(106, 179, 74, 0.9);
+}
+
+.bush-a {
+  left: 22%;
+  bottom: 38%;
+}
+
+.bush-b {
+  left: 61%;
+  bottom: 41%;
+}
+
+.bush-c {
+  right: 12%;
+  bottom: 36%;
+}
+
+.lamp-post {
+  position: absolute;
+  width: 12px;
+  height: 42px;
+}
+
+.lamp-post::before,
+.lamp-post::after {
+  content: "";
+  position: absolute;
+}
+
+.lamp-post::before {
+  left: 4px;
+  bottom: 0;
+  width: 4px;
+  height: 26px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #5c5c5c, #272727);
+}
+
+.lamp-post::after {
+  left: 0;
+  top: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff6b8, #ffc95a);
+  box-shadow: 0 0 14px rgba(255, 214, 102, 0.45);
+}
+
+.lamp-post-a {
+  left: 47%;
+  bottom: 44%;
+}
+
+.lamp-post-b {
+  right: 22%;
+  bottom: 44%;
+}
+
+.harbor-cove {
+  position: absolute;
+  left: 8%;
+  bottom: 22%;
+  width: 24%;
+  height: 18%;
+  border-radius: 56% 44% 50% 38%;
+  background: linear-gradient(180deg, rgba(178, 235, 252, 0.92), rgba(86, 179, 211, 0.96));
+  box-shadow: inset 0 0 0 4px rgba(255, 255, 255, 0.18);
+}
+
+.island-dock {
+  left: 15%;
+  bottom: 31%;
+  width: 92px;
+  height: 16px;
+  border-radius: 10px;
+}
+
+.island-dock::before,
+.island-dock::after {
+  bottom: -18px;
+  width: 8px;
+  height: 24px;
+}
+
+.dock-crates {
+  position: absolute;
+  left: 23%;
+  bottom: 36%;
+  width: 28px;
+  height: 18px;
+  background:
+    linear-gradient(90deg, #8f5f36 0 12px, transparent 12px 16px, #8f5f36 16px 28px),
+    linear-gradient(180deg, #c6945d, #8f5f36);
+  border-radius: 4px;
+}
+
+.market-stall,
+.gazebo,
+.field-preview-b,
+.flower-ribbon-b,
+.lamp-post-b,
+.bush-c {
+  opacity: 0.72;
+}
+
+.island-decorations-layer {
+  z-index: 5;
+}
+
+.island-deco {
+  width: 48px;
+  height: 48px;
+}
+
+.island-scene[data-level="1"] .island-house {
+  transform: translateX(-50%) scale(0.92);
+}
+
+.island-scene[data-level="2"] .island {
+  width: 79%;
+}
+
+.island-scene[data-level="2"] .island-lawn-east {
+  width: 26%;
+}
+
+.island-scene[data-level="2"] .market-stall,
+.island-scene[data-level="2"] .field-preview-b {
+  opacity: 0.9;
+}
+
+.island-scene[data-level="3"] .island {
+  width: 82%;
+  height: 28%;
+}
+
+.island-scene[data-level="3"] .island-house {
+  transform: translateX(-50%) scale(1);
+}
+
+.island-scene[data-level="3"] .field-preview-b,
+.island-scene[data-level="3"] .market-stall,
+.island-scene[data-level="3"] .flower-ribbon-b,
+.island-scene[data-level="3"] .lamp-post-b {
+  opacity: 1;
+}
+
+.island-scene[data-level="4"] .island {
+  width: 84%;
+  height: 30%;
+}
+
+.island-scene[data-level="4"] .gazebo,
+.island-scene[data-level="4"] .bush-c {
+  opacity: 1;
+}
+
+.island-scene[data-level="4"] .island-house,
+.island-scene[data-level="5"] .island-house {
+  transform: translateX(-50%) scale(1.08);
+}
+
+.island-scene[data-level="4"] .island-dock {
+  width: 110px;
+}
+
+.island-scene[data-level="5"] .island-background::before {
+  opacity: 1;
+  background: linear-gradient(180deg, rgba(10, 19, 44, 0.4), rgba(15, 31, 58, 0.18));
+}
+
+.island-scene[data-level="5"] .sea {
+  background:
+    radial-gradient(circle at 18% 22%, rgba(255, 255, 255, 0.16), transparent 10%),
+    radial-gradient(circle at 76% 18%, rgba(255, 255, 255, 0.12), transparent 11%),
+    linear-gradient(180deg, #2b90c1, #185f92 55%, #0e3d67 100%);
+}
+
+.island-scene[data-level="5"] .sun {
+  width: 50px;
+  height: 50px;
+  background: radial-gradient(circle at 35% 35%, #fffde7, #cfd8ff 60%, #9fa8da 100%);
+  box-shadow: 0 0 0 10px rgba(207, 216, 255, 0.12), 0 0 24px rgba(159, 168, 218, 0.32);
+}
+
+.island-scene[data-level="5"] .lamp-post::after,
+.island-scene[data-level="5"] .house-window {
+  box-shadow: 0 0 16px rgba(255, 220, 130, 0.35), inset 0 0 0 2px rgba(255, 255, 255, 0.5);
+}
+
+.island-scene[data-level="5"] .gazebo-roof {
+  background: linear-gradient(180deg, #ffe28d, #d5a650);
+}
+
+.scene-district {
+  position: absolute;
+  z-index: 4;
+}
+
+.scene-district-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 10px;
+}
+
+.scene-district-kicker {
+  color: rgba(46, 71, 31, 0.72);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.scene-district-title {
+  margin: 0;
+  color: #23402b;
+  font-size: 16px;
+  font-weight: 900;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+.farm-section.farm-district {
+  left: 6%;
+  bottom: 10%;
+  width: 46%;
+  margin: 0;
+  padding: 14px 16px 16px;
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(248, 236, 198, 0.95), rgba(227, 205, 156, 0.92));
+  box-shadow: 0 18px 28px rgba(33, 54, 25, 0.2), inset 0 0 0 2px rgba(255, 255, 255, 0.18);
+}
+
+.farm-section.farm-district::before {
+  content: "";
+  position: absolute;
+  inset: 38px 12px 12px;
+  border-radius: 18px;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,0.08) 0 2%, transparent 2% 33%, rgba(255,255,255,0.08) 33% 35%, transparent 35% 66%, rgba(255,255,255,0.08) 66% 68%, transparent 68%),
+    linear-gradient(180deg, rgba(255,255,255,0.08) 0 3%, transparent 3% 50%, rgba(255,255,255,0.08) 50% 53%, transparent 53%),
+    linear-gradient(180deg, #8c5a2f, #724523);
+  box-shadow: inset 0 0 0 2px rgba(67, 41, 18, 0.18);
+}
+
+.scene-plots-grid {
+  position: relative;
+  z-index: 1;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.farm-district .plot {
+  min-height: 116px;
+  padding: 14px 12px 12px;
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0)),
+    linear-gradient(180deg, #9f6535, #7d4b26);
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 222, 165, 0.08),
+    inset 0 -12px 18px rgba(70, 38, 15, 0.24),
+    0 8px 12px rgba(60, 35, 12, 0.18);
+}
+
+.farm-district .plot::before {
+  content: "";
+  position: absolute;
+  inset: 10px 8px 28px;
+  border-radius: 14px;
+  background:
+    linear-gradient(90deg, transparent 0 10%, rgba(61, 35, 15, 0.22) 10% 13%, transparent 13% 22%, rgba(61, 35, 15, 0.22) 22% 25%, transparent 25% 34%, rgba(61, 35, 15, 0.22) 34% 37%, transparent 37% 46%, rgba(61, 35, 15, 0.22) 46% 49%, transparent 49%),
+    linear-gradient(180deg, rgba(184, 117, 62, 0.55), rgba(117, 67, 31, 0.2));
+}
+
+.farm-district .plot.locked {
+  background: linear-gradient(180deg, rgba(125, 109, 92, 0.96), rgba(89, 75, 64, 0.96));
+}
+
+.farm-district .plot.is-harvestable {
+  background:
+    linear-gradient(180deg, rgba(255,240,174,0.14), rgba(255,255,255,0)),
+    linear-gradient(180deg, #a86d38, #8f5426);
+}
+
+.farm-district .plot-icon {
+  height: 52px;
+  margin-bottom: 4px;
+}
+
+.farm-district .plot-name {
+  font-size: 12px;
+  color: #fff9ef;
+}
+
+.farm-district .plot-status {
+  color: rgba(255, 247, 229, 0.8);
+  font-size: 11px;
+}
+
+.farm-district .plot-progress {
+  margin-top: 10px;
+  background: rgba(35, 21, 8, 0.26);
+}
+
+.farm-district .plot-need {
+  top: 6px;
+  right: 6px;
+  font-size: 16px;
+}
+
+.farm-district .plot-stage-badge {
+  margin-left: 4px;
+  background: rgba(255, 248, 225, 0.16);
+}
+
+.pet-section.pet-district {
+  right: 6%;
+  bottom: 19%;
+  width: 27%;
+  margin: 0;
+  padding: 14px;
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(238, 243, 214, 0.96), rgba(208, 230, 188, 0.94));
+  box-shadow: 0 18px 28px rgba(33, 54, 25, 0.2), inset 0 0 0 2px rgba(255, 255, 255, 0.2);
+}
+
+.pet-section.pet-district::before {
+  content: "";
+  position: absolute;
+  inset: 42px 12px 12px;
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 20% 24%, rgba(255,255,255,0.28), transparent 18%),
+    linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0)),
+    linear-gradient(180deg, #8fd26a, #6eb44d);
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,0.14);
+}
+
+.pet-section.pet-district::after {
+  content: "";
+  position: absolute;
+  inset: 54px 16px 16px;
+  border-radius: 16px;
+  background:
+    linear-gradient(90deg, #9b6c3d 0 6px, transparent 6px 24px, #9b6c3d 24px 30px, transparent 30px),
+    linear-gradient(180deg, transparent 0 72%, rgba(113, 73, 34, 0.3) 72% 78%, transparent 78%);
+  opacity: 0.36;
+}
+
+.pet-district .pet-container {
+  position: relative;
+  z-index: 1;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255,255,255,0.18);
+  box-shadow: 0 8px 16px rgba(42, 75, 31, 0.12);
+}
+
+.pet-district .pet-display {
+  min-width: 88px;
+}
+
+.pet-district .pet-icon {
+  font-size: 52px;
+}
+
+.pet-district .pet-name {
+  color: #244329;
+  font-size: 13px;
+}
+
+.pet-district .pet-bonus-pill {
+  background: rgba(56, 118, 44, 0.14);
+  color: #335d26;
+}
+
+.pet-district .status-label {
+  color: #31522d;
+  min-width: 34px;
+  font-size: 12px;
+}
+
+.pet-district .status-bar {
+  background: rgba(41, 75, 32, 0.18);
+}
+
+.pet-district .pet-list {
+  position: relative;
+  z-index: 1;
+  margin-top: 12px;
+  gap: 8px;
+}
+
+.pet-district .pet-chip {
+  padding: 7px 9px;
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(69, 114, 48, 0.18);
+  color: #244329;
+}
+
+.pet-district .pet-chip.is-active {
+  background: rgba(255, 255, 255, 0.36);
+  border-color: rgba(69, 114, 48, 0.3);
+}
+
+.pet-district .pet-chip .pet-chip-name {
+  font-size: 11px;
+}
+
+.island-scene[data-level="1"] .pet-district,
+.island-scene[data-level="1"] .farm-district {
+  transform: scale(0.97);
+}
+
+.island-scene[data-level="2"] .farm-district {
+  width: 48%;
+}
+
+.island-scene[data-level="3"] .pet-district {
+  width: 28%;
+}
+
+.island-scene[data-level="4"] .farm-district {
+  width: 50%;
+}
+
+.island-scene[data-level="4"] .pet-district::before {
+  background:
+    radial-gradient(circle at 20% 24%, rgba(255,255,255,0.28), transparent 18%),
+    linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0)),
+    linear-gradient(180deg, #98da73, #70bb4c);
+}
+
+.island-scene[data-level="5"] .farm-district {
+  box-shadow: 0 22px 34px rgba(19, 43, 19, 0.24), inset 0 0 0 2px rgba(255, 255, 255, 0.18);
+}
+
+.island-scene[data-level="5"] .pet-district {
+  box-shadow: 0 22px 34px rgba(19, 43, 19, 0.24), inset 0 0 0 2px rgba(255, 255, 255, 0.24);
+}
+
+.island-scene[data-level="5"] .pet-district .pet-container {
+  background: rgba(255, 255, 255, 0.24);
+}
+
 
 /* Friend interaction modal */
-.friend-interaction-modal {
   width: 90%;
   background: linear-gradient(180deg, #1a2a3a, #0d1b2a);
   border: 1px solid rgba(255, 255, 255, 0.1);
