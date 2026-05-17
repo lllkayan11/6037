@@ -1901,7 +1901,7 @@ const IslandGardenModule = (function() {
   function normalizeDecorationRotation(rotation) {
     const value = Number(rotation || 0);
     if (!Number.isFinite(value)) return 0;
-    return ((Math.round(value / 90) * 90) % 360 + 360) % 360;
+    return Math.abs(value) > 0 ? 1 : 0;
   }
 
   function getActivePet(islandState) {
@@ -2453,15 +2453,20 @@ const IslandGardenModule = (function() {
     return { success: true, message: '已更新装饰位置' };
   }
 
-  function rotateDecoration(islandState, slotIndex, delta = 90) {
+  function rotateDecoration(islandState, slotIndex, nextState = null) {
     ensureIslandProgress(islandState);
     const decorations = Array.isArray(islandState.decorations) ? islandState.decorations : [];
     if (!Number.isInteger(slotIndex) || !decorations[slotIndex]) {
       return { success: false, message: '没有可旋转的装饰' };
     }
     const current = normalizeDecorationRotation(decorations[slotIndex].rotation);
-    decorations[slotIndex].rotation = normalizeDecorationRotation(current + Number(delta || 0));
-    return { success: true, message: `已旋转到 ${decorations[slotIndex].rotation}°`, rotation: decorations[slotIndex].rotation };
+    const targetState = nextState === null ? (current ? 0 : 1) : normalizeDecorationRotation(nextState);
+    decorations[slotIndex].rotation = targetState;
+    return {
+      success: true,
+      message: targetState ? '已切换为左右翻转' : '已恢复默认方向',
+      rotation: decorations[slotIndex].rotation
+    };
   }
 
   function claimDailyTask(islandState, taskId) {
@@ -3046,19 +3051,14 @@ if (typeof document !== 'undefined') {
 
     function getDecorationRotationLabel(rotation) {
       const safeRotation = normalizeDecorationRotation(rotation);
-      const labelMap = {
-        0: '朝上',
-        90: '朝右',
-        180: '朝下',
-        270: '朝左'
-      };
-      return `${safeRotation}° · ${labelMap[safeRotation] || '已旋转'}`;
+      return safeRotation ? '左右翻转' : '默认方向';
     }
 
     function getDecorationVisualMarkup(type, info, className = '', rotation = 0) {
       if (isImageDecorationType(type)) {
         const visual = decorationVisualState[type];
-        return `<span class="${className} decoration-image-frame decoration-image-frame-${type}" style="--decoration-rotation:${normalizeDecorationRotation(rotation)}deg;"><img class="decoration-image decoration-image-${type}" data-decoration-image="${type}" src="${escapeHtml(visual?.src || DECORATION_IMAGE_ASSETS[type].path)}" alt="${escapeHtml(info?.name || type)}"></span>`;
+        const scaleX = normalizeDecorationRotation(rotation) ? -1 : 1;
+        return `<span class="${className} decoration-image-frame decoration-image-frame-${type}" style="--decoration-scale-x:${scaleX};"><img class="decoration-image decoration-image-${type}" data-decoration-image="${type}" src="${escapeHtml(visual?.src || DECORATION_IMAGE_ASSETS[type].path)}" alt="${escapeHtml(info?.name || type)}"></span>`;
       }
       return `<span class="${className}" title="${escapeHtml(info?.name || type)}">${escapeHtml(info?.icon || '✨')}</span>`;
     }
@@ -5557,8 +5557,8 @@ if (typeof document !== 'undefined') {
       }
 
       if (target.id === 'rotateDecorationLeftBtn' || target.id === 'rotateDecorationRightBtn') {
-        const delta = target.id === 'rotateDecorationLeftBtn' ? -90 : 90;
-        const result = IslandGardenModule.rotateDecoration(islandState, selectedDecorationSlot, delta);
+        const nextState = target.id === 'rotateDecorationLeftBtn' ? 1 : 0;
+        const result = IslandGardenModule.rotateDecoration(islandState, selectedDecorationSlot, nextState);
         showMessage(result.message);
         if (result.success) {
           updateIslandUI();
@@ -6238,7 +6238,7 @@ if (typeof document !== 'undefined') {
         node.className = `island-deco deco-${deco.type}`;
         node.style.left = `${pos.x}%`;
         node.style.top = `${pos.y}%`;
-        node.style.setProperty('--decoration-rotation', `${normalizeDecorationRotation(deco.rotation)}deg`);
+        node.style.setProperty('--decoration-scale-x', normalizeDecorationRotation(deco.rotation) ? '-1' : '1');
         node.dataset.decoIndex = String(idx);
         node.setAttribute('aria-label', info?.name || deco.type);
         node.addEventListener('pointerdown', (event) => startDecorationDrag(node, idx, event));
