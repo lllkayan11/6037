@@ -3765,8 +3765,10 @@ a {
 }
 
 .island-deco.deco-fence {
-  width: 54px;
-  height: 40px;
+  width: 58px;
+  height: 44px;
+  background: center / contain no-repeat var(--fence-image, url("./栅栏.png"));
+  filter: drop-shadow(0 10px 8px rgba(0, 0, 0, 0.2));
   transform: translate(-50%, -50%) rotate(-7deg);
 }
 
@@ -3774,29 +3776,9 @@ a {
   transform: translate(-50%, -50%) rotate(-7deg) scale(1.03);
 }
 
-.island-deco.deco-fence::before {
-  inset: 6px 4px 4px;
-  border-radius: 6px;
-  background:
-    linear-gradient(180deg, #edc181 0 14%, #c9833d 14% 78%, #9b5c2d 78% 100%) 0 0 / 12px 100% no-repeat,
-    linear-gradient(180deg, #edc181 0 14%, #c9833d 14% 78%, #9b5c2d 78% 100%) 50% 0 / 12px 100% no-repeat,
-    linear-gradient(180deg, #edc181 0 14%, #c9833d 14% 78%, #9b5c2d 78% 100%) 100% 0 / 12px 100% no-repeat;
-  box-shadow: 0 10px 10px rgba(0, 0, 0, 0.16);
-}
-
+.island-deco.deco-fence::before,
 .island-deco.deco-fence::after {
-  left: 8px;
-  top: 12px;
-  width: 38px;
-  height: 16px;
-  border-radius: 4px;
-  background:
-    radial-gradient(circle, rgba(235, 238, 242, 0.95) 0 1.3px, transparent 1.4px) 8px 3px / 30px 10px no-repeat,
-    radial-gradient(circle, rgba(235, 238, 242, 0.95) 0 1.3px, transparent 1.4px) 8px 13px / 30px 10px no-repeat,
-    linear-gradient(180deg, #ebb46f, #bf7637 65%, #945627) 0 0 / 100% 6px no-repeat,
-    linear-gradient(180deg, #ebb46f, #bf7637 65%, #945627) 0 10px / 100% 6px no-repeat;
-  transform: skewX(-18deg);
-  filter: drop-shadow(0 8px 8px rgba(0, 0, 0, 0.14));
+  content: none;
 }
 
 .island-deco.deco-flower::before {
@@ -4544,7 +4526,31 @@ a {
 }
 
 .slot-decoration-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 36px;
   font-size: 24px;
+  line-height: 1;
+}
+
+.decoration-image-frame {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.decoration-image-frame-fence {
+  width: 52px;
+  height: 36px;
+}
+
+.decoration-image {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
 }
 
 .slot-decoration-name {
@@ -5200,7 +5206,16 @@ a {
 }
 
 .decoration-current-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
   font-size: 34px;
+}
+
+.decoration-current-visual.decoration-image-frame-fence {
+  width: 84px;
+  height: 56px;
 }
 
 .decoration-current-name {

@@ -1771,7 +1771,7 @@ const IslandGardenModule = (function() {
 
   // 定义装饰品
   const DECORATION_TYPES = {
-    fence: { name: '栅栏', icon: '🪜', cost: { coins: 100 }, effect: 'security', category: 'functional', maxCount: 2 },
+    fence: { name: '栅栏', icon: '🪵', cost: { coins: 100 }, effect: 'security', category: 'functional', maxCount: 2 },
     fountain: { name: '喷泉', icon: '⛲', cost: { coins: 500 }, effect: 'happiness', category: 'landmark', maxCount: 1 },
     bench: { name: '长椅', icon: '🪑', cost: { coins: 300 }, effect: 'rest', category: 'functional', maxCount: 2 },
     lamp: { name: '路灯', icon: '🪔', cost: { coins: 200 }, effect: 'night', category: 'functional', maxCount: 2 },
@@ -2812,6 +2812,8 @@ if (typeof document !== 'undefined') {
     let currentFriendId = null;
     let currentGuideStep = 0;
     let draggingDecoration = null;
+    let fenceVisualSrc = './栅栏.png';
+    let fenceVisualPrepared = false;
 
     const elements = {
       home: document.querySelector('.home-shell'),
@@ -3000,6 +3002,144 @@ if (typeof document !== 'undefined') {
 
     function clamp(value, min, max) {
       return Math.min(max, Math.max(min, value));
+    }
+
+    function getFenceVisualMarkup(className = '', alt = '栅栏') {
+      return `<span class="${className} decoration-image-frame decoration-image-frame-fence"><img class="decoration-image decoration-fence-image" data-fence-image="true" src="${fenceVisualSrc}" alt="${escapeHtml(alt)}"></span>`;
+    }
+
+    function getDecorationVisualMarkup(type, info, className = '') {
+      if (type === 'fence') {
+        return getFenceVisualMarkup(className, info?.name || '栅栏');
+      }
+      return `<span class="${className}" title="${escapeHtml(info?.name || type)}">${escapeHtml(info?.icon || '✨')}</span>`;
+    }
+
+    function applyFenceVisualToDom() {
+      document.querySelectorAll('[data-fence-image="true"]').forEach((img) => {
+        if (img.getAttribute('src') !== fenceVisualSrc) {
+          img.setAttribute('src', fenceVisualSrc);
+        }
+      });
+      const cssFenceSrc = String(fenceVisualSrc).replace(/"/g, '\\"');
+      document.documentElement.style.setProperty('--fence-image', `url("${cssFenceSrc}")`);
+    }
+
+    function ensureTransparentFenceVisual() {
+      if (fenceVisualPrepared) return;
+      fenceVisualPrepared = true;
+      const source = new Image();
+      source.decoding = 'async';
+      source.onload = () => {
+        try {
+          const width = source.naturalWidth || source.width;
+          const height = source.naturalHeight || source.height;
+          if (!width || !height) {
+            applyFenceVisualToDom();
+            return;
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const context = canvas.getContext('2d', { willReadFrequently: true });
+          if (!context) {
+            applyFenceVisualToDom();
+            return;
+          }
+          context.drawImage(source, 0, 0, width, height);
+          const imageData = context.getImageData(0, 0, width, height);
+          const data = imageData.data;
+          const sampleRadius = Math.max(2, Math.floor(Math.min(width, height) * 0.06));
+          const samplePoints = [
+            [0, 0],
+            [width - sampleRadius, 0],
+            [0, height - sampleRadius],
+            [width - sampleRadius, height - sampleRadius]
+          ];
+          let sumR = 0;
+          let sumG = 0;
+          let sumB = 0;
+          let sampleCount = 0;
+          samplePoints.forEach(([startX, startY]) => {
+            for (let y = Math.max(0, startY); y < Math.min(height, startY + sampleRadius); y++) {
+              for (let x = Math.max(0, startX); x < Math.min(width, startX + sampleRadius); x++) {
+                const index = (y * width + x) * 4;
+                sumR += data[index];
+                sumG += data[index + 1];
+                sumB += data[index + 2];
+                sampleCount++;
+              }
+            }
+          });
+          if (!sampleCount) {
+            applyFenceVisualToDom();
+            return;
+          }
+          const bgR = sumR / sampleCount;
+          const bgG = sumG / sampleCount;
+          const bgB = sumB / sampleCount;
+          let minX = width;
+          let minY = height;
+          let maxX = 0;
+          let maxY = 0;
+          let hasOpaquePixel = false;
+          for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+              const index = (y * width + x) * 4;
+              const r = data[index];
+              const g = data[index + 1];
+              const b = data[index + 2];
+              const colorDiff = Math.sqrt(((r - bgR) ** 2) + ((g - bgG) ** 2) + ((b - bgB) ** 2));
+              let alpha = data[index + 3];
+              if (colorDiff < 36) {
+                alpha = 0;
+              } else if (colorDiff < 68) {
+                alpha = Math.round(alpha * ((colorDiff - 36) / (68 - 36)));
+              }
+              data[index + 3] = alpha;
+              if (alpha > 14) {
+                hasOpaquePixel = true;
+                minX = Math.min(minX, x);
+                minY = Math.min(minY, y);
+                maxX = Math.max(maxX, x);
+                maxY = Math.max(maxY, y);
+              }
+            }
+          }
+          context.putImageData(imageData, 0, 0);
+          if (!hasOpaquePixel) {
+            applyFenceVisualToDom();
+            return;
+          }
+          const padding = 2;
+          const cropX = Math.max(0, minX - padding);
+          const cropY = Math.max(0, minY - padding);
+          const cropWidth = Math.min(width - cropX, (maxX - minX + 1) + padding * 2);
+          const cropHeight = Math.min(height - cropY, (maxY - minY + 1) + padding * 2);
+          const trimmedCanvas = document.createElement('canvas');
+          trimmedCanvas.width = cropWidth;
+          trimmedCanvas.height = cropHeight;
+          const trimmedContext = trimmedCanvas.getContext('2d');
+          if (!trimmedContext) {
+            applyFenceVisualToDom();
+            return;
+          }
+          trimmedContext.drawImage(canvas, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+          fenceVisualSrc = trimmedCanvas.toDataURL('image/png');
+          applyFenceVisualToDom();
+          updateDecorationsUI();
+          if (!elements.decorationManageModal?.hidden && Number.isInteger(selectedDecorationSlot)) {
+            openDecorationManageModal(selectedDecorationSlot);
+          }
+        } catch (error) {
+          console.warn('Failed to build transparent fence visual', error);
+          applyFenceVisualToDom();
+        }
+      };
+      source.onerror = () => {
+        applyFenceVisualToDom();
+      };
+      source.src = './栅栏.png';
     }
 
     function readStorage(key) {
@@ -5800,7 +5940,7 @@ if (typeof document !== 'undefined') {
       if (elements.decorationManageCurrent) {
         elements.decorationManageCurrent.innerHTML = `
           <div class="decoration-current-card">
-            <div class="decoration-current-icon">${info?.icon || '✨'}</div>
+            <div class="decoration-current-icon">${getDecorationVisualMarkup(decoration.type, info, 'decoration-current-visual')}</div>
             <div class="decoration-current-name">${escapeHtml(info?.name || decoration.type)}</div>
             <div class="decoration-current-meta">点击“去商店替换”后，新的装饰会直接覆盖当前槽位，不需要先手动清空。</div>
           </div>
@@ -5997,13 +6137,13 @@ if (typeof document !== 'undefined') {
           return;
         }
         const info = decorationTypes[deco.type];
-        const icon = info?.icon || '✨';
         const name = info?.name || deco.type;
+        const iconMarkup = getDecorationVisualMarkup(deco.type, info, 'slot-decoration-icon');
         slot.classList.remove('locked');
         slot.classList.remove('empty');
         slot.innerHTML = `
           <div class="slot-decoration">
-            <span class="slot-decoration-icon" title="${escapeHtml(name)}">${icon}</span>
+            ${iconMarkup}
             <span class="slot-decoration-name">${escapeHtml(name)}</span>
           </div>
           <span class="slot-action">管理</span>
@@ -6733,6 +6873,7 @@ if (typeof document !== 'undefined') {
 
     // Initialize island state
     restoreIslandState();
+    ensureTransparentFenceVisual();
     bindIslandDirectClicks();
 
     // Update island state periodically
