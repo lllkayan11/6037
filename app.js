@@ -816,7 +816,7 @@ const PomolandCore = (() => {
 
   function inferGoalCategory(goal = '') {
     const combined = String(goal).toLowerCase();
-    if (/(ielts|exam|study|学习|雅思|考试|复习|阅读|听力|写作)/i.test(combined)) return 'study';
+    if (/(ielts|exam|test|cert|certificate|study|学习|雅思|考试|复习|阅读|听力|写作|考证|证书|資格證|资格证|考取)/i.test(combined)) return 'study';
     if (/(project|prototype|coding|code|design|develop|ship|开发|产品|项目|编程|设计|原型|上线)/i.test(combined)) return 'project';
     if (/(habit|workout|fitness|exercise|习惯|健身|运动|早起)/i.test(combined)) return 'habit';
     return 'general';
@@ -858,6 +858,114 @@ const PomolandCore = (() => {
     };
   }
 
+  function buildFallbackTasks(goal, language) {
+    const lang = normalizeLanguage(language);
+    const category = inferGoalCategory(goal);
+    const target = String(goal || '').trim() || COPY[lang].defaultGoal;
+
+    const templates = {
+      study: {
+        'zh-CN': [
+          { title: '明确考试要求与里程碑', notes: `针对「${target}」，先确认考试/证书要求、报名条件、考试科目与通过标准，并把 3 个月拆成每周里程碑。`, duration: 25 },
+          { title: '搭建资料与题库清单', notes: `收集官方大纲、教材/课程、真题与练习题，整理到一个清单里（按科目/章节分类）。`, duration: 30 },
+          { title: '重点模块训练（今天先一章）', notes: `选择最关键或最薄弱的一个模块，完成“学习 + 练习题 + 错题记录”。`, duration: 45 },
+          { title: '模拟与复盘（小步快跑）', notes: `做一套小测/模拟（可缩短到 30-45 分钟），复盘错题原因，并更新明天的训练重点。`, duration: 35 }
+        ],
+        'zh-HK': [
+          { title: '確認考試要求與里程碑', notes: `針對「${target}」，先確認考試/證書要求、報名條件、考試科目與通過標準，並把 3 個月拆成每週里程碑。`, duration: 25 },
+          { title: '建立資料與題庫清單', notes: `收集官方大綱、教材/課程、真題與練習題，整理成清單（按科目/章節分類）。`, duration: 30 },
+          { title: '重點模組訓練（今天先一章）', notes: `選擇最關鍵或最薄弱的一個模組，完成「學習 + 練習題 + 錯題記錄」。`, duration: 45 },
+          { title: '模擬與復盤（小步快跑）', notes: `做一套小測/模擬（可縮短到 30-45 分鐘），復盤錯題原因，並更新明天的訓練重點。`, duration: 35 }
+        ],
+        en: [
+          { title: 'Confirm requirements & milestones', notes: `For "${target}", confirm exam/cert requirements, eligibility, subjects, and pass criteria. Turn 3 months into weekly milestones.`, duration: 25 },
+          { title: 'Build materials & question bank', notes: 'Collect syllabus, textbooks/courses, past papers, and practice sets. Organize them by topic.', duration: 30 },
+          { title: 'Train one key module today', notes: 'Pick the most important or weakest module and do: learn → practice → log mistakes.', duration: 45 },
+          { title: 'Mock + review loop', notes: 'Do a short mock (30–45 min), review mistakes, and update tomorrow’s focus.', duration: 35 }
+        ]
+      },
+      project: {
+        'zh-CN': [
+          { title: '定义交付物与验收标准', notes: `把「${target}」写成一句“可验收”的结果：交付什么、给谁、什么时候完成。`, duration: 20 },
+          { title: '拆出 4 个里程碑', notes: '列出：准备/调研 → 产出草稿/原型 → 完成主干 → 打磨与交付，并标注每个里程碑日期。', duration: 30 },
+          { title: '启动第一个可交付小块', notes: '今天先完成最小可交付的一步（例如：搭建框架、写大纲、做一个页面/模块）。', duration: 45 },
+          { title: '风险清单与下一步', notes: '列出 3 个最大风险/阻塞点，并为每个风险写一个备选方案或下一步动作。', duration: 25 }
+        ],
+        'zh-HK': [
+          { title: '定義交付物與驗收標準', notes: `把「${target}」寫成一句「可驗收」的結果：交付什麼、給誰、何時完成。`, duration: 20 },
+          { title: '拆出 4 個里程碑', notes: '列出：準備/調研 → 產出草稿/原型 → 完成主幹 → 打磨與交付，並標註每個里程碑日期。', duration: 30 },
+          { title: '啟動第一個可交付小塊', notes: '今天先完成最小可交付的一步（例如：搭建框架、寫大綱、做一個頁面/模組）。', duration: 45 },
+          { title: '風險清單與下一步', notes: '列出 3 個最大風險/阻塞點，並為每個風險寫一個備選方案或下一步動作。', duration: 25 }
+        ],
+        en: [
+          { title: 'Define deliverable & acceptance', notes: `Rewrite "${target}" into an outcome you can verify: what to ship, for whom, and by when.`, duration: 20 },
+          { title: 'Break into 4 milestones', notes: 'Plan: research → draft/prototype → core build → polish & ship. Add dates.', duration: 30 },
+          { title: 'Start the smallest shippable slice', notes: 'Finish one tiny deliverable today (scaffold, outline, first screen/module).', duration: 45 },
+          { title: 'Risks & next actions', notes: 'List your top 3 blockers and define a fallback or next action for each.', duration: 25 }
+        ]
+      },
+      habit: {
+        'zh-CN': [
+          { title: '把习惯变成可执行触发', notes: `针对「${target}」，写下：触发点（何时何地）+ 行为（做什么）+ 最小版本（2 分钟）。`, duration: 20 },
+          { title: '准备环境与阻力清单', notes: '把需要的物品/场地准备好，并写下 3 个可能阻力与对应应对策略。', duration: 25 },
+          { title: '完成一次最小行动', notes: '只做“最小版本”，把完成打卡下来（不要追求完美）。', duration: 25 },
+          { title: '复盘并优化明天', notes: '记录今天最顺/最难的点，给明天设定更容易完成的版本。', duration: 15 }
+        ],
+        'zh-HK': [
+          { title: '把習慣變成可執行觸發', notes: `針對「${target}」，寫下：觸發點（何時何地）+ 行為（做什麼）+ 最小版本（2 分鐘）。`, duration: 20 },
+          { title: '準備環境與阻力清單', notes: '把需要的物品/場地準備好，並寫下 3 個可能阻力與對應策略。', duration: 25 },
+          { title: '完成一次最小行動', notes: '只做「最小版本」，把完成打卡下來（不要追求完美）。', duration: 25 },
+          { title: '復盤並優化明天', notes: '記錄今天最順/最難的點，給明天設定更容易完成的版本。', duration: 15 }
+        ],
+        en: [
+          { title: 'Turn it into a trigger plan', notes: `For "${target}", write: when/where + what to do + a 2-minute minimum version.`, duration: 20 },
+          { title: 'Prep environment & blockers', notes: 'Prepare tools/space and list 3 likely blockers with 대응 strategies.', duration: 25 },
+          { title: 'Do one minimum action', notes: 'Only do the minimum version. Log it—no perfection required.', duration: 25 },
+          { title: 'Review & make tomorrow easier', notes: 'Note what was easy/hard and set an even easier version for tomorrow.', duration: 15 }
+        ]
+      },
+      general: {
+        'zh-CN': [
+          { title: '把目标写成一句可衡量的结果', notes: `把「${target}」改写成可衡量的句子：数量/标准/截止时间。`, duration: 20 },
+          { title: '列出关键子模块（4 块即可）', notes: '写下完成目标必须包含的 4 个子模块，并选出最先做的一个。', duration: 25 },
+          { title: '执行最先的一步', notes: '今天只完成“最先做的那个子模块”的第一步，并记录产出物。', duration: 40 },
+          { title: '总结与调整', notes: '回顾进展，更新下一步清单，并给自己一句鼓励。', duration: 15 }
+        ],
+        'zh-HK': [
+          { title: '把目標寫成一句可衡量的結果', notes: `把「${target}」改寫成可衡量的句子：數量/標準/截止時間。`, duration: 20 },
+          { title: '列出關鍵子模組（4 塊即可）', notes: '寫下完成目標必須包含的 4 個子模組，並選出最先做的一個。', duration: 25 },
+          { title: '執行最先的一步', notes: '今天只完成「最先做的那個子模組」的第一步，並記錄產出物。', duration: 40 },
+          { title: '總結與調整', notes: '回顧進展，更新下一步清單，並給自己一句鼓勵。', duration: 15 }
+        ],
+        en: [
+          { title: 'Make the goal measurable', notes: `Rewrite "${target}" into a measurable outcome: metric/quality bar/deadline.`, duration: 20 },
+          { title: 'List 4 key components', notes: 'List 4 components needed to achieve it and pick the first one to start.', duration: 25 },
+          { title: 'Execute the first step', notes: 'Finish the first step of that component today and record the output.', duration: 40 },
+          { title: 'Review & adjust', notes: 'Review progress, update next actions, and write one line of encouragement.', duration: 15 }
+        ]
+      }
+    };
+
+    const group = templates[category] || templates.general;
+    const list = group[lang] || group.en;
+    const encouragement = lang === 'en'
+      ? 'Nice work—small steps compound fast. Keep going!'
+      : (lang === 'zh-HK'
+        ? '你做得好！小步累積得很快，繼續加油！'
+        : '你做得很好！小步积累得很快，继续加油！');
+
+    const tasks = list.map((item, index) => normalizeTask({
+      id: `task${index + 1}`,
+      title: item.title,
+      notes: item.notes,
+      description: item.notes,
+      duration: item.duration,
+      customized: true
+    }, index, target, lang));
+
+    return { tasks, encouragement };
+  }
+
   async function fetchApi(endpoint, data) {
     const response = await fetch(`http://localhost:3000${endpoint}`, {
       method: 'POST',
@@ -880,20 +988,16 @@ const PomolandCore = (() => {
       const apiResponse = await fetchApi('/api/generate-tasks', { goal: cleanGoal, language: lang });
       const tasks = apiResponse.tasks.map((task, index) => normalizeTask({
         ...task,
-        id: `task${index + 1}`
+        id: `task${index + 1}`,
+        // AI 生成内容不应被语言包（如 IELTS 示例文案）覆盖
+        customized: true
       }, index, cleanGoal, lang));
       return { tasks, encouragement: apiResponse.encouragement };
     } catch (error) {
       console.error('Error fetching tasks from AI:', error);
-      return {
-        tasks: TASK_IDS.map((id, index) => normalizeTask({
-          id,
-          title: COPY[lang][id],
-          description: COPY[lang][`${id}Desc`],
-          duration: TASK_DURATIONS[index]
-        }, index, cleanGoal, lang)),
-        encouragement: COPY[lang].aiFallbackEncouragement
-      };
+      // 当后端不可用（GitHub Pages / 未启动本地服务）时，改用“基于输入目标”的本地拆解，
+      // 避免永远回落到 IELTS 示例任务，造成“无论输入什么都显示雅思任务拆解”的体验。
+      return buildFallbackTasks(cleanGoal, lang);
     }
   }
 
