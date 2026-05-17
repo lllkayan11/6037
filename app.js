@@ -5559,13 +5559,7 @@ if (typeof document !== 'undefined') {
 
       if (target.id === 'flipDecorationBtn' || target.id === 'resetDecorationFlipBtn') {
         const nextState = target.id === 'flipDecorationBtn' ? 1 : 0;
-        const result = IslandGardenModule.flipDecoration(islandState, selectedDecorationSlot, nextState);
-        showMessage(result.message);
-        if (result.success) {
-          updateIslandUI();
-          persistIslandState();
-          openDecorationManageModal(selectedDecorationSlot);
-        }
+        handleDecorationFlip(nextState);
       }
 
       if (target.id === 'replaceDecorationBtn') {
@@ -6020,6 +6014,15 @@ if (typeof document !== 'undefined') {
       if (elements.decorationManageModal) {
         elements.decorationManageModal.hidden = false;
       }
+    }
+
+    function handleDecorationFlip(nextState) {
+      const result = IslandGardenModule.flipDecoration(islandState, selectedDecorationSlot, nextState);
+      showMessage(result.message);
+      if (!result.success) return;
+      updateIslandUI();
+      persistIslandState();
+      openDecorationManageModal(selectedDecorationSlot);
     }
 
     function renderUpgradePanel() {
@@ -6939,6 +6942,18 @@ if (typeof document !== 'undefined') {
           } else {
             showMessage('已取消工具选择');
           }
+        });
+      });
+
+      [elements.flipDecorationBtn, elements.resetDecorationFlipBtn].forEach((btn) => {
+        if (!btn || btn.dataset.boundClick === '1') return;
+        btn.dataset.boundClick = '1';
+        btn.addEventListener('click', (event) => {
+          if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+          handleDecorationFlip(btn.id === 'flipDecorationBtn' ? 1 : 0);
         });
       });
     }
