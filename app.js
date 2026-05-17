@@ -1898,8 +1898,8 @@ const IslandGardenModule = (function() {
     return { x, y };
   }
 
-  function normalizeDecorationRotation(rotation) {
-    const value = Number(rotation || 0);
+  function normalizeDecorationFlip(flipped) {
+    const value = Number(flipped || 0);
     if (!Number.isFinite(value)) return 0;
     return Math.abs(value) > 0 ? 1 : 0;
   }
@@ -2046,10 +2046,11 @@ const IslandGardenModule = (function() {
     islandState.decorationFilter = islandState.decorationFilter || 'all';
     islandState.decorations = (Array.isArray(islandState.decorations) ? islandState.decorations : []).map((decoration, index) => {
       if (!decoration) return decoration;
+      const { rotation: legacyRotation, flipped: savedFlipped, ...rest } = decoration;
       return {
-        ...decoration,
+        ...rest,
         position: normalizeDecorationPosition(decoration.position, index),
-        rotation: normalizeDecorationRotation(decoration.rotation)
+        flipped: normalizeDecorationFlip(savedFlipped ?? legacyRotation)
       };
     });
     ensureDailySystems(islandState);
@@ -2414,7 +2415,7 @@ const IslandGardenModule = (function() {
       type: decorationType,
       placedAt: Date.now(),
       position: normalizeDecorationPosition(decorations[targetSlot]?.position, targetSlot),
-      rotation: normalizeDecorationRotation(decorations[targetSlot]?.rotation)
+      flipped: normalizeDecorationFlip(decorations[targetSlot]?.flipped ?? decorations[targetSlot]?.rotation)
     };
     islandState.stats.decorationCount = islandState.decorations.filter(Boolean).length;
 
@@ -2453,19 +2454,19 @@ const IslandGardenModule = (function() {
     return { success: true, message: '已更新装饰位置' };
   }
 
-  function rotateDecoration(islandState, slotIndex, nextState = null) {
+  function flipDecoration(islandState, slotIndex, nextState = null) {
     ensureIslandProgress(islandState);
     const decorations = Array.isArray(islandState.decorations) ? islandState.decorations : [];
     if (!Number.isInteger(slotIndex) || !decorations[slotIndex]) {
-      return { success: false, message: '没有可旋转的装饰' };
+      return { success: false, message: '没有可翻转的装饰' };
     }
-    const current = normalizeDecorationRotation(decorations[slotIndex].rotation);
-    const targetState = nextState === null ? (current ? 0 : 1) : normalizeDecorationRotation(nextState);
-    decorations[slotIndex].rotation = targetState;
+    const current = normalizeDecorationFlip(decorations[slotIndex].flipped ?? decorations[slotIndex].rotation);
+    const targetState = nextState === null ? (current ? 0 : 1) : normalizeDecorationFlip(nextState);
+    decorations[slotIndex].flipped = targetState;
     return {
       success: true,
       message: targetState ? '已切换为左右翻转' : '已恢复默认方向',
-      rotation: decorations[slotIndex].rotation
+      flipped: decorations[slotIndex].flipped
     };
   }
 
@@ -2766,7 +2767,7 @@ const IslandGardenModule = (function() {
     unlockPet,
     buyDecoration,
     moveDecoration,
-    rotateDecoration,
+    flipDecoration,
     claimDailyTask,
     claimOrder,
     giftFriendCrop,
@@ -2787,7 +2788,7 @@ const IslandGardenModule = (function() {
     getCropsStatus,
     getPetsStatus,
     getActivePetEffect,
-    normalizeDecorationRotation,
+    normalizeDecorationFlip,
     CROP_TYPES,
     PET_TYPES,
     DECORATION_TYPES
@@ -2973,8 +2974,8 @@ if (typeof document !== 'undefined') {
       decorationManageModal: document.querySelector('#decorationManageModal'),
       closeDecorationManage: document.querySelector('#closeDecorationManage'),
       decorationManageCurrent: document.querySelector('#decorationManageCurrent'),
-      rotateDecorationLeftBtn: document.querySelector('#rotateDecorationLeftBtn'),
-      rotateDecorationRightBtn: document.querySelector('#rotateDecorationRightBtn'),
+      flipDecorationBtn: document.querySelector('#flipDecorationBtn'),
+      resetDecorationFlipBtn: document.querySelector('#resetDecorationFlipBtn'),
       removeDecorationBtn: document.querySelector('#removeDecorationBtn'),
       replaceDecorationBtn: document.querySelector('#replaceDecorationBtn'),
       islandUpgradeModal: document.querySelector('#islandUpgradeModal'),
@@ -3047,17 +3048,17 @@ if (typeof document !== 'undefined') {
       return Object.prototype.hasOwnProperty.call(decorationVisualState, type);
     }
 
-    const normalizeDecorationRotation = IslandGardenModule.normalizeDecorationRotation;
+    const normalizeDecorationFlip = IslandGardenModule.normalizeDecorationFlip;
 
-    function getDecorationRotationLabel(rotation) {
-      const safeRotation = normalizeDecorationRotation(rotation);
-      return safeRotation ? '左右翻转' : '默认方向';
+    function getDecorationDirectionLabel(flipped) {
+      const safeFlip = normalizeDecorationFlip(flipped);
+      return safeFlip ? '左右翻转' : '默认方向';
     }
 
-    function getDecorationVisualMarkup(type, info, className = '', rotation = 0) {
+    function getDecorationVisualMarkup(type, info, className = '', flipped = 0) {
       if (isImageDecorationType(type)) {
         const visual = decorationVisualState[type];
-        const scaleX = normalizeDecorationRotation(rotation) ? -1 : 1;
+        const scaleX = normalizeDecorationFlip(flipped) ? -1 : 1;
         return `<span class="${className} decoration-image-frame decoration-image-frame-${type}" style="--decoration-scale-x:${scaleX};"><img class="decoration-image decoration-image-${type}" data-decoration-image="${type}" src="${escapeHtml(visual?.src || DECORATION_IMAGE_ASSETS[type].path)}" alt="${escapeHtml(info?.name || type)}"></span>`;
       }
       return `<span class="${className}" title="${escapeHtml(info?.name || type)}">${escapeHtml(info?.icon || '✨')}</span>`;
@@ -5556,9 +5557,9 @@ if (typeof document !== 'undefined') {
         }
       }
 
-      if (target.id === 'rotateDecorationLeftBtn' || target.id === 'rotateDecorationRightBtn') {
-        const nextState = target.id === 'rotateDecorationLeftBtn' ? 1 : 0;
-        const result = IslandGardenModule.rotateDecoration(islandState, selectedDecorationSlot, nextState);
+      if (target.id === 'flipDecorationBtn' || target.id === 'resetDecorationFlipBtn') {
+        const nextState = target.id === 'flipDecorationBtn' ? 1 : 0;
+        const result = IslandGardenModule.flipDecoration(islandState, selectedDecorationSlot, nextState);
         showMessage(result.message);
         if (result.success) {
           updateIslandUI();
@@ -6005,13 +6006,13 @@ if (typeof document !== 'undefined') {
       }
       selectedDecorationSlot = slotIndex;
       const info = IslandGardenModule.DECORATION_TYPES[decoration.type];
-      const rotation = normalizeDecorationRotation(decoration.rotation);
+      const flipped = normalizeDecorationFlip(decoration.flipped ?? decoration.rotation);
       if (elements.decorationManageCurrent) {
         elements.decorationManageCurrent.innerHTML = `
           <div class="decoration-current-card">
-            <div class="decoration-current-icon">${getDecorationVisualMarkup(decoration.type, info, 'decoration-current-visual', rotation)}</div>
+            <div class="decoration-current-icon">${getDecorationVisualMarkup(decoration.type, info, 'decoration-current-visual', flipped)}</div>
             <div class="decoration-current-name">${escapeHtml(info?.name || decoration.type)}</div>
-            <div class="decoration-rotation-meta">当前方向：${escapeHtml(getDecorationRotationLabel(rotation))}</div>
+            <div class="decoration-direction-meta">当前方向：${escapeHtml(getDecorationDirectionLabel(flipped))}</div>
             <div class="decoration-current-meta">点击“去商店替换”后，新的装饰会直接覆盖当前槽位，不需要先手动清空。</div>
           </div>
         `;
@@ -6208,7 +6209,7 @@ if (typeof document !== 'undefined') {
         }
         const info = decorationTypes[deco.type];
         const name = info?.name || deco.type;
-        const iconMarkup = getDecorationVisualMarkup(deco.type, info, 'slot-decoration-icon', deco.rotation);
+        const iconMarkup = getDecorationVisualMarkup(deco.type, info, 'slot-decoration-icon', deco.flipped ?? deco.rotation);
         slot.classList.remove('locked');
         slot.classList.remove('empty');
         slot.innerHTML = `
@@ -6238,7 +6239,7 @@ if (typeof document !== 'undefined') {
         node.className = `island-deco deco-${deco.type}`;
         node.style.left = `${pos.x}%`;
         node.style.top = `${pos.y}%`;
-        node.style.setProperty('--decoration-scale-x', normalizeDecorationRotation(deco.rotation) ? '-1' : '1');
+        node.style.setProperty('--decoration-scale-x', normalizeDecorationFlip(deco.flipped ?? deco.rotation) ? '-1' : '1');
         node.dataset.decoIndex = String(idx);
         node.setAttribute('aria-label', info?.name || deco.type);
         node.addEventListener('pointerdown', (event) => startDecorationDrag(node, idx, event));

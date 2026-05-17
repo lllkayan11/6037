@@ -3702,8 +3702,7 @@ a {
 .island-deco {
   position: absolute;
   --decoration-scale-x: 1;
-  --decoration-base-rotation: 0deg;
-  transform: translate(-50%, -50%) rotate(var(--decoration-base-rotation)) scaleX(var(--decoration-scale-x));
+  transform: translate(-50%, -50%) scaleX(var(--decoration-scale-x));
   width: 42px;
   height: 42px;
   filter: drop-shadow(0 10px 10px rgba(0,0,0,0.18));
@@ -3714,7 +3713,7 @@ a {
 
 .island-deco.is-dragging {
   cursor: grabbing;
-  transform: translate(-50%, -50%) rotate(var(--decoration-base-rotation)) scaleX(var(--decoration-scale-x)) scale(1.03);
+  transform: translate(-50%, -50%) scaleX(var(--decoration-scale-x)) scale(1.03);
   filter: drop-shadow(0 16px 18px rgba(0,0,0,0.25));
   z-index: 3;
 }
@@ -3728,7 +3727,6 @@ a {
 .island-deco.deco-fence {
   width: 58px;
   height: 44px;
-  --decoration-base-rotation: -7deg;
   background: center / contain no-repeat var(--fence-image, url("./栅栏.png"));
   filter: drop-shadow(0 10px 8px rgba(0, 0, 0, 0.2));
 }
@@ -5146,7 +5144,7 @@ a {
   gap: 12px;
 }
 
-.decoration-rotate-actions {
+.decoration-flip-actions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
@@ -5193,7 +5191,7 @@ a {
   font-weight: 800;
 }
 
-.decoration-rotation-meta {
+.decoration-direction-meta {
   font-size: 12px;
   font-weight: 700;
   color: #ffd54f;
