@@ -5277,9 +5277,6 @@ a {
   height: 34%;
 }
 
-.island-scene[data-level="5"] .island-dock {
-  width: 108px;
-}
 
 /* Island scene overhaul */
 .island-background {
@@ -5858,11 +5855,6 @@ a {
 
 .island-decorations-layer {
   z-index: 5;
-}
-
-.island-deco {
-  width: 48px;
-  height: 48px;
 }
 
 .island-scene[data-level="1"] .island-house {
@@ -7247,18 +7239,6 @@ a {
   box-shadow: inset 0 -14px 24px rgba(26, 100, 30, 0.22);
 }
 
-.island-path {
-  position: absolute;
-  bottom: 38%;
-  left: 50%;
-  width: 84px;
-  height: 30px;
-  transform: translateX(-50%) rotate(-10deg);
-  border-radius: 999px;
-  background: linear-gradient(90deg, rgba(222, 195, 134, 0.9), rgba(208, 177, 119, 0.95));
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
-}
-
 .island-house {
   position: absolute;
   left: 50%;
@@ -7343,46 +7323,11 @@ a {
   transform: scale(0.9);
 }
 
-.island-dock {
-  position: absolute;
-  left: 15%;
-  bottom: 28%;
-  width: 66px;
-  height: 12px;
-  border-radius: 8px;
-  background: linear-gradient(180deg, #9d6a41, #75502e);
-  transform: rotate(-10deg);
-  box-shadow: 0 8px 14px rgba(0, 0, 0, 0.16);
-}
-
-.island-dock::before,
-.island-dock::after {
-  content: "";
-  position: absolute;
-  bottom: -14px;
-  width: 6px;
-  height: 18px;
-  background: #6d4827;
-}
-
-.island-dock::before {
-  left: 10px;
-}
-
-.island-dock::after {
-  right: 10px;
-}
-
 .island-decorations-layer {
   position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: auto;
-}
-
-.island-deco {
-  width: 42px;
-  height: 42px;
 }
 
 .island-scene[data-level="1"] .island-house {
@@ -7393,10 +7338,6 @@ a {
   width: 76%;
 }
 
-.island-scene[data-level="2"] .island-path {
-  width: 100px;
-}
-
 .island-scene[data-level="3"] .island {
   width: 79%;
   height: 30%;
@@ -7404,10 +7345,6 @@ a {
 
 .island-scene[data-level="3"] .island-house {
   transform: translateX(-50%) scale(1.04);
-}
-
-.island-scene[data-level="3"] .island-dock {
-  width: 80px;
 }
 
 .island-scene[data-level="3"] .tree-c,
@@ -7428,14 +7365,6 @@ a {
 .island-scene[data-level="4"] .island {
   width: 82%;
   height: 32%;
-}
-
-.island-scene[data-level="4"] .island-path {
-  width: 118px;
-}
-
-.island-scene[data-level="4"] .island-dock {
-  width: 92px;
 }
 
 .island-scene[data-level="5"] .house-window {
