@@ -1898,6 +1898,12 @@ const IslandGardenModule = (function() {
     return { x, y };
   }
 
+  function normalizeDecorationRotation(rotation) {
+    const value = Number(rotation || 0);
+    if (!Number.isFinite(value)) return 0;
+    return ((Math.round(value / 90) * 90) % 360 + 360) % 360;
+  }
+
   function getActivePet(islandState) {
     if (!islandState?.pets?.length) return null;
     const activePet = islandState.activePetId
@@ -2042,7 +2048,8 @@ const IslandGardenModule = (function() {
       if (!decoration) return decoration;
       return {
         ...decoration,
-        position: normalizeDecorationPosition(decoration.position, index)
+        position: normalizeDecorationPosition(decoration.position, index),
+        rotation: normalizeDecorationRotation(decoration.rotation)
       };
     });
     ensureDailySystems(islandState);
@@ -2406,7 +2413,8 @@ const IslandGardenModule = (function() {
       id: `deco${Date.now()}`,
       type: decorationType,
       placedAt: Date.now(),
-      position: normalizeDecorationPosition(decorations[targetSlot]?.position, targetSlot)
+      position: normalizeDecorationPosition(decorations[targetSlot]?.position, targetSlot),
+      rotation: normalizeDecorationRotation(decorations[targetSlot]?.rotation)
     };
     islandState.stats.decorationCount = islandState.decorations.filter(Boolean).length;
 
@@ -2443,6 +2451,17 @@ const IslandGardenModule = (function() {
     }
     decorations[slotIndex].position = normalizeDecorationPosition(position, slotIndex);
     return { success: true, message: '已更新装饰位置' };
+  }
+
+  function rotateDecoration(islandState, slotIndex, delta = 90) {
+    ensureIslandProgress(islandState);
+    const decorations = Array.isArray(islandState.decorations) ? islandState.decorations : [];
+    if (!Number.isInteger(slotIndex) || !decorations[slotIndex]) {
+      return { success: false, message: '没有可旋转的装饰' };
+    }
+    const current = normalizeDecorationRotation(decorations[slotIndex].rotation);
+    decorations[slotIndex].rotation = normalizeDecorationRotation(current + Number(delta || 0));
+    return { success: true, message: `已旋转到 ${decorations[slotIndex].rotation}°`, rotation: decorations[slotIndex].rotation };
   }
 
   function claimDailyTask(islandState, taskId) {
@@ -2742,6 +2761,7 @@ const IslandGardenModule = (function() {
     unlockPet,
     buyDecoration,
     moveDecoration,
+    rotateDecoration,
     claimDailyTask,
     claimOrder,
     giftFriendCrop,
@@ -2762,6 +2782,7 @@ const IslandGardenModule = (function() {
     getCropsStatus,
     getPetsStatus,
     getActivePetEffect,
+    normalizeDecorationRotation,
     CROP_TYPES,
     PET_TYPES,
     DECORATION_TYPES
@@ -2812,8 +2833,19 @@ if (typeof document !== 'undefined') {
     let currentFriendId = null;
     let currentGuideStep = 0;
     let draggingDecoration = null;
-    let fenceVisualSrc = './栅栏.png';
-    let fenceVisualPrepared = false;
+    const DECORATION_IMAGE_ASSETS = {
+      fence: { path: './栅栏.png', varName: '--fence-image' },
+      fountain: { path: './喷泉.png', varName: '--fountain-image' },
+      lamp: { path: './路灯.png', varName: '--lamp-image' },
+      flower: { path: './花草石礅.png', varName: '--flower-image' }
+    };
+    const decorationVisualState = Object.fromEntries(
+      Object.entries(DECORATION_IMAGE_ASSETS).map(([type, asset]) => [type, {
+        src: asset.path,
+        prepared: false,
+        varName: asset.varName
+      }])
+    );
 
     const elements = {
       home: document.querySelector('.home-shell'),
@@ -2936,6 +2968,8 @@ if (typeof document !== 'undefined') {
       decorationManageModal: document.querySelector('#decorationManageModal'),
       closeDecorationManage: document.querySelector('#closeDecorationManage'),
       decorationManageCurrent: document.querySelector('#decorationManageCurrent'),
+      rotateDecorationLeftBtn: document.querySelector('#rotateDecorationLeftBtn'),
+      rotateDecorationRightBtn: document.querySelector('#rotateDecorationRightBtn'),
       removeDecorationBtn: document.querySelector('#removeDecorationBtn'),
       replaceDecorationBtn: document.querySelector('#replaceDecorationBtn'),
       islandUpgradeModal: document.querySelector('#islandUpgradeModal'),
@@ -3004,30 +3038,49 @@ if (typeof document !== 'undefined') {
       return Math.min(max, Math.max(min, value));
     }
 
-    function getFenceVisualMarkup(className = '', alt = '栅栏') {
-      return `<span class="${className} decoration-image-frame decoration-image-frame-fence"><img class="decoration-image decoration-fence-image" data-fence-image="true" src="${fenceVisualSrc}" alt="${escapeHtml(alt)}"></span>`;
+    function isImageDecorationType(type) {
+      return Object.prototype.hasOwnProperty.call(decorationVisualState, type);
     }
 
-    function getDecorationVisualMarkup(type, info, className = '') {
-      if (type === 'fence') {
-        return getFenceVisualMarkup(className, info?.name || '栅栏');
+    const normalizeDecorationRotation = IslandGardenModule.normalizeDecorationRotation;
+
+    function getDecorationRotationLabel(rotation) {
+      const safeRotation = normalizeDecorationRotation(rotation);
+      const labelMap = {
+        0: '朝上',
+        90: '朝右',
+        180: '朝下',
+        270: '朝左'
+      };
+      return `${safeRotation}° · ${labelMap[safeRotation] || '已旋转'}`;
+    }
+
+    function getDecorationVisualMarkup(type, info, className = '', rotation = 0) {
+      if (isImageDecorationType(type)) {
+        const visual = decorationVisualState[type];
+        return `<span class="${className} decoration-image-frame decoration-image-frame-${type}" style="--decoration-rotation:${normalizeDecorationRotation(rotation)}deg;"><img class="decoration-image decoration-image-${type}" data-decoration-image="${type}" src="${escapeHtml(visual?.src || DECORATION_IMAGE_ASSETS[type].path)}" alt="${escapeHtml(info?.name || type)}"></span>`;
       }
       return `<span class="${className}" title="${escapeHtml(info?.name || type)}">${escapeHtml(info?.icon || '✨')}</span>`;
     }
 
-    function applyFenceVisualToDom() {
-      document.querySelectorAll('[data-fence-image="true"]').forEach((img) => {
-        if (img.getAttribute('src') !== fenceVisualSrc) {
-          img.setAttribute('src', fenceVisualSrc);
+    function applyDecorationVisualToDom(type) {
+      const visual = decorationVisualState[type];
+      const asset = DECORATION_IMAGE_ASSETS[type];
+      if (!visual || !asset) return;
+      document.querySelectorAll(`[data-decoration-image="${type}"]`).forEach((img) => {
+        if (img.getAttribute('src') !== visual.src) {
+          img.setAttribute('src', visual.src);
         }
       });
-      const cssFenceSrc = String(fenceVisualSrc).replace(/"/g, '\\"');
-      document.documentElement.style.setProperty('--fence-image', `url("${cssFenceSrc}")`);
+      const cssSrc = String(visual.src).replace(/"/g, '\\"');
+      document.documentElement.style.setProperty(asset.varName, `url("${cssSrc}")`);
     }
 
-    function ensureTransparentFenceVisual() {
-      if (fenceVisualPrepared) return;
-      fenceVisualPrepared = true;
+    function ensureTransparentDecorationVisual(type) {
+      const visual = decorationVisualState[type];
+      const asset = DECORATION_IMAGE_ASSETS[type];
+      if (!visual || !asset || visual.prepared) return;
+      visual.prepared = true;
       const source = new Image();
       source.decoding = 'async';
       source.onload = () => {
@@ -3035,7 +3088,7 @@ if (typeof document !== 'undefined') {
           const width = source.naturalWidth || source.width;
           const height = source.naturalHeight || source.height;
           if (!width || !height) {
-            applyFenceVisualToDom();
+            applyDecorationVisualToDom(type);
             return;
           }
           const canvas = document.createElement('canvas');
@@ -3043,7 +3096,7 @@ if (typeof document !== 'undefined') {
           canvas.height = height;
           const context = canvas.getContext('2d', { willReadFrequently: true });
           if (!context) {
-            applyFenceVisualToDom();
+            applyDecorationVisualToDom(type);
             return;
           }
           context.drawImage(source, 0, 0, width, height);
@@ -3072,7 +3125,7 @@ if (typeof document !== 'undefined') {
             }
           });
           if (!sampleCount) {
-            applyFenceVisualToDom();
+            applyDecorationVisualToDom(type);
             return;
           }
           const bgR = sumR / sampleCount;
@@ -3108,7 +3161,7 @@ if (typeof document !== 'undefined') {
           }
           context.putImageData(imageData, 0, 0);
           if (!hasOpaquePixel) {
-            applyFenceVisualToDom();
+            applyDecorationVisualToDom(type);
             return;
           }
           const padding = 2;
@@ -3121,25 +3174,29 @@ if (typeof document !== 'undefined') {
           trimmedCanvas.height = cropHeight;
           const trimmedContext = trimmedCanvas.getContext('2d');
           if (!trimmedContext) {
-            applyFenceVisualToDom();
+            applyDecorationVisualToDom(type);
             return;
           }
           trimmedContext.drawImage(canvas, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
-          fenceVisualSrc = trimmedCanvas.toDataURL('image/png');
-          applyFenceVisualToDom();
+          visual.src = trimmedCanvas.toDataURL('image/png');
+          applyDecorationVisualToDom(type);
           updateDecorationsUI();
           if (!elements.decorationManageModal?.hidden && Number.isInteger(selectedDecorationSlot)) {
             openDecorationManageModal(selectedDecorationSlot);
           }
         } catch (error) {
-          console.warn('Failed to build transparent fence visual', error);
-          applyFenceVisualToDom();
+          console.warn(`Failed to build transparent ${type} visual`, error);
+          applyDecorationVisualToDom(type);
         }
       };
       source.onerror = () => {
-        applyFenceVisualToDom();
+        applyDecorationVisualToDom(type);
       };
-      source.src = './栅栏.png';
+      source.src = asset.path;
+    }
+
+    function ensureTransparentDecorationVisuals() {
+      Object.keys(decorationVisualState).forEach((type) => ensureTransparentDecorationVisual(type));
     }
 
     function readStorage(key) {
@@ -5499,6 +5556,17 @@ if (typeof document !== 'undefined') {
         }
       }
 
+      if (target.id === 'rotateDecorationLeftBtn' || target.id === 'rotateDecorationRightBtn') {
+        const delta = target.id === 'rotateDecorationLeftBtn' ? -90 : 90;
+        const result = IslandGardenModule.rotateDecoration(islandState, selectedDecorationSlot, delta);
+        showMessage(result.message);
+        if (result.success) {
+          updateIslandUI();
+          persistIslandState();
+          openDecorationManageModal(selectedDecorationSlot);
+        }
+      }
+
       if (target.id === 'replaceDecorationBtn') {
         if (elements.decorationManageModal) elements.decorationManageModal.hidden = true;
         openShopModal('decorations');
@@ -5937,11 +6005,13 @@ if (typeof document !== 'undefined') {
       }
       selectedDecorationSlot = slotIndex;
       const info = IslandGardenModule.DECORATION_TYPES[decoration.type];
+      const rotation = normalizeDecorationRotation(decoration.rotation);
       if (elements.decorationManageCurrent) {
         elements.decorationManageCurrent.innerHTML = `
           <div class="decoration-current-card">
-            <div class="decoration-current-icon">${getDecorationVisualMarkup(decoration.type, info, 'decoration-current-visual')}</div>
+            <div class="decoration-current-icon">${getDecorationVisualMarkup(decoration.type, info, 'decoration-current-visual', rotation)}</div>
             <div class="decoration-current-name">${escapeHtml(info?.name || decoration.type)}</div>
+            <div class="decoration-rotation-meta">当前方向：${escapeHtml(getDecorationRotationLabel(rotation))}</div>
             <div class="decoration-current-meta">点击“去商店替换”后，新的装饰会直接覆盖当前槽位，不需要先手动清空。</div>
           </div>
         `;
@@ -6138,7 +6208,7 @@ if (typeof document !== 'undefined') {
         }
         const info = decorationTypes[deco.type];
         const name = info?.name || deco.type;
-        const iconMarkup = getDecorationVisualMarkup(deco.type, info, 'slot-decoration-icon');
+        const iconMarkup = getDecorationVisualMarkup(deco.type, info, 'slot-decoration-icon', deco.rotation);
         slot.classList.remove('locked');
         slot.classList.remove('empty');
         slot.innerHTML = `
@@ -6168,6 +6238,7 @@ if (typeof document !== 'undefined') {
         node.className = `island-deco deco-${deco.type}`;
         node.style.left = `${pos.x}%`;
         node.style.top = `${pos.y}%`;
+        node.style.setProperty('--decoration-rotation', `${normalizeDecorationRotation(deco.rotation)}deg`);
         node.dataset.decoIndex = String(idx);
         node.setAttribute('aria-label', info?.name || deco.type);
         node.addEventListener('pointerdown', (event) => startDecorationDrag(node, idx, event));
@@ -6873,7 +6944,7 @@ if (typeof document !== 'undefined') {
 
     // Initialize island state
     restoreIslandState();
-    ensureTransparentFenceVisual();
+    ensureTransparentDecorationVisuals();
     bindIslandDirectClicks();
 
     // Update island state periodically

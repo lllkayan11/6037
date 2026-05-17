@@ -3743,7 +3743,9 @@ a {
 
 .island-deco {
   position: absolute;
-  transform: translate(-50%, -50%);
+  --decoration-rotation: 0deg;
+  --decoration-base-rotation: 0deg;
+  transform: translate(-50%, -50%) rotate(calc(var(--decoration-base-rotation) + var(--decoration-rotation)));
   width: 42px;
   height: 42px;
   filter: drop-shadow(0 10px 10px rgba(0,0,0,0.18));
@@ -3754,6 +3756,7 @@ a {
 
 .island-deco.is-dragging {
   cursor: grabbing;
+  transform: translate(-50%, -50%) rotate(calc(var(--decoration-base-rotation) + var(--decoration-rotation))) scale(1.03);
   filter: drop-shadow(0 16px 18px rgba(0,0,0,0.25));
   z-index: 3;
 }
@@ -3767,13 +3770,9 @@ a {
 .island-deco.deco-fence {
   width: 58px;
   height: 44px;
+  --decoration-base-rotation: -7deg;
   background: center / contain no-repeat var(--fence-image, url("./栅栏.png"));
   filter: drop-shadow(0 10px 8px rgba(0, 0, 0, 0.2));
-  transform: translate(-50%, -50%) rotate(-7deg);
-}
-
-.island-deco.deco-fence.is-dragging {
-  transform: translate(-50%, -50%) rotate(-7deg) scale(1.03);
 }
 
 .island-deco.deco-fence::before,
@@ -3781,45 +3780,15 @@ a {
   content: none;
 }
 
-.island-deco.deco-flower::before {
-  left: 15px;
-  bottom: 7px;
-  width: 4px;
-  height: 16px;
-  background: #4caf50;
+.island-deco.deco-flower {
+  width: 66px;
+  height: 58px;
+  background: center / contain no-repeat var(--flower-image, url("./花草石礅.png"));
 }
 
+.island-deco.deco-flower::before,
 .island-deco.deco-flower::after {
-  left: 9px;
-  top: 8px;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 50% 50%, #ffe082 0 24%, transparent 25%),
-    radial-gradient(circle at 50% 0, #ff7aa8 0 26%, transparent 27%),
-    radial-gradient(circle at 100% 50%, #ff7aa8 0 26%, transparent 27%),
-    radial-gradient(circle at 50% 100%, #ff7aa8 0 26%, transparent 27%),
-    radial-gradient(circle at 0 50%, #ff7aa8 0 26%, transparent 27%);
-}
-
-.island-deco.deco-lamp::before {
-  left: 18px;
-  top: 8px;
-  width: 5px;
-  height: 24px;
-  border-radius: 999px;
-  background: linear-gradient(180deg, #434343, #1f1f1f);
-}
-
-.island-deco.deco-lamp::after {
-  left: 12px;
-  top: 2px;
-  width: 17px;
-  height: 13px;
-  border-radius: 8px 8px 6px 6px;
-  background: linear-gradient(180deg, #ffeaa7, #ffc65c);
-  box-shadow: 0 0 16px rgba(255, 214, 102, 0.45);
+  content: none;
 }
 
 .island-deco.deco-bench::before {
@@ -3841,20 +3810,26 @@ a {
     linear-gradient(180deg, #a0693d 0 4px, transparent 4px);
 }
 
-.island-deco.deco-fountain::before {
-  inset: 8px;
-  border-radius: 50%;
-  background: radial-gradient(circle, #c9f4ff 0%, #7ed2f4 55%, #4ca8d5 100%);
-  box-shadow: inset 0 0 0 4px rgba(255,255,255,0.35);
+.island-deco.deco-lamp {
+  width: 56px;
+  height: 72px;
+  background: center / contain no-repeat var(--lamp-image, url("./路灯.png"));
 }
 
+.island-deco.deco-lamp::before,
+.island-deco.deco-lamp::after {
+  content: none;
+}
+
+.island-deco.deco-fountain {
+  width: 72px;
+  height: 72px;
+  background: center / contain no-repeat var(--fountain-image, url("./喷泉.png"));
+}
+
+.island-deco.deco-fountain::before,
 .island-deco.deco-fountain::after {
-  left: 18px;
-  top: 4px;
-  width: 6px;
-  height: 18px;
-  border-radius: 999px;
-  background: linear-gradient(180deg, rgba(255,255,255,0), #b7f0ff 45%, rgba(255,255,255,0));
+  content: none;
 }
 
 .island-deco.deco-pond::before {
@@ -4539,11 +4514,28 @@ a {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  transform: rotate(var(--decoration-rotation, 0deg));
+  transform-origin: center;
 }
 
 .decoration-image-frame-fence {
   width: 52px;
   height: 36px;
+}
+
+.decoration-image-frame-flower {
+  width: 54px;
+  height: 44px;
+}
+
+.decoration-image-frame-lamp {
+  width: 42px;
+  height: 54px;
+}
+
+.decoration-image-frame-fountain {
+  width: 54px;
+  height: 54px;
 }
 
 .decoration-image {
@@ -5196,6 +5188,12 @@ a {
   gap: 12px;
 }
 
+.decoration-rotate-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
 .decoration-current-card {
   display: grid;
   justify-items: center;
@@ -5218,8 +5216,29 @@ a {
   height: 56px;
 }
 
+.decoration-current-visual.decoration-image-frame-flower {
+  width: 88px;
+  height: 72px;
+}
+
+.decoration-current-visual.decoration-image-frame-lamp {
+  width: 64px;
+  height: 96px;
+}
+
+.decoration-current-visual.decoration-image-frame-fountain {
+  width: 88px;
+  height: 88px;
+}
+
 .decoration-current-name {
   font-weight: 800;
+}
+
+.decoration-rotation-meta {
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffd54f;
 }
 
 .decoration-current-meta {
