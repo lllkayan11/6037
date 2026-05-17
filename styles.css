@@ -6181,6 +6181,7 @@ a {
 
 
 /* Friend interaction modal */
+.friend-interaction-modal {
   width: 90%;
   background: linear-gradient(180deg, #1a2a3a, #0d1b2a);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -7133,6 +7134,326 @@ a {
 .search-result-item .result-info span {
   font-size: 11px;
   color: var(--ink-400);
+}
+
+/* Island scene restore */
+.island-background {
+  position: relative;
+  height: 280px;
+  background: linear-gradient(180deg, #7ac7ff 0%, #b7e7ff 42%, #7bc4dd 42%, #63b6d8 100%);
+  border-radius: 16px;
+  margin-bottom: 24px;
+  overflow: hidden;
+  border: none;
+  box-shadow: inset 0 -24px 60px rgba(0, 0, 0, 0.14);
+}
+
+.island-background::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(6, 13, 32, 0), rgba(15, 31, 58, 0));
+  transition: opacity 0.35s ease, background 0.35s ease;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sky {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60%;
+  overflow: hidden;
+}
+
+.sun {
+  position: absolute;
+  top: 28px;
+  right: 52px;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff8c4, #ffd54f 55%, #ffb300 100%);
+  box-shadow: 0 0 0 14px rgba(255, 213, 79, 0.18), 0 0 32px rgba(255, 213, 79, 0.42);
+}
+
+.cloud-a {
+  top: 44px;
+  left: 42px;
+  width: 76px;
+}
+
+.cloud-b {
+  top: 82px;
+  left: 200px;
+  width: 68px;
+  transform: scale(0.9);
+}
+
+.sea {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 40%;
+  background: linear-gradient(180deg, #49bce6, #168ec8 70%, #0f6a9a);
+}
+
+.island-shore {
+  position: absolute;
+  bottom: 28%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 84%;
+  height: 32%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, #eacb8b 0%, #dfba72 62%, #d7ac61 100%);
+  box-shadow: none;
+}
+
+.island {
+  position: absolute;
+  bottom: 31%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 74%;
+  height: 28%;
+  background:
+    radial-gradient(circle at 20% 32%, rgba(148, 224, 135, 0.95), transparent 18%),
+    radial-gradient(circle at 74% 30%, rgba(140, 220, 134, 0.9), transparent 16%),
+    radial-gradient(ellipse at center, #8bcf6d 0%, #76bf58 70%, #5ca847 100%);
+  border-radius: 50%;
+  box-shadow: inset 0 -14px 24px rgba(26, 100, 30, 0.22);
+}
+
+.island-path {
+  position: absolute;
+  bottom: 38%;
+  left: 50%;
+  width: 84px;
+  height: 30px;
+  transform: translateX(-50%) rotate(-10deg);
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(222, 195, 134, 0.9), rgba(208, 177, 119, 0.95));
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+.island-house {
+  position: absolute;
+  left: 50%;
+  bottom: 44%;
+  width: 72px;
+  height: 74px;
+  transform: translateX(-50%);
+}
+
+.house-roof {
+  top: 0;
+  left: 6px;
+  width: 60px;
+  height: 26px;
+}
+
+.house-body {
+  left: 11px;
+  top: 22px;
+  width: 50px;
+  height: 38px;
+  border-radius: 10px;
+}
+
+.house-door {
+  left: 31px;
+  top: 38px;
+  width: 12px;
+  height: 22px;
+  border-radius: 4px 4px 0 0;
+}
+
+.house-window {
+  top: 34px;
+  width: 10px;
+  height: 10px;
+}
+
+.house-window-left {
+  left: 18px;
+}
+
+.house-window-right {
+  right: 18px;
+}
+
+.island-tree {
+  position: absolute;
+  width: 22px;
+  height: 52px;
+  bottom: 40%;
+}
+
+.island-tree::before {
+  left: 9px;
+  bottom: 0;
+  width: 4px;
+  height: 20px;
+}
+
+.island-tree::after {
+  left: 0;
+  top: 0;
+  width: 22px;
+  height: 28px;
+  box-shadow: 10px 2px 0 2px rgba(98, 177, 81, 0.95), -8px 4px 0 1px rgba(87, 166, 75, 0.92);
+}
+
+.tree-a {
+  left: 28%;
+  bottom: 40%;
+}
+
+.tree-b {
+  right: 26%;
+  bottom: 40%;
+}
+
+.tree-c {
+  right: 16%;
+  bottom: 40%;
+  transform: scale(0.9);
+}
+
+.island-dock {
+  position: absolute;
+  left: 15%;
+  bottom: 28%;
+  width: 66px;
+  height: 12px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #9d6a41, #75502e);
+  transform: rotate(-10deg);
+  box-shadow: 0 8px 14px rgba(0, 0, 0, 0.16);
+}
+
+.island-dock::before,
+.island-dock::after {
+  content: "";
+  position: absolute;
+  bottom: -14px;
+  width: 6px;
+  height: 18px;
+  background: #6d4827;
+}
+
+.island-dock::before {
+  left: 10px;
+}
+
+.island-dock::after {
+  right: 10px;
+}
+
+.island-decorations-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: auto;
+}
+
+.island-deco {
+  width: 42px;
+  height: 42px;
+}
+
+.island-scene[data-level="1"] .island-house {
+  transform: translateX(-50%) scale(0.96);
+}
+
+.island-scene[data-level="2"] .island {
+  width: 76%;
+}
+
+.island-scene[data-level="2"] .island-path {
+  width: 100px;
+}
+
+.island-scene[data-level="3"] .island {
+  width: 79%;
+  height: 30%;
+}
+
+.island-scene[data-level="3"] .island-house {
+  transform: translateX(-50%) scale(1.04);
+}
+
+.island-scene[data-level="3"] .island-dock {
+  width: 80px;
+}
+
+.island-scene[data-level="3"] .tree-c,
+.island-scene[data-level="4"] .tree-c,
+.island-scene[data-level="5"] .tree-c {
+  display: block;
+}
+
+.island-scene[data-level="1"] .tree-c {
+  display: none;
+}
+
+.island-scene[data-level="4"] .island-house,
+.island-scene[data-level="5"] .island-house {
+  transform: translateX(-50%) scale(1.08);
+}
+
+.island-scene[data-level="4"] .island {
+  width: 82%;
+  height: 32%;
+}
+
+.island-scene[data-level="4"] .island-path {
+  width: 118px;
+}
+
+.island-scene[data-level="4"] .island-dock {
+  width: 92px;
+}
+
+.island-scene[data-level="5"] .house-window {
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.5), 0 0 16px rgba(255, 220, 130, 0.35);
+}
+
+.island-scene[data-level="5"] .island-background::before {
+  opacity: 1;
+  background: linear-gradient(180deg, rgba(6, 13, 32, 0.52), rgba(15, 31, 58, 0.16));
+}
+
+.island-scene[data-level="5"] .sky-glow {
+  background:
+    radial-gradient(circle at 18% 22%, rgba(255, 255, 255, 0.32), transparent 16%),
+    radial-gradient(circle at 76% 12%, rgba(255, 255, 255, 0.2), transparent 12%),
+    radial-gradient(circle at 68% 16%, rgba(255, 249, 196, 0.28) 0 1.5%, transparent 1.6%),
+    radial-gradient(circle at 14% 20%, rgba(255, 249, 196, 0.32) 0 1.4%, transparent 1.5%),
+    radial-gradient(circle at 52% 10%, rgba(255, 249, 196, 0.24) 0 1.1%, transparent 1.2%);
+}
+
+.island-scene[data-level="5"] .sun {
+  width: 44px;
+  height: 44px;
+  background: radial-gradient(circle at 35% 35%, #fffde7, #cfd8ff 60%, #9fa8da 100%);
+  box-shadow: 0 0 0 10px rgba(207, 216, 255, 0.12), 0 0 24px rgba(159, 168, 218, 0.32);
+}
+
+.island-scene[data-level="5"] .sea {
+  background: linear-gradient(180deg, #2b5f98, #143f68 70%, #0b2b47);
+}
+
+.island-scene[data-level="5"] .island {
+  width: 84%;
+  height: 34%;
+}
+
+.island-scene[data-level="5"] .island-dock {
+  width: 108px;
 }
 
 /* Pending Requests */
