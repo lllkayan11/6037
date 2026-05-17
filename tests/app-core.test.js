@@ -70,6 +70,15 @@ test('goal category inference changes with different user goals', () => {
   assert.equal(core.inferGoalCategory('Build a morning workout habit'), 'habit');
 });
 
+test('API base URL prefers runtime config and trims trailing slashes', () => {
+  assert.equal(core.resolveApiBaseUrl({ apiBaseUrl: 'https://api.example.com///' }), 'https://api.example.com');
+  assert.equal(
+    core.resolveApiBaseUrl({ config: { apiBaseUrl: 'https://worker.example.com/proxy/' } }),
+    'https://worker.example.com/proxy'
+  );
+  assert.equal(core.resolveApiBaseUrl({}), '');
+});
+
 test('selecting a task moves it into the focus state', async () => {
   const state = core.createInitialState();
   const result = await core.generateTasks('三个月准备雅思考试', 'zh-CN');

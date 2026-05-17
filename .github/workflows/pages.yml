@@ -23,6 +23,24 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Run tests
+        run: npm test
+      - name: Write runtime config
+        env:
+          POMOLAND_API_BASE_URL: ${{ vars.POMOLAND_API_BASE_URL }}
+        run: |
+          cat > runtime-config.js <<EOF
+          window.__POMOLAND_CONFIG__ = Object.freeze({
+            apiBaseUrl: "${POMOLAND_API_BASE_URL}"
+          });
+          EOF
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact

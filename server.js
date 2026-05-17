@@ -2,18 +2,33 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const OpenAI = require('openai');
+const path = require('path');
 
 const app = express();
-const port = 3000;
+const port = Number(process.env.PORT) || 3000;
+const publicDir = __dirname;
+const deepseekBaseUrl = process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com';
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.static(publicDir));
 
 // DeepSeek API configuration
-const openai = new OpenAI({
-  apiKey: process.env.DEEPSEEK_API_KEY,
-  baseURL: process.env.DEEPSEEK_BASE_URL, // 使用环境变量
+const openai = process.env.DEEPSEEK_API_KEY
+  ? new OpenAI({
+      apiKey: process.env.DEEPSEEK_API_KEY,
+      baseURL: deepseekBaseUrl,
+    })
+  : null;
+
+app.get('/api/health', (req, res) => {
+  res.json({
+    ok: true,
+    apiConfigured: Boolean(process.env.DEEPSEEK_API_KEY),
+    baseURL: deepseekBaseUrl,
+    model: 'deepseek-chat'
+  });
 });
 
 // API Endpoint for generating tasks
@@ -23,6 +38,10 @@ app.post('/api/generate-tasks', async (req, res) => {
 
     if (!goal || !language) {
       return res.status(400).json({ error: 'Goal and language are required.' });
+    }
+
+    if (!openai) {
+      return res.status(503).json({ error: 'DeepSeek API key is not configured on the server.' });
     }
 
     // Prompt for DeepSeek API
@@ -95,6 +114,10 @@ app.post('/api/get-planning-steps', async (req, res) => {
   }
 });
 
+app.get('*', (req, res) => {
+  res.sendFile(path.join(publicDir, 'index.html'));
+});
+
 app.listen(port, () => {
-  console.log(`Backend server listening at http://localhost:${port}`);
+  console.log(`Pomoland app listening at http://localhost:${port}`);
 });

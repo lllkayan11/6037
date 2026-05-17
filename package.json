@@ -5,7 +5,8 @@
   "description": "Backend proxy for Pomoland AI API integration",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node --test tests/app-core.test.js"
   },
   "keywords": [],
   "author": "",

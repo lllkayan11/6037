@@ -966,19 +966,59 @@ const PomolandCore = (() => {
     return { tasks, encouragement };
   }
 
+  function normalizeApiBaseUrl(baseUrl = '') {
+    return String(baseUrl || '').trim().replace(/\/+$/, '');
+  }
+
+  function resolveApiBaseUrl(runtime = {}) {
+    const runtimeBaseUrl = normalizeApiBaseUrl(runtime.apiBaseUrl);
+    if (runtimeBaseUrl) return runtimeBaseUrl;
+
+    const config = runtime.config || (typeof window !== 'undefined' ? window.__POMOLAND_CONFIG__ : null);
+    const configuredBaseUrl = normalizeApiBaseUrl(config && config.apiBaseUrl);
+    if (configuredBaseUrl) return configuredBaseUrl;
+
+    if (typeof window !== 'undefined' && window.location && /^https?:$/i.test(window.location.protocol)) {
+      return normalizeApiBaseUrl(window.location.origin);
+    }
+
+    return '';
+  }
+
+  function reportApiError(message, error) {
+    if (typeof window !== 'undefined') {
+      console.error(message, error);
+    }
+  }
+
   async function fetchApi(endpoint, data) {
-    const response = await fetch(`http://localhost:3000${endpoint}`, {
+    const apiBaseUrl = resolveApiBaseUrl();
+    if (!apiBaseUrl && typeof window === 'undefined') {
+      throw new Error('API base URL is not configured for this runtime.');
+    }
+    const response = await fetch(`${apiBaseUrl}${endpoint}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(data),
     });
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || `API call failed with status ${response.status}`);
+    const rawText = await response.text();
+    let payload = {};
+    if (rawText) {
+      try {
+        payload = JSON.parse(rawText);
+      } catch (error) {
+        if (!response.ok) {
+          throw new Error(`API call failed with status ${response.status}`);
+        }
+        throw new Error('API returned a non-JSON response.');
+      }
     }
-    return response.json();
+    if (!response.ok) {
+      throw new Error(payload.error || `API call failed with status ${response.status}`);
+    }
+    return payload;
   }
 
   async function generateTasks(goal, language) {
@@ -994,7 +1034,7 @@ const PomolandCore = (() => {
       }, index, cleanGoal, lang));
       return { tasks, encouragement: apiResponse.encouragement };
     } catch (error) {
-      console.error('Error fetching tasks from AI:', error);
+      reportApiError('Error fetching tasks from AI:', error);
       // 当后端不可用（GitHub Pages / 未启动本地服务）时，改用“基于输入目标”的本地拆解，
       // 避免永远回落到 IELTS 示例任务，造成“无论输入什么都显示雅思任务拆解”的体验。
       return buildFallbackTasks(cleanGoal, lang);
@@ -1007,7 +1047,7 @@ const PomolandCore = (() => {
       const steps = await fetchApi('/api/get-planning-steps', { language: lang });
       return steps;
     } catch (error) {
-      console.error('Error fetching planning steps from AI:', error);
+      reportApiError('Error fetching planning steps from AI:', error);
       // Fallback to local data if API fails
       return PLANNING_STEP_KEYS.map(([id, key]) => ({
         id,
@@ -1470,6 +1510,7 @@ const PomolandCore = (() => {
     getIslandActions,
     calculateTaskGold,
     inferGoalCategory,
+    resolveApiBaseUrl,
     createTimerState,
     syncTimerState,
     startTimerState,
