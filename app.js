@@ -2944,6 +2944,15 @@ if (typeof document !== 'undefined') {
       visitMood: document.querySelector('#visitMood'),
       visitResources: document.querySelector('#visitResources'),
       visitNote: document.querySelector('#visitNote'),
+      profileModal: document.querySelector('#profileModal'),
+      profileBody: document.querySelector('#profileBody'),
+      closeProfile: document.querySelector('#closeProfile'),
+      openProfileTopbar: document.querySelector('#openProfileTopbar'),
+      openProfileSidebar: document.querySelector('#openProfileSidebar'),
+      saveNicknameBtn: document.querySelector('#saveNicknameBtn'),
+      logoutBtn: document.querySelector('#logoutBtn'),
+      logoutSidebar: document.querySelector('#logoutSidebar'),
+      clearLocalBtn: document.querySelector('#clearLocalBtn'),
       authShell: document.querySelector('#authShell'),
       homeShell: document.querySelector('#homeShell'),
       authTitle: document.querySelector('#authTitle'),
@@ -3403,6 +3412,160 @@ if (typeof document !== 'undefined') {
 
     function clearAuth() {
       writeStorage(STORAGE_KEYS.authState, null);
+    }
+
+    // ===== Profile (个人中心) =====
+    let meProfile = null; // { uid, nickname, createdAt, lastLoginAt }
+
+    function formatDateTime(ts) {
+      const n = Number(ts || 0);
+      if (!n) return '-';
+      const d = new Date(n);
+      const pad = (x) => String(x).padStart(2, '0');
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+
+    function validateNickname(nickname) {
+      const clean = String(nickname || '').trim();
+      if (clean.length < 2 || clean.length > 12) return '';
+      return clean;
+    }
+
+    async function loadMeProfile() {
+      if (!getAuth()) {
+        meProfile = null;
+        return null;
+      }
+      try {
+        const profile = await fetchAuthedGet('/api/me');
+        meProfile = profile;
+        return profile;
+      } catch (error) {
+        console.warn('load profile failed', error);
+        meProfile = null;
+        return null;
+      }
+    }
+
+    function buildHarvestSummary() {
+      const harvested = islandState?.inventory?.harvested || {};
+      const order = ['tomato', 'strawberry', 'carrot', 'apple', 'watermelon'];
+      const parts = order
+        .filter((k) => Number(harvested[k] || 0) > 0)
+        .map((k) => `${FRUIT_LABELS[k] || k}×${harvested[k]}`);
+      return parts.length ? parts.join('、') : '暂无';
+    }
+
+    function renderProfileModal() {
+      if (!elements.profileBody) return;
+      const auth = getAuth();
+      if (!auth) {
+        elements.profileBody.innerHTML = `<div class="empty-state" style="padding:12px;"><strong>请先登录</strong></div>`;
+        return;
+      }
+      const nickname = (meProfile && meProfile.nickname) ? meProfile.nickname : `番茄${auth.uid.slice(-4)}`;
+      const createdAt = meProfile ? formatDateTime(meProfile.createdAt) : '-';
+      const lastLoginAt = meProfile ? formatDateTime(meProfile.lastLoginAt) : '-';
+      const friendsCount = Array.isArray(serverFriends) ? serverFriends.length : 0;
+      const incomingCount = Array.isArray(serverIncomingRequests) ? serverIncomingRequests.length : 0;
+      const outgoingCount = Array.isArray(serverOutgoingRequests) ? serverOutgoingRequests.length : 0;
+      const resources = state?.resources || {};
+      const islandLevel = islandState?.level || islandState?.islandLevel || 1;
+      elements.profileBody.innerHTML = `
+        <div style="display:grid;gap:14px;">
+          <div style="background:var(--bg-warm);border:1px solid var(--line);border-radius:12px;padding:14px;">
+            <strong style="display:block;margin-bottom:10px;">基础信息</strong>
+            <div style="display:grid;gap:10px;">
+              <div><span style="color:var(--muted);font-size:13px;">UID</span><div style="font-weight:800;font-size:18px;margin-top:4px;">${escapeHtml(auth.uid)}</div></div>
+              <div>
+                <span style="color:var(--muted);font-size:13px;">昵称（可修改）</span>
+                <input id="nicknameEdit" type="text" value="${escapeHtml(nickname)}" maxlength="12" style="width:100%;margin-top:6px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font-size:14px;outline:none;">
+                <div style="color:var(--muted);font-size:12px;margin-top:6px;">规则：2-12 个字符</div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                <div><span style="color:var(--muted);font-size:13px;">注册时间</span><div style="font-weight:700;margin-top:4px;">${escapeHtml(createdAt)}</div></div>
+                <div><span style="color:var(--muted);font-size:13px;">最近登录</span><div style="font-weight:700;margin-top:4px;">${escapeHtml(lastLoginAt)}</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;">
+            <strong style="display:block;margin-bottom:10px;">游戏数据</strong>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <span>🏝️ Lv.${escapeHtml(islandLevel)}</span>
+              <span>💰 ${escapeHtml(resources.coins ?? 0)}</span>
+              <span>💧 ${escapeHtml(resources.water ?? 0)}</span>
+              <span>☀️ ${escapeHtml(resources.sunlight ?? 0)}</span>
+              <span>🤝 ${escapeHtml(resources.chances ?? 0)}</span>
+            </div>
+            <div style="margin-top:10px;color:var(--ink-700);font-size:13px;">背包果实：${escapeHtml(buildHarvestSummary())}</div>
+          </div>
+
+          <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;">
+            <strong style="display:block;margin-bottom:10px;">社交数据</strong>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <span>👥 好友 ${friendsCount}</span>
+              <span>📩 待处理 ${incomingCount}</span>
+              <span>📤 已发送 ${outgoingCount}</span>
+            </div>
+          </div>
+
+          <div style="background:#fff;border:1px dashed var(--line-strong);border-radius:12px;padding:14px;">
+            <strong style="display:block;margin-bottom:8px;">隐私与安全</strong>
+            <div style="color:var(--muted);font-size:13px;line-height:1.6;">
+              这里不提供找回密码功能；如需切换账号请点击「退出登录」。
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function openProfile() {
+      if (!elements.profileModal) return;
+      await refreshFriendsFromServer();
+      await loadMeProfile();
+      renderProfileModal();
+      elements.profileModal.hidden = false;
+    }
+
+    function closeProfile() {
+      if (elements.profileModal) elements.profileModal.hidden = true;
+    }
+
+    function clearLocalCacheKeepAuth() {
+      writeStorage(STORAGE_KEYS.appState, null);
+      writeStorage(STORAGE_KEYS.timerState, null);
+      writeStorage(STORAGE_KEYS.rewardState, null);
+      writeStorage(STORAGE_KEYS.islandState, null);
+      state = core.createInitialState();
+      islandState = IslandGardenModule.createIslandState();
+      timerState = core.createTimerState(selectedDuration);
+      rewardReady = core.buildRewardBundle(language, selectedDuration);
+      restoreSession();
+      restoreIslandState();
+      renderAll();
+      updateIslandUI();
+      showMessage('已清空本地缓存（云端存档不受影响）');
+    }
+
+    function logout() {
+      clearAuth();
+      // clear local progress to avoid mixing accounts
+      writeStorage(STORAGE_KEYS.appState, null);
+      writeStorage(STORAGE_KEYS.timerState, null);
+      writeStorage(STORAGE_KEYS.rewardState, null);
+      writeStorage(STORAGE_KEYS.islandState, null);
+      meProfile = null;
+      serverFriends = [];
+      serverIncomingRequests = [];
+      serverOutgoingRequests = [];
+      friendsCacheLoaded = false;
+      remoteStateUpdatedAt = 0;
+      elements.authShell.hidden = false;
+      elements.homeShell.hidden = true;
+      if (elements.workspace) elements.workspace.hidden = true;
+      closeProfile();
+      showMessage('已退出登录');
     }
 
     async function postApi(endpoint, data) {
@@ -4626,13 +4789,15 @@ if (typeof document !== 'undefined') {
 
       elements.friendGrid.innerHTML = friendsData.map((friend) => {
         const uid = friend.uid;
+        const nickname = friend.nickname ? String(friend.nickname) : '';
+        const displayName = nickname ? `${escapeHtml(nickname)}（${escapeHtml(uid)}）` : `UID ${escapeHtml(uid)}`;
         const level = friend.island?.level ? `Lv.${friend.island.level}` : 'Lv.?';
         return `
           <article class="friend-card">
             <div class="friend-card-header">
               <div class="friend-avatar">${escapeHtml(String(uid).slice(-2))}</div>
               <div class="friend-info">
-                <h4>UID ${escapeHtml(uid)}</h4>
+                <h4>${displayName}</h4>
                 <span>${escapeHtml(level)}</span>
               </div>
             </div>
@@ -5197,6 +5362,11 @@ if (typeof document !== 'undefined') {
 
       try {
         const response = await fetchAuthedGet(`/api/friends/${friendUid}/island`);
+        if (response && response.nickname) {
+          elements.visitName.textContent = `${response.nickname}（${friendUid}）`;
+        } else {
+          elements.visitName.textContent = `UID ${friendUid}`;
+        }
         const island = response?.island;
         if (!island) {
           elements.visitFocus.textContent = '暂无岛屿数据';
@@ -5317,12 +5487,15 @@ if (typeof document !== 'undefined') {
         lastSearchResultUid = result.uid;
         const alreadyFriend = serverFriends.some(f => f.uid === uid);
         const isMe = getAuth()?.uid === uid;
+        const nicknameLine = result.nickname
+          ? `<span style="color:var(--ink-700)">昵称：${escapeHtml(result.nickname)}</span>`
+          : `<span style="color:var(--muted)">暂未设置昵称</span>`;
         elements.searchResults.innerHTML = `
           <div class="search-result-item">
             <div class="result-avatar">${escapeHtml(uid.slice(-2))}</div>
             <div class="result-info">
               <strong>UID ${escapeHtml(uid)}</strong>
-              <span style="color:var(--muted)">已注册用户</span>
+              ${nicknameLine}
             </div>
             <button class="small-button secondary" type="button" data-send-friend-request="${escapeHtml(uid)}" ${alreadyFriend || isMe ? 'disabled' : ''}>
               ${isMe ? '这是你自己' : (alreadyFriend ? '已是好友' : '发送申请')}
@@ -5476,17 +5649,57 @@ if (typeof document !== 'undefined') {
           setAuth({ uid: response.uid, token: response.token });
           // 拉取该账号的云端存档（如有），再恢复
           await restoreFromServerIfAny();
+          await loadMeProfile();
+          await refreshFriendsFromServer();
           restoreSession();
           restoreIslandState();
           renderAll();
           updateIslandUI();
-          elements.authShell.hidden = true;
-          elements.homeShell.hidden = false;
         } catch (error) {
           setAuthError(error.message || '登录/注册失败');
         } finally {
           if (elements.authSubmitBtn) elements.authSubmitBtn.disabled = false;
         }
+        return;
+      }
+
+      if (target.id === 'openProfileTopbar' || target.id === 'openProfileSidebar') {
+        await openProfile();
+        return;
+      }
+      if (target.id === 'closeProfile') {
+        closeProfile();
+        return;
+      }
+      if (target.id === 'saveNicknameBtn') {
+        const input = document.querySelector('#nicknameEdit');
+        const nickname = validateNickname(input ? input.value : '');
+        if (!nickname) {
+          showMessage('昵称需为 2-12 个字符');
+          return;
+        }
+        try {
+          const resp = await fetchAuthedApi('/api/me/profile', { nickname });
+          meProfile = { ...(meProfile || {}), nickname: resp.nickname };
+          showMessage('昵称已更新');
+          await refreshFriendsFromServer();
+          renderFriends();
+          renderProfileModal();
+          if (currentVisitUid) {
+            await openVisitModal(currentVisitUid);
+          }
+        } catch (error) {
+          showMessage(error.message || '更新失败');
+        }
+        return;
+      }
+      if (target.id === 'logoutBtn' || target.id === 'logoutSidebar') {
+        logout();
+        return;
+      }
+      if (target.id === 'clearLocalBtn') {
+        clearLocalCacheKeepAuth();
+        renderProfileModal();
         return;
       }
 
@@ -6154,6 +6367,8 @@ if (typeof document !== 'undefined') {
     // If already logged in, prefer restoring the latest cloud state.
     if (getAuth()) {
       window.setTimeout(async () => {
+        await loadMeProfile();
+        await refreshFriendsFromServer();
         const restored = await restoreFromServerIfAny();
         if (restored) {
           restoreSession();

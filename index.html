@@ -206,6 +206,10 @@
         <div><span data-i18n="water">水滴</span><strong data-resource="water">3</strong></div>
         <div><span data-i18n="chances">游戏机会</span><strong data-resource="chances">1</strong></div>
       </div>
+      <div style="margin-top:auto; display:flex; flex-direction:column; gap:10px;">
+        <button class="secondary-button" type="button" id="openProfileSidebar">个人中心</button>
+        <button class="text-button" type="button" id="logoutSidebar">退出登录</button>
+      </div>
     </aside>
 
     <main class="workspace-main">
@@ -214,10 +218,13 @@
           <p class="eyebrow">Demo Workspace</p>
           <h1 data-i18n="workspaceTitle">Pomoland Demo</h1>
         </div>
-        <div class="language-switcher" aria-label="Language switcher">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <button class="secondary-button" type="button" id="openProfileTopbar">个人中心</button>
+          <div class="language-switcher" aria-label="Language switcher">
           <button class="language-button is-active" type="button" data-lang="zh-CN">简</button>
           <button class="language-button" type="button" data-lang="zh-HK">繁</button>
           <button class="language-button" type="button" data-lang="en">EN</button>
+          </div>
         </div>
       </header>
 
@@ -1184,6 +1191,21 @@
       <div class="guide-actions">
         <button class="secondary-button" id="skipIslandGuide" type="button">跳过引导</button>
         <button class="primary-button" id="nextIslandGuide" type="button">下一步</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 个人中心 -->
+  <div class="modal-backdrop" id="profileModal" hidden>
+    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
+      <button class="modal-close" id="closeProfile" type="button" aria-label="Close">×</button>
+      <p class="eyebrow">Profile</p>
+      <h2 id="profileTitle">个人中心</h2>
+      <div id="profileBody"></div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:16px;">
+        <button class="primary-button" type="button" id="saveNicknameBtn">保存昵称</button>
+        <button class="secondary-button" type="button" id="clearLocalBtn">清空本地缓存</button>
+        <button class="text-button" type="button" id="logoutBtn">退出登录</button>
       </div>
     </div>
   </div>

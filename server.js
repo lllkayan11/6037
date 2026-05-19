@@ -41,7 +41,9 @@ const dbPromise = (async () => {
     CREATE TABLE IF NOT EXISTS users (
       uid TEXT PRIMARY KEY,
       password_hash TEXT NOT NULL,
-      created_at INTEGER NOT NULL
+      created_at INTEGER NOT NULL,
+      nickname TEXT,
+      last_login_at INTEGER
     );
     CREATE TABLE IF NOT EXISTS user_state (
       uid TEXT PRIMARY KEY,
@@ -67,6 +69,9 @@ const dbPromise = (async () => {
     CREATE INDEX IF NOT EXISTS idx_friends_uid1 ON friends(uid1);
     CREATE INDEX IF NOT EXISTS idx_friends_uid2 ON friends(uid2);
   `);
+  // Lightweight migrations for existing databases
+  try { await db.exec(`ALTER TABLE users ADD COLUMN nickname TEXT;`); } catch (e) {}
+  try { await db.exec(`ALTER TABLE users ADD COLUMN last_login_at INTEGER;`); } catch (e) {}
   return db;
 })();
 
@@ -109,6 +114,14 @@ app.get('/api/health', (req, res) => {
 function normalizeUid(value) {
   const clean = String(value || '').trim();
   return /^\d{8}$/.test(clean) ? clean : '';
+}
+
+function normalizeNickname(value) {
+  const raw = String(value || '').trim();
+  // 2-12 chars; allow most unicode except control chars
+  const clean = raw.replace(/[\u0000-\u001f\u007f]/g, '');
+  if (clean.length < 2 || clean.length > 12) return '';
+  return clean;
 }
 
 function ensureStateShape(remote) {
@@ -168,11 +181,15 @@ app.post('/api/auth/register', async (req, res) => {
       return res.status(409).json({ error: '该 UID 已被注册，请换一个。' });
     }
     const passwordHash = await bcrypt.hash(cleanPassword, 10);
+    const defaultNickname = `番茄${cleanUid.slice(-4)}`;
+    const now = Date.now();
     await db.run(
-      'INSERT INTO users(uid, password_hash, created_at) VALUES (?, ?, ?)',
+      'INSERT INTO users(uid, password_hash, created_at, nickname, last_login_at) VALUES (?, ?, ?, ?, ?)',
       cleanUid,
       passwordHash,
-      Date.now()
+      now,
+      defaultNickname,
+      now
     );
     const token = signToken(cleanUid);
     return res.json({ uid: cleanUid, token });
@@ -199,6 +216,7 @@ app.post('/api/auth/login', async (req, res) => {
     if (!ok) {
       return res.status(401).json({ error: '账号或密码错误。' });
     }
+    await db.run('UPDATE users SET last_login_at = ? WHERE uid = ?', Date.now(), cleanUid);
     const token = signToken(cleanUid);
     return res.json({ uid: cleanUid, token });
   } catch (error) {
@@ -257,15 +275,46 @@ app.post('/api/state', requireAuth, async (req, res) => {
   }
 });
 
+// ---- Profile APIs ----
+app.get('/api/me', requireAuth, async (req, res) => {
+  try {
+    const db = await dbPromise;
+    const user = await db.get('SELECT uid, nickname, created_at, last_login_at FROM users WHERE uid = ?', req.uid);
+    if (!user) return res.status(404).json({ error: '用户不存在。' });
+    return res.json({
+      uid: user.uid,
+      nickname: user.nickname || '',
+      createdAt: Number(user.created_at || 0),
+      lastLoginAt: Number(user.last_login_at || 0)
+    });
+  } catch (error) {
+    console.error('get me error', error);
+    return res.status(500).json({ error: '读取个人信息失败。' });
+  }
+});
+
+app.post('/api/me/profile', requireAuth, async (req, res) => {
+  try {
+    const db = await dbPromise;
+    const nickname = normalizeNickname(req.body && req.body.nickname);
+    if (!nickname) return res.status(400).json({ error: '昵称需为 2-12 个字符。' });
+    await db.run('UPDATE users SET nickname = ? WHERE uid = ?', nickname, req.uid);
+    return res.json({ ok: true, nickname });
+  } catch (error) {
+    console.error('update profile error', error);
+    return res.status(500).json({ error: '更新个人信息失败。' });
+  }
+});
+
 // ---- Real friends system ----
 app.get('/api/users/:uid', requireAuth, async (req, res) => {
   try {
     const targetUid = normalizeUid(req.params.uid);
     if (!targetUid) return res.status(400).json({ error: 'UID 必须是 8 位数字。' });
     const db = await dbPromise;
-    const user = await db.get('SELECT uid, created_at FROM users WHERE uid = ?', targetUid);
+    const user = await db.get('SELECT uid, nickname, created_at FROM users WHERE uid = ?', targetUid);
     if (!user) return res.status(404).json({ error: '用户不存在。' });
-    return res.json({ uid: user.uid, createdAt: user.created_at });
+    return res.json({ uid: user.uid, nickname: user.nickname || '', createdAt: user.created_at });
   } catch (error) {
     console.error('user lookup error', error);
     return res.status(500).json({ error: '查询失败。' });
@@ -424,12 +473,18 @@ app.get('/api/friends', requireAuth, async (req, res) => {
     const friendUids = rows.map(r => (r.uid1 === req.uid ? r.uid2 : r.uid1));
     const result = [];
     for (const fuid of friendUids) {
+      const user = await db.get('SELECT uid, nickname, created_at FROM users WHERE uid = ?', fuid);
       const stRow = await db.get('SELECT state_json FROM user_state WHERE uid = ?', fuid);
       let snapshot = null;
       if (stRow && stRow.state_json) {
         try { snapshot = buildIslandSnapshot(JSON.parse(stRow.state_json)); } catch (e) { snapshot = null; }
       }
-      result.push({ uid: fuid, island: snapshot ? { level: snapshot.level, exp: snapshot.exp, maxExp: snapshot.maxExp } : null });
+      result.push({
+        uid: fuid,
+        nickname: user?.nickname || '',
+        createdAt: Number(user?.created_at || 0),
+        island: snapshot ? { level: snapshot.level, exp: snapshot.exp, maxExp: snapshot.maxExp } : null
+      });
     }
     return res.json({ friends: result });
   } catch (error) {
@@ -444,11 +499,12 @@ app.get('/api/friends/:uid/island', requireAuth, async (req, res) => {
     if (!targetUid) return res.status(400).json({ error: 'UID 必须是 8 位数字。' });
     const db = await dbPromise;
     if (!(await areFriends(db, req.uid, targetUid))) return res.status(403).json({ error: '你们还不是好友。' });
+    const user = await db.get('SELECT uid, nickname, created_at FROM users WHERE uid = ?', targetUid);
     const row = await db.get('SELECT state_json, updated_at FROM user_state WHERE uid = ?', targetUid);
-    if (!row) return res.json({ uid: targetUid, island: null, updatedAt: 0 });
+    if (!row) return res.json({ uid: targetUid, nickname: user?.nickname || '', island: null, updatedAt: 0 });
     let parsed = null;
     try { parsed = JSON.parse(row.state_json); } catch (e) { parsed = null; }
-    return res.json({ uid: targetUid, island: parsed ? buildIslandSnapshot(parsed) : null, updatedAt: Number(row.updated_at || 0) });
+    return res.json({ uid: targetUid, nickname: user?.nickname || '', island: parsed ? buildIslandSnapshot(parsed) : null, updatedAt: Number(row.updated_at || 0) });
   } catch (error) {
     console.error('friend island error', error);
     return res.status(500).json({ error: '读取好友岛屿失败。' });
