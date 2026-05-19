@@ -3422,6 +3422,48 @@ if (typeof document !== 'undefined') {
       islandGuideLead: document.querySelector('#islandGuideLead')
     };
 
+    // Prefer direct event binding for critical controls (more robust than event delegation,
+    // especially when the click target is a Text node or nested element).
+    function bindDirectClick(node, handler) {
+      if (!node) return;
+      node.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        handler(e);
+      });
+    }
+
+    bindDirectClick(elements.openProfileTopbar, () => openProfile());
+    bindDirectClick(elements.openProfileSidebar, () => openProfile());
+    bindDirectClick(elements.closeProfile, () => closeProfile());
+    bindDirectClick(elements.logoutBtn, () => logout());
+    bindDirectClick(elements.logoutSidebar, () => logout());
+    bindDirectClick(elements.clearLocalBtn, () => {
+      clearLocalCacheKeepAuth();
+      renderProfileModal();
+    });
+    bindDirectClick(elements.saveNicknameBtn, async () => {
+      const input = document.querySelector('#nicknameEdit');
+      const nickname = validateNickname(input ? input.value : '');
+      if (!nickname) {
+        showMessage('昵称需为 2-12 个字符');
+        return;
+      }
+      try {
+        const resp = await fetchAuthedApi('/api/me/profile', { nickname });
+        meProfile = { ...(meProfile || {}), nickname: resp.nickname };
+        showMessage('昵称已更新');
+        await refreshFriendsFromServer();
+        renderFriends();
+        renderProfileModal();
+        if (currentVisitUid) {
+          await openVisitModal(currentVisitUid);
+        }
+      } catch (error) {
+        showMessage(error.message || '更新失败');
+      }
+    });
+
     const STORAGE_KEYS = {
       appState: 'pomoland-demo-state-v2',
       timerState: 'pomoland-demo-timer-v2',
@@ -6029,7 +6071,11 @@ if (typeof document !== 'undefined') {
       // IMPORTANT: island interactions use <div> (plots, seed options, etc.).
       // We still want button shortcuts, but must not ignore non-button clicks.
       const rawTarget = event.target;
-      const target = rawTarget && rawTarget.closest ? (rawTarget.closest('button, a') || rawTarget) : rawTarget;
+      // Some browsers can report Text nodes as event.target when clicking button labels.
+      const normalizedTarget = rawTarget && rawTarget.nodeType === 3 ? rawTarget.parentElement : rawTarget;
+      const target = normalizedTarget && normalizedTarget.closest
+        ? (normalizedTarget.closest('button, a') || normalizedTarget)
+        : normalizedTarget;
       if (!target) return;
 
       if (target.id === 'toggleAuthMode') {
