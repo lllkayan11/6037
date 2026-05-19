@@ -3,16 +3,72 @@ const express = require('express');
 const cors = require('cors');
 const OpenAI = require('openai');
 const path = require('path');
+const fs = require('fs');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const sqlite3 = require('sqlite3');
+const { open } = require('sqlite');
 
 const app = express();
 const port = Number(process.env.PORT) || 3000;
 const publicDir = __dirname;
 const deepseekBaseUrl = process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com';
+const jwtSecret = process.env.JWT_SECRET || 'dev_secret_change_me';
+const sqlitePath = process.env.SQLITE_PATH || path.join(__dirname, 'data', 'pomoland.db');
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.static(publicDir));
+
+function ensureDir(dirPath) {
+  try {
+    fs.mkdirSync(dirPath, { recursive: true });
+  } catch (error) {
+    // ignore
+  }
+}
+
+// Database (SQLite)
+const dbPromise = (async () => {
+  ensureDir(path.dirname(sqlitePath));
+  const db = await open({
+    filename: sqlitePath,
+    driver: sqlite3.Database
+  });
+  await db.exec(`
+    PRAGMA journal_mode=WAL;
+    CREATE TABLE IF NOT EXISTS users (
+      uid TEXT PRIMARY KEY,
+      password_hash TEXT NOT NULL,
+      created_at INTEGER NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS user_state (
+      uid TEXT PRIMARY KEY,
+      state_json TEXT NOT NULL,
+      updated_at INTEGER NOT NULL,
+      FOREIGN KEY(uid) REFERENCES users(uid) ON DELETE CASCADE
+    );
+  `);
+  return db;
+})();
+
+function signToken(uid) {
+  return jwt.sign({ uid }, jwtSecret, { expiresIn: '30d' });
+}
+
+function requireAuth(req, res, next) {
+  const header = String(req.headers.authorization || '').trim();
+  const token = header.startsWith('Bearer ') ? header.slice('Bearer '.length) : '';
+  if (!token) return res.status(401).json({ error: 'Missing auth token.' });
+  try {
+    const payload = jwt.verify(token, jwtSecret);
+    req.uid = payload.uid;
+    return next();
+  } catch (error) {
+    return res.status(401).json({ error: 'Invalid or expired auth token.' });
+  }
+}
 
 // DeepSeek API configuration
 const openai = process.env.DEEPSEEK_API_KEY
@@ -26,9 +82,109 @@ app.get('/api/health', (req, res) => {
   res.json({
     ok: true,
     apiConfigured: Boolean(process.env.DEEPSEEK_API_KEY),
+    authConfigured: Boolean(process.env.JWT_SECRET),
+    dbPath: sqlitePath,
     baseURL: deepseekBaseUrl,
     model: 'deepseek-chat'
   });
+});
+
+// ---- Auth + Save State APIs ----
+app.post('/api/auth/register', async (req, res) => {
+  try {
+    const { uid, password } = req.body || {};
+    const cleanUid = String(uid || '').trim();
+    const cleanPassword = String(password || '');
+    if (!/^\d{8}$/.test(cleanUid)) {
+      return res.status(400).json({ error: 'UID 必须是 8 位数字。' });
+    }
+    if (!cleanPassword || cleanPassword.length < 4) {
+      return res.status(400).json({ error: '密码至少 4 位。' });
+    }
+    const db = await dbPromise;
+    const existing = await db.get('SELECT uid FROM users WHERE uid = ?', cleanUid);
+    if (existing) {
+      return res.status(409).json({ error: '该 UID 已被注册，请换一个。' });
+    }
+    const passwordHash = await bcrypt.hash(cleanPassword, 10);
+    await db.run(
+      'INSERT INTO users(uid, password_hash, created_at) VALUES (?, ?, ?)',
+      cleanUid,
+      passwordHash,
+      Date.now()
+    );
+    const token = signToken(cleanUid);
+    return res.json({ uid: cleanUid, token });
+  } catch (error) {
+    console.error('register error', error);
+    return res.status(500).json({ error: '注册失败。' });
+  }
+});
+
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { uid, password } = req.body || {};
+    const cleanUid = String(uid || '').trim();
+    const cleanPassword = String(password || '');
+    if (!/^\d{8}$/.test(cleanUid)) {
+      return res.status(400).json({ error: 'UID 必须是 8 位数字。' });
+    }
+    const db = await dbPromise;
+    const user = await db.get('SELECT uid, password_hash FROM users WHERE uid = ?', cleanUid);
+    if (!user) {
+      return res.status(401).json({ error: '账号或密码错误。' });
+    }
+    const ok = await bcrypt.compare(cleanPassword, user.password_hash);
+    if (!ok) {
+      return res.status(401).json({ error: '账号或密码错误。' });
+    }
+    const token = signToken(cleanUid);
+    return res.json({ uid: cleanUid, token });
+  } catch (error) {
+    console.error('login error', error);
+    return res.status(500).json({ error: '登录失败。' });
+  }
+});
+
+app.get('/api/state', requireAuth, async (req, res) => {
+  try {
+    const db = await dbPromise;
+    const row = await db.get('SELECT state_json FROM user_state WHERE uid = ?', req.uid);
+    if (!row) return res.json({ state: null });
+    let payload = null;
+    try {
+      payload = JSON.parse(row.state_json);
+    } catch (error) {
+      payload = null;
+    }
+    return res.json({ state: payload });
+  } catch (error) {
+    console.error('get state error', error);
+    return res.status(500).json({ error: '读取存档失败。' });
+  }
+});
+
+app.post('/api/state', requireAuth, async (req, res) => {
+  try {
+    const state = req.body && req.body.state;
+    if (!state || typeof state !== 'object') {
+      return res.status(400).json({ error: 'state is required.' });
+    }
+    const db = await dbPromise;
+    const serialized = JSON.stringify(state);
+    await db.run(
+      `INSERT INTO user_state(uid, state_json, updated_at)
+       VALUES (?, ?, ?)
+       ON CONFLICT(uid) DO UPDATE SET state_json=excluded.state_json, updated_at=excluded.updated_at`,
+      req.uid,
+      serialized,
+      Date.now()
+    );
+    return res.json({ ok: true });
+  } catch (error) {
+    console.error('save state error', error);
+    return res.status(500).json({ error: '保存存档失败。' });
+  }
 });
 
 // API Endpoint for generating tasks

@@ -11,13 +11,19 @@
     <div class="auth-form-container">
       <div class="auth-form">
         <p class="eyebrow">Welcome</p>
-        <h2>登录 / 注册</h2>
-        <p style="color: var(--muted); margin-bottom: 32px;">输入昵称开始使用 Pomoland 专注工具。</p>
+        <h2 id="authTitle">登录</h2>
+        <p style="color: var(--muted); margin-bottom: 24px;">使用 8 位数字 UID + 密码登录（或注册新账号）。</p>
 
-        <label for="nicknameInput" style="display:block; margin-bottom: 8px; font-weight: bold; color: var(--muted);">你的昵称</label>
-        <input type="text" id="nicknameInput" placeholder="例如：小番茄" style="width: 100%; padding: 14px; border: 1px solid var(--line); border-radius: 8px; margin-bottom: 32px; font-size: 16px; outline: none;" />
+        <label for="uidInput" style="display:block; margin-bottom: 8px; font-weight: bold; color: var(--muted);">UID（8 位数字）</label>
+        <input type="text" id="uidInput" inputmode="numeric" maxlength="8" placeholder="例如：12345678" style="width: 100%; padding: 14px; border: 1px solid var(--line); border-radius: 8px; margin-bottom: 16px; font-size: 16px; outline: none;" />
 
-        <button class="primary-button wide" id="confirmLoginBtn" type="button" style="height: 52px; font-size: 16px;">进入岛屿</button>
+        <label for="passwordInput" style="display:block; margin-bottom: 8px; font-weight: bold; color: var(--muted);">密码</label>
+        <input type="password" id="passwordInput" placeholder="至少 4 位" style="width: 100%; padding: 14px; border: 1px solid var(--line); border-radius: 8px; margin-bottom: 12px; font-size: 16px; outline: none;" />
+
+        <div id="authError" style="color:#c62828; font-size: 13px; min-height: 18px; margin-bottom: 16px;"></div>
+
+        <button class="primary-button wide" id="authSubmitBtn" type="button" style="height: 52px; font-size: 16px;">登录并进入</button>
+        <button class="text-button wide" id="toggleAuthMode" type="button" style="margin-top:12px;">没有账号？注册</button>
       </div>
     </div>
   </div>

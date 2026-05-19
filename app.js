@@ -2944,8 +2944,12 @@ if (typeof document !== 'undefined') {
       visitNote: document.querySelector('#visitNote'),
       authShell: document.querySelector('#authShell'),
       homeShell: document.querySelector('#homeShell'),
-      nicknameInput: document.querySelector('#nicknameInput'),
-      confirmLoginBtn: document.querySelector('#confirmLoginBtn'),
+      authTitle: document.querySelector('#authTitle'),
+      uidInput: document.querySelector('#uidInput'),
+      passwordInput: document.querySelector('#passwordInput'),
+      authError: document.querySelector('#authError'),
+      authSubmitBtn: document.querySelector('#authSubmitBtn'),
+      toggleAuthMode: document.querySelector('#toggleAuthMode'),
       // Social module elements
       addFriendBtn: document.querySelector('#addFriendBtn'),
       createChallengeBtn: document.querySelector('#createChallengeBtn'),
@@ -3299,6 +3303,147 @@ if (typeof document !== 'undefined') {
       writeStorage(STORAGE_KEYS.appState, state);
       writeStorage(STORAGE_KEYS.timerState, timerState);
       writeStorage(STORAGE_KEYS.rewardState, rewardReady);
+      scheduleCloudSave();
+    }
+
+    // ===== Cloud save (every 15s + key actions) =====
+    let cloudSaveTimer = null;
+    let cloudSaveInFlight = false;
+    let lastCloudSaveAt = 0;
+
+    function buildCloudStatePayload() {
+      return {
+        version: 1,
+        savedAt: Date.now(),
+        appState: state,
+        timerState,
+        rewardState: rewardReady,
+        islandState
+      };
+    }
+
+    async function saveCloudStateNow() {
+      const auth = getAuth();
+      if (!auth) return;
+      if (cloudSaveInFlight) return;
+      cloudSaveInFlight = true;
+      try {
+        await fetchAuthedApi('/api/state', { state: buildCloudStatePayload() });
+        lastCloudSaveAt = Date.now();
+      } catch (error) {
+        console.warn('Cloud save failed', error);
+      } finally {
+        cloudSaveInFlight = false;
+      }
+    }
+
+    function scheduleCloudSave(delayMs = 900) {
+      // avoid saving too frequently
+      const now = Date.now();
+      if (now - lastCloudSaveAt < 800) delayMs = Math.max(delayMs, 1200);
+      if (cloudSaveTimer) window.clearTimeout(cloudSaveTimer);
+      cloudSaveTimer = window.setTimeout(() => {
+        cloudSaveTimer = null;
+        saveCloudStateNow();
+      }, delayMs);
+    }
+
+    let authMode = 'login'; // 'login' | 'register'
+    function setAuthError(message = '') {
+      if (elements.authError) elements.authError.textContent = message || '';
+    }
+
+    function setAuthMode(mode) {
+      authMode = mode === 'register' ? 'register' : 'login';
+      if (elements.authTitle) elements.authTitle.textContent = authMode === 'register' ? '注册' : '登录';
+      if (elements.authSubmitBtn) elements.authSubmitBtn.textContent = authMode === 'register' ? '注册并进入' : '登录并进入';
+      if (elements.toggleAuthMode) {
+        elements.toggleAuthMode.textContent = authMode === 'register' ? '已有账号？登录' : '没有账号？注册';
+      }
+      setAuthError('');
+    }
+
+    function getAuth() {
+      const auth = readStorage(STORAGE_KEYS.authState);
+      return auth && auth.token && auth.uid ? auth : null;
+    }
+
+    function setAuth(auth) {
+      writeStorage(STORAGE_KEYS.authState, auth);
+    }
+
+    function clearAuth() {
+      writeStorage(STORAGE_KEYS.authState, null);
+    }
+
+    async function fetchAuthedApi(endpoint, data) {
+      const auth = getAuth();
+      if (!auth) throw new Error('Not logged in');
+      const apiBaseUrl = resolveApiBaseUrl();
+      const response = await fetch(`${apiBaseUrl}${endpoint}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${auth.token}`
+        },
+        body: JSON.stringify(data || {})
+      });
+      const rawText = await response.text();
+      let payload = {};
+      if (rawText) {
+        try {
+          payload = JSON.parse(rawText);
+        } catch (error) {
+          if (!response.ok) throw new Error(`API call failed with status ${response.status}`);
+          throw new Error('API returned a non-JSON response.');
+        }
+      }
+      if (!response.ok) {
+        throw new Error(payload.error || `API call failed with status ${response.status}`);
+      }
+      return payload;
+    }
+
+    async function fetchAuthedGet(endpoint) {
+      const auth = getAuth();
+      if (!auth) throw new Error('Not logged in');
+      const apiBaseUrl = resolveApiBaseUrl();
+      const response = await fetch(`${apiBaseUrl}${endpoint}`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${auth.token}`
+        }
+      });
+      const rawText = await response.text();
+      let payload = {};
+      if (rawText) {
+        try {
+          payload = JSON.parse(rawText);
+        } catch (error) {
+          if (!response.ok) throw new Error(`API call failed with status ${response.status}`);
+          throw new Error('API returned a non-JSON response.');
+        }
+      }
+      if (!response.ok) {
+        throw new Error(payload.error || `API call failed with status ${response.status}`);
+      }
+      return payload;
+    }
+
+    async function restoreFromServerIfAny() {
+      try {
+        const response = await fetchAuthedGet('/api/state');
+        if (!response || !response.state) return false;
+        const remote = response.state;
+        if (remote.appState) writeStorage(STORAGE_KEYS.appState, remote.appState);
+        if (remote.timerState) writeStorage(STORAGE_KEYS.timerState, remote.timerState);
+        if (remote.rewardState) writeStorage(STORAGE_KEYS.rewardState, remote.rewardState);
+        if (remote.islandState) writeStorage(STORAGE_KEYS.islandState, remote.islandState);
+        return true;
+      } catch (error) {
+        console.warn('Failed to restore from server', error);
+        return false;
+      }
     }
 
     function restoreSession() {
@@ -3313,13 +3458,13 @@ if (typeof document !== 'undefined') {
         delete rewardReady.seeds;
       }
 
-      const auth = readStorage(STORAGE_KEYS.authState);
-      if (auth && auth.loggedIn) {
+      const auth = getAuth();
+      if (auth) {
         elements.authShell.hidden = true;
         elements.homeShell.hidden = false;
-        if (elements.nicknameInput && auth.nickname) {
-          elements.nicknameInput.value = auth.nickname;
-        }
+      } else {
+        elements.authShell.hidden = false;
+        elements.homeShell.hidden = true;
       }
     }
 
@@ -5133,23 +5278,48 @@ if (typeof document !== 'undefined') {
       `;
     }
 
-    document.addEventListener('click', (event) => {
+    document.addEventListener('click', async (event) => {
       // IMPORTANT: island interactions use <div> (plots, seed options, etc.).
       // We still want button shortcuts, but must not ignore non-button clicks.
       const rawTarget = event.target;
       const target = rawTarget && rawTarget.closest ? (rawTarget.closest('button, a') || rawTarget) : rawTarget;
       if (!target) return;
 
-      if (target.id === 'confirmLoginBtn') {
-        const nickname = elements.nicknameInput.value.trim();
-        if (!nickname) return alert('请输入昵称');
+      if (target.id === 'toggleAuthMode') {
+        setAuthMode(authMode === 'login' ? 'register' : 'login');
+        return;
+      }
 
-        writeStorage(STORAGE_KEYS.authState, {
-          loggedIn: true,
-          nickname
-        });
-        elements.authShell.hidden = true;
-        elements.homeShell.hidden = false;
+      if (target.id === 'authSubmitBtn') {
+        const uid = (elements.uidInput?.value || '').trim();
+        const password = elements.passwordInput?.value || '';
+        if (!/^\d{8}$/.test(uid)) {
+          setAuthError('UID 必须是 8 位数字');
+          return;
+        }
+        if (!password || password.length < 4) {
+          setAuthError('密码至少 4 位');
+          return;
+        }
+        setAuthError('');
+        if (elements.authSubmitBtn) elements.authSubmitBtn.disabled = true;
+        try {
+          const endpoint = authMode === 'register' ? '/api/auth/register' : '/api/auth/login';
+          const response = await fetchApi(endpoint, { uid, password });
+          setAuth({ uid: response.uid, token: response.token });
+          // 拉取该账号的云端存档（如有），再恢复
+          await restoreFromServerIfAny();
+          restoreSession();
+          restoreIslandState();
+          renderAll();
+          updateIslandUI();
+          elements.authShell.hidden = true;
+          elements.homeShell.hidden = false;
+        } catch (error) {
+          setAuthError(error.message || '登录/注册失败');
+        } finally {
+          if (elements.authSubmitBtn) elements.authSubmitBtn.disabled = false;
+        }
         return;
       }
 
@@ -5780,7 +5950,25 @@ if (typeof document !== 'undefined') {
       persistSession();
     });
 
+    setAuthMode('login');
     restoreSession();
+    // If already logged in, prefer restoring the latest cloud state.
+    if (getAuth()) {
+      window.setTimeout(async () => {
+        const restored = await restoreFromServerIfAny();
+        if (restored) {
+          restoreSession();
+          restoreIslandState();
+          renderAll();
+          updateIslandUI();
+        }
+      }, 0);
+    }
+    // Auto-save strategy B: every 15s + key actions (debounced via scheduleCloudSave())
+    window.setInterval(() => {
+      if (!getAuth()) return;
+      saveCloudStateNow();
+    }, 15000);
     setLanguage(language);
     if (focusPreview) {
       if (elements.home) elements.home.hidden = true;
@@ -6913,6 +7101,7 @@ if (typeof document !== 'undefined') {
 
     function persistIslandState() {
       writeStorage(STORAGE_KEYS.islandState, islandState);
+      scheduleCloudSave();
     }
 
     function restoreIslandState() {
