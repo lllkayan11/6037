@@ -4598,6 +4598,21 @@ if (typeof document !== 'undefined') {
         return;
       }
 
+      if (!friendsCacheLoaded) {
+        elements.friendGrid.innerHTML = `
+          <div class="empty-state">
+            <strong>正在加载好友列表...</strong>
+            <span>如果你刚打开网站，这通常只需要 1 秒</span>
+          </div>
+        `;
+        // lazy load once
+        window.setTimeout(async () => {
+          await refreshFriendsFromServer();
+          renderFriends();
+        }, 0);
+        return;
+      }
+
       const friendsData = Array.isArray(serverFriends) ? serverFriends : [];
       if (!friendsData.length) {
         elements.friendGrid.innerHTML = `
@@ -5240,14 +5255,20 @@ if (typeof document !== 'undefined') {
     let serverIncomingRequests = [];
     let serverOutgoingRequests = [];
     let lastSearchResultUid = null;
+    let friendsCacheLoaded = false;
+    let friendsCacheLoading = false;
 
     async function refreshFriendsFromServer() {
       if (!getAuth()) {
         serverFriends = [];
         serverIncomingRequests = [];
         serverOutgoingRequests = [];
+        friendsCacheLoaded = false;
+        friendsCacheLoading = false;
         return;
       }
+      if (friendsCacheLoading) return;
+      friendsCacheLoading = true;
       try {
         const [friendsResp, reqResp] = await Promise.all([
           fetchAuthedGet('/api/friends'),
@@ -5256,8 +5277,12 @@ if (typeof document !== 'undefined') {
         serverFriends = Array.isArray(friendsResp?.friends) ? friendsResp.friends : [];
         serverIncomingRequests = Array.isArray(reqResp?.incoming) ? reqResp.incoming : [];
         serverOutgoingRequests = Array.isArray(reqResp?.outgoing) ? reqResp.outgoing : [];
+        friendsCacheLoaded = true;
       } catch (error) {
         console.warn('refresh friends error', error);
+        friendsCacheLoaded = true; // avoid blocking UI forever
+      } finally {
+        friendsCacheLoading = false;
       }
     }
 
@@ -5480,6 +5505,10 @@ if (typeof document !== 'undefined') {
 
       if (target.matches('[data-view]')) {
         switchView(target.dataset.view);
+        if (target.dataset.view === 'friends') {
+          await refreshFriendsFromServer();
+          renderFriends();
+        }
         if (target.dataset.view === 'island') {
           window.setTimeout(() => {
             updateIslandUI();
