@@ -108,6 +108,99 @@ const PomolandCore = (() => {
       decoratePurpose: '放置码头、灯具等装饰，让 Pomoland 更有展示感。',
       decorateEffect: '解锁岛屿装饰。',
       islandStatus: '岛屿状态',
+      islandGardenTitle: '我的岛屿花园',
+      islandUpgradeKicker: 'Island Upgrade',
+      islandUpgradeHint: '继续专注与建设，解锁更大的 Pomoland。',
+      islandUpgradeBtn: '升级岛屿',
+      islandFarmTitle: '农田',
+      islandPetsTitle: '宠物',
+      islandDecorTitle: '装饰',
+      islandDecorHint: '拖动岛上的装饰物可自由摆放位置，点击装饰槽位可管理或替换。',
+      islandDailyTasksTitle: '每日任务',
+      islandOrdersTitle: '岛屿订单',
+      islandOrdersStatusActive: '进行中',
+      islandToolsFarm: '农场工具',
+      islandToolPlant: '种植',
+      islandToolWater: '浇水',
+      islandToolSunlight: '阳光照射',
+      islandToolHarvest: '收获',
+      islandToolsPetCare: '宠物照料',
+      islandToolFeed: '喂养',
+      islandToolsShop: '商店',
+      islandToolOpenShop: '打开商店',
+      islandToolInventory: '查看背包',
+      islandToolsSocial: '社交',
+      islandToolVisitFriends: '参观好友',
+      islandToolHelpWater: '帮助浇水',
+      islandToolsBackpack: '背包',
+      islandInvSeedsTitle: '种子',
+      islandInvHarvestTitle: '收获',
+      islandAiMoodTitle: 'AI 心情推荐',
+      islandAiRecommendBtn: 'AI推荐',
+      islandMessageInitial: '选择地块开始种植',
+      petBonusLocked: '宠物加成待解锁',
+      petMoodLabel: '心情',
+      petHungerLabel: '饥饿',
+      moodStressed: '压力大',
+      moodTired: '疲惫',
+      moodAnxious: '焦虑',
+      moodHappy: '开心',
+      seedTomato: '番茄种子',
+      seedStrawberry: '草莓种子',
+      seedCarrot: '胡萝卜种子',
+      seedApple: '苹果种子',
+      seedWatermelon: '西瓜种子',
+      fruitTomato: '番茄',
+      fruitStrawberry: '草莓',
+      fruitCarrot: '胡萝卜',
+      fruitApple: '苹果',
+      fruitWatermelon: '西瓜',
+      plantingTitle: '选择种子',
+      plantingQuestion: '你要种植什么？',
+      cropInfoTomato: '生长30分钟 | 收获1个',
+      cropInfoStrawberry: '生长2小时 | 收获1个',
+      cropInfoCarrot: '生长5分钟 | 收获1个',
+      cropInfoApple: '生长6小时 | 收获1个',
+      cropInfoWatermelon: '生长12小时 | 收获1个',
+      shopTitle: '商店',
+      shopBuyTitle: '购买装饰和种子',
+      shopTabDecorations: '装饰品',
+      shopTabSeeds: '种子',
+      shopTabPets: '宠物',
+      shopFilterAll: '全部',
+      shopFilterNature: '自然',
+      shopFilterFunctional: '功能',
+      shopFilterLandmark: '地标',
+      decorFence: '栅栏',
+      decorFlower: '花草石礅',
+      decorLamp: '路灯',
+      decorBench: '长椅',
+      decorFountain: '喷泉',
+      buyBtn: '购买',
+      petCat: '猫咪',
+      petDog: '小狗',
+      petBird: '小鸟',
+      inventoryTitle: '我的背包',
+      inventoryHeading: '种子和收获',
+      islandUpgradeModalTitle: 'Pomoland 升级成功',
+      islandUpgradeModalLead: '你的岛屿变得更繁荣了。',
+      islandUpgradeSummaryTitle: '本次成长',
+      islandUpgradeRewardsTitle: '新解锁内容',
+      islandUpgradeContinue: '继续建设',
+      decorManageTitle: '管理装饰位',
+      decorManageLead: '你可以移除当前装饰，或者前往商店替换成新的风格。',
+      decorManageCurrent: '当前装饰',
+      decorManageActions: '可执行操作',
+      decorFlip: '左右翻转',
+      decorFlipReset: '恢复方向',
+      decorRemove: '移除装饰',
+      decorReplace: '去商店替换',
+      petFeedEyebrow: '喂养宠物',
+      petFeedTitle: '选择要喂养的宠物',
+      islandGuideTitle: '欢迎来到 Pomoland Island',
+      islandGuideLead: '先了解 3 个关键玩法，再开始建设你的岛屿。',
+      islandGuideSkip: '跳过引导',
+      islandGuideNext: '下一步',
       checkInTitle: '打卡与连胜',
       streak: '连续天数',
       protection: '连胜保护卡',
@@ -314,6 +407,99 @@ const PomolandCore = (() => {
       decoratePurpose: '放置碼頭、燈具等裝飾，讓 Pomoland 更有展示感。',
       decorateEffect: '解鎖島嶼裝飾。',
       islandStatus: '島嶼狀態',
+      islandGardenTitle: '我的島嶼花園',
+      islandUpgradeKicker: 'Island Upgrade',
+      islandUpgradeHint: '繼續專注與建設，解鎖更大的 Pomoland。',
+      islandUpgradeBtn: '升級島嶼',
+      islandFarmTitle: '農田',
+      islandPetsTitle: '寵物',
+      islandDecorTitle: '裝飾',
+      islandDecorHint: '拖動島上的裝飾物可自由擺放位置，點擊裝飾槽位可管理或替換。',
+      islandDailyTasksTitle: '每日任務',
+      islandOrdersTitle: '島嶼訂單',
+      islandOrdersStatusActive: '進行中',
+      islandToolsFarm: '農場工具',
+      islandToolPlant: '種植',
+      islandToolWater: '澆水',
+      islandToolSunlight: '陽光照射',
+      islandToolHarvest: '收穫',
+      islandToolsPetCare: '寵物照料',
+      islandToolFeed: '餵養',
+      islandToolsShop: '商店',
+      islandToolOpenShop: '打開商店',
+      islandToolInventory: '查看背包',
+      islandToolsSocial: '社交',
+      islandToolVisitFriends: '參觀好友',
+      islandToolHelpWater: '幫助澆水',
+      islandToolsBackpack: '背包',
+      islandInvSeedsTitle: '種子',
+      islandInvHarvestTitle: '收穫',
+      islandAiMoodTitle: 'AI 心情推薦',
+      islandAiRecommendBtn: 'AI推薦',
+      islandMessageInitial: '選擇地塊開始種植',
+      petBonusLocked: '寵物加成待解鎖',
+      petMoodLabel: '心情',
+      petHungerLabel: '飢餓',
+      moodStressed: '壓力大',
+      moodTired: '疲憊',
+      moodAnxious: '焦慮',
+      moodHappy: '開心',
+      seedTomato: '番茄種子',
+      seedStrawberry: '草莓種子',
+      seedCarrot: '胡蘿蔔種子',
+      seedApple: '蘋果種子',
+      seedWatermelon: '西瓜種子',
+      fruitTomato: '番茄',
+      fruitStrawberry: '草莓',
+      fruitCarrot: '胡蘿蔔',
+      fruitApple: '蘋果',
+      fruitWatermelon: '西瓜',
+      plantingTitle: '選擇種子',
+      plantingQuestion: '你要種植什麼？',
+      cropInfoTomato: '生長30分鐘 | 收穫1個',
+      cropInfoStrawberry: '生長2小時 | 收穫1個',
+      cropInfoCarrot: '生長5分鐘 | 收穫1個',
+      cropInfoApple: '生長6小時 | 收穫1個',
+      cropInfoWatermelon: '生長12小時 | 收穫1個',
+      shopTitle: '商店',
+      shopBuyTitle: '購買裝飾和種子',
+      shopTabDecorations: '裝飾品',
+      shopTabSeeds: '種子',
+      shopTabPets: '寵物',
+      shopFilterAll: '全部',
+      shopFilterNature: '自然',
+      shopFilterFunctional: '功能',
+      shopFilterLandmark: '地標',
+      decorFence: '柵欄',
+      decorFlower: '花草石礅',
+      decorLamp: '路燈',
+      decorBench: '長椅',
+      decorFountain: '噴泉',
+      buyBtn: '購買',
+      petCat: '貓咪',
+      petDog: '小狗',
+      petBird: '小鳥',
+      inventoryTitle: '我的背包',
+      inventoryHeading: '種子和收穫',
+      islandUpgradeModalTitle: 'Pomoland 升級成功',
+      islandUpgradeModalLead: '你的島嶼變得更繁榮了。',
+      islandUpgradeSummaryTitle: '本次成長',
+      islandUpgradeRewardsTitle: '新解鎖內容',
+      islandUpgradeContinue: '繼續建設',
+      decorManageTitle: '管理裝飾位',
+      decorManageLead: '你可以移除當前裝飾，或者前往商店替換成新的風格。',
+      decorManageCurrent: '當前裝飾',
+      decorManageActions: '可執行操作',
+      decorFlip: '左右翻轉',
+      decorFlipReset: '恢復方向',
+      decorRemove: '移除裝飾',
+      decorReplace: '去商店替換',
+      petFeedEyebrow: '餵養寵物',
+      petFeedTitle: '選擇要餵養的寵物',
+      islandGuideTitle: '歡迎來到 Pomoland Island',
+      islandGuideLead: '先了解 3 個關鍵玩法，再開始建設你的島嶼。',
+      islandGuideSkip: '跳過引導',
+      islandGuideNext: '下一步',
       checkInTitle: '打卡與連勝',
       streak: '連續天數',
       protection: '連勝保護卡',
@@ -520,6 +706,99 @@ const PomolandCore = (() => {
       decoratePurpose: 'Place docks, lamps, and decorations to make Pomoland presentation-ready.',
       decorateEffect: 'Unlocks island decoration.',
       islandStatus: 'Island Status',
+      islandGardenTitle: 'My island garden',
+      islandUpgradeKicker: 'Island Upgrade',
+      islandUpgradeHint: 'Keep focusing and building to unlock a bigger Pomoland.',
+      islandUpgradeBtn: 'Upgrade island',
+      islandFarmTitle: 'Farm',
+      islandPetsTitle: 'Pets',
+      islandDecorTitle: 'Decorations',
+      islandDecorHint: 'Drag decorations to reposition. Click a slot to manage or replace.',
+      islandDailyTasksTitle: 'Daily tasks',
+      islandOrdersTitle: 'Island orders',
+      islandOrdersStatusActive: 'Active',
+      islandToolsFarm: 'Farm tools',
+      islandToolPlant: 'Plant',
+      islandToolWater: 'Water',
+      islandToolSunlight: 'Sunlight boost',
+      islandToolHarvest: 'Harvest',
+      islandToolsPetCare: 'Pet care',
+      islandToolFeed: 'Feed',
+      islandToolsShop: 'Shop',
+      islandToolOpenShop: 'Open shop',
+      islandToolInventory: 'Backpack',
+      islandToolsSocial: 'Social',
+      islandToolVisitFriends: 'Visit friends',
+      islandToolHelpWater: 'Help water',
+      islandToolsBackpack: 'Inventory',
+      islandInvSeedsTitle: 'Seeds',
+      islandInvHarvestTitle: 'Harvest',
+      islandAiMoodTitle: 'AI mood tips',
+      islandAiRecommendBtn: 'AI Suggest',
+      islandMessageInitial: 'Pick a plot to start planting',
+      petBonusLocked: 'Pet bonus locked',
+      petMoodLabel: 'Mood',
+      petHungerLabel: 'Hunger',
+      moodStressed: 'Stressed',
+      moodTired: 'Tired',
+      moodAnxious: 'Anxious',
+      moodHappy: 'Happy',
+      seedTomato: 'Tomato seed',
+      seedStrawberry: 'Strawberry seed',
+      seedCarrot: 'Carrot seed',
+      seedApple: 'Apple seed',
+      seedWatermelon: 'Watermelon seed',
+      fruitTomato: 'Tomato',
+      fruitStrawberry: 'Strawberry',
+      fruitCarrot: 'Carrot',
+      fruitApple: 'Apple',
+      fruitWatermelon: 'Watermelon',
+      plantingTitle: 'Pick a seed',
+      plantingQuestion: 'What do you want to plant?',
+      cropInfoTomato: '30 min | 1 harvest',
+      cropInfoStrawberry: '2 hours | 1 harvest',
+      cropInfoCarrot: '5 min | 1 harvest',
+      cropInfoApple: '6 hours | 1 harvest',
+      cropInfoWatermelon: '12 hours | 1 harvest',
+      shopTitle: 'Shop',
+      shopBuyTitle: 'Buy decor & seeds',
+      shopTabDecorations: 'Decor',
+      shopTabSeeds: 'Seeds',
+      shopTabPets: 'Pets',
+      shopFilterAll: 'All',
+      shopFilterNature: 'Nature',
+      shopFilterFunctional: 'Functional',
+      shopFilterLandmark: 'Landmarks',
+      decorFence: 'Fence',
+      decorFlower: 'Flower stand',
+      decorLamp: 'Street lamp',
+      decorBench: 'Bench',
+      decorFountain: 'Fountain',
+      buyBtn: 'Buy',
+      petCat: 'Cat',
+      petDog: 'Dog',
+      petBird: 'Bird',
+      inventoryTitle: 'Backpack',
+      inventoryHeading: 'Seeds & harvest',
+      islandUpgradeModalTitle: 'Island upgrade complete',
+      islandUpgradeModalLead: 'Your island is getting more prosperous.',
+      islandUpgradeSummaryTitle: 'This upgrade',
+      islandUpgradeRewardsTitle: 'New unlocks',
+      islandUpgradeContinue: 'Continue',
+      decorManageTitle: 'Manage decoration slot',
+      decorManageLead: 'Remove the current decoration or replace it from the shop.',
+      decorManageCurrent: 'Current decoration',
+      decorManageActions: 'Actions',
+      decorFlip: 'Flip left/right',
+      decorFlipReset: 'Reset direction',
+      decorRemove: 'Remove decoration',
+      decorReplace: 'Replace in shop',
+      petFeedEyebrow: 'Feed pet',
+      petFeedTitle: 'Choose a pet to feed',
+      islandGuideTitle: 'Welcome to Pomoland Island',
+      islandGuideLead: 'Learn 3 key mechanics before you start building your island.',
+      islandGuideSkip: 'Skip',
+      islandGuideNext: 'Next',
       checkInTitle: 'Check-in and streak',
       streak: 'Day Streak',
       protection: 'Streak Protection',
@@ -6526,12 +6805,12 @@ if (typeof document !== 'undefined') {
       if (!plot || !plot.crop) return null;
       const cropType = IslandGardenModule.CROP_TYPES[plot.crop];
       const progress = IslandGardenModule.getGrowthProgress(plot, islandState);
-      if (progress >= 100) return { className: 'stage-ripe', label: '成熟期' };
-      if (cropType.name === '苹果' && progress >= 65) return { className: 'stage-bloom', label: '挂果期' };
-      if (progress >= 70) return { className: 'stage-bloom', label: '开花期' };
-      if (progress >= 40) return { className: 'stage-grow', label: '生长期' };
-      if (progress >= 10) return { className: 'stage-sprout', label: '幼苗期' };
-      return { className: 'stage-seed', label: '播种期' };
+      if (progress >= 100) return { className: 'stage-ripe', label: localizedText('成熟期', '成熟期', 'Ripe') };
+      if (cropType.name === '苹果' && progress >= 65) return { className: 'stage-bloom', label: localizedText('挂果期', '掛果期', 'Fruiting') };
+      if (progress >= 70) return { className: 'stage-bloom', label: localizedText('开花期', '開花期', 'Blooming') };
+      if (progress >= 40) return { className: 'stage-grow', label: localizedText('生长期', '生長期', 'Growing') };
+      if (progress >= 10) return { className: 'stage-sprout', label: localizedText('幼苗期', '幼苗期', 'Sprouting') };
+      return { className: 'stage-seed', label: localizedText('播种期', '播種期', 'Seeded') };
     }
 
     function renderCropVisual(plot) {
@@ -6735,11 +7014,11 @@ if (typeof document !== 'undefined') {
           elements.upgradeRequirementList.innerHTML = '<span class="upgrade-chip is-met">已解锁全部等级内容</span>';
         }
         if (elements.upgradeRewardPreview) {
-          elements.upgradeRewardPreview.innerHTML = '<span class="reward-chip">继续专注可获得更多经营资源</span>';
+        elements.upgradeRewardPreview.innerHTML = `<span class="reward-chip">${escapeHtml(localizedText('继续专注可获得更多经营资源', '繼續專注可獲得更多經營資源', 'Keep focusing to earn more building resources.'))}</span>`;
         }
         if (elements.upgradeIslandBtn) {
           elements.upgradeIslandBtn.disabled = true;
-          elements.upgradeIslandBtn.textContent = '已满级';
+        elements.upgradeIslandBtn.textContent = localizedText('已满级', '已滿級', 'Max level');
         }
         if (elements.islandUpgradePanel) {
           elements.islandUpgradePanel.classList.remove('is-ready');
@@ -6752,8 +7031,8 @@ if (typeof document !== 'undefined') {
       }
       if (elements.upgradeHint) {
         elements.upgradeHint.textContent = isReady
-          ? '升级条件已满足，点击按钮让岛屿扩张并领取新解锁内容。'
-          : '先积累经验并完成建设条件，再触发岛屿升级。';
+          ? localizedText('升级条件已满足，点击按钮让岛屿扩张并领取新解锁内容。', '升級條件已滿足，點擊按鈕讓島嶼擴張並領取新解鎖內容。', 'Upgrade is ready. Click to expand the island and claim new unlocks.')
+          : localizedText('先积累经验并完成建设条件，再触发岛屿升级。', '先累積經驗並完成建設條件，再觸發島嶼升級。', 'Earn XP and meet the requirements to unlock the next upgrade.');
       }
       if (elements.islandXpText) {
         elements.islandXpText.textContent = `${islandState.exp} / ${rule.requiredXp} XP`;
@@ -6775,7 +7054,9 @@ if (typeof document !== 'undefined') {
       }
       if (elements.upgradeIslandBtn) {
         elements.upgradeIslandBtn.disabled = !isReady;
-        elements.upgradeIslandBtn.textContent = isReady ? '升级岛屿' : '继续建设';
+        elements.upgradeIslandBtn.textContent = isReady
+          ? core.t(language, 'islandUpgradeBtn')
+          : localizedText('继续建设', '繼續建設', 'Keep building');
       }
       if (elements.islandUpgradePanel) {
         elements.islandUpgradePanel.classList.toggle('is-ready', isReady);
@@ -6784,14 +7065,22 @@ if (typeof document !== 'undefined') {
 
     function openIslandUpgradeModal(result) {
       if (elements.islandUpgradeModalTitle) {
-        elements.islandUpgradeModalTitle.textContent = `Pomoland 升到 Lv.${result.toLevel}`;
+        elements.islandUpgradeModalTitle.textContent = localizedText(
+          `Pomoland 升到 Lv.${result.toLevel}`,
+          `Pomoland 升到 Lv.${result.toLevel}`,
+          `Pomoland reached Lv.${result.toLevel}`
+        );
       }
       if (elements.islandUpgradeModalLead) {
-        elements.islandUpgradeModalLead.textContent = `岛屿从 Lv.${result.fromLevel} 升级到 Lv.${result.toLevel}，新的区域和资源已经解锁。`;
+        elements.islandUpgradeModalLead.textContent = localizedText(
+          `岛屿从 Lv.${result.fromLevel} 升级到 Lv.${result.toLevel}，新的区域和资源已经解锁。`,
+          `島嶼從 Lv.${result.fromLevel} 升級到 Lv.${result.toLevel}，新的區域和資源已經解鎖。`,
+          `Island upgraded from Lv.${result.fromLevel} to Lv.${result.toLevel}. New areas and rewards unlocked.`
+        );
       }
       if (elements.islandUpgradeSummary) {
         const summaryItems = [
-          `Island XP 已达成升级阈值`,
+          localizedText('Island XP 已达成升级阈值', 'Island XP 已達成升級門檻', 'Island XP requirement met'),
           ...Object.entries((result.rule && result.rule.conditions) || {}).map(([key, target]) => getConditionLabel(key, target))
         ];
         elements.islandUpgradeSummary.innerHTML = `<div class="upgrade-modal-list">${summaryItems.map((item) => `<div class="upgrade-modal-item">${escapeHtml(item)}</div>`).join('')}</div>`;
@@ -6962,8 +7251,8 @@ if (typeof document !== 'undefined') {
           const unlockLevel = getPlotUnlockLevel(index);
           plotElement.classList.add('locked');
           if (plotIcon) plotIcon.textContent = '🔒';
-          if (plotName) plotName.textContent = `Lv.${unlockLevel} 解锁`;
-          if (plotStatus) plotStatus.textContent = '升级岛屿后开放';
+          if (plotName) plotName.textContent = localizedText(`Lv.${unlockLevel} 解锁`, `Lv.${unlockLevel} 解鎖`, `Unlock at Lv.${unlockLevel}`);
+          if (plotStatus) plotStatus.textContent = localizedText('升级岛屿后开放', '升級島嶼後開放', 'Unlock by upgrading the island');
           if (plotProgress) plotProgress.style.width = '0%';
           if (plotNeed) plotNeed.style.opacity = '0';
           return;
@@ -6972,16 +7261,24 @@ if (typeof document !== 'undefined') {
         plotElement.classList.remove('locked');
         if (plot.crop) {
           const cropType = IslandGardenModule.CROP_TYPES[plot.crop];
+          const cropNameKeyMap = {
+            tomato: 'fruitTomato',
+            strawberry: 'fruitStrawberry',
+            carrot: 'fruitCarrot',
+            apple: 'fruitApple',
+            watermelon: 'fruitWatermelon'
+          };
+          const cropDisplayName = core.t(language, cropNameKeyMap[plot.crop] || 'fruitTomato') || cropType.name;
           const growthProgress = IslandGardenModule.getGrowthProgress(plot, islandState);
           const stageMeta = getCropStageMeta(plot);
           plotElement.classList.toggle('is-harvestable', growthProgress >= 100);
 
           if (plotIcon) {
             plotIcon.innerHTML = renderCropVisual(plot);
-            if (plotName) plotName.textContent = cropType.name;
+            if (plotName) plotName.textContent = cropDisplayName;
             if (plotStatus) {
               plotStatus.innerHTML = growthProgress >= 100
-                ? '可收获'
+                ? localizedText('可收获', '可收穫', 'Ready')
                 : `${Math.floor(growthProgress)}% <span class="plot-stage-badge">${escapeHtml(stageMeta.label)}</span>`;
             }
           }
@@ -7003,8 +7300,8 @@ if (typeof document !== 'undefined') {
           }
         } else {
           if (plotIcon) plotIcon.textContent = '🌱';
-          if (plotName) plotName.textContent = '空地块';
-          if (plotStatus) plotStatus.textContent = '点击种植';
+          if (plotName) plotName.textContent = localizedText('空地块', '空地塊', 'Empty plot');
+          if (plotStatus) plotStatus.textContent = localizedText('点击种植', '點擊種植', 'Click to plant');
           if (plotProgress) plotProgress.style.width = '0%';
           if (plotNeed) plotNeed.style.opacity = '0';
           plotElement.classList.remove('needs-water');
@@ -7035,7 +7332,7 @@ if (typeof document !== 'undefined') {
         petName.textContent = petToShow.name;
       }
       if (elements.petBonusLabel) {
-        elements.petBonusLabel.textContent = petEffect.label || '宠物加成待解锁';
+        elements.petBonusLabel.textContent = petEffect.label || core.t(language, 'petBonusLocked');
       }
 
       // Update happiness bar
@@ -7493,10 +7790,18 @@ if (typeof document !== 'undefined') {
       lastIslandAlertAt = now;
 
       const message = needsWaterCount && petNeedsFeed
-        ? `⏰ 提醒：${needsWaterCount} 块农田需要浇水，宠物也饿了。`
+        ? localizedText(
+          `⏰ 提醒：${needsWaterCount} 块农田需要浇水，宠物也饿了。`,
+          `⏰ 提醒：${needsWaterCount} 塊農田需要澆水，寵物也餓了。`,
+          `⏰ Reminder: ${needsWaterCount} farm plot(s) need watering, and your pet is hungry.`
+        )
         : needsWaterCount
-          ? `⏰ 提醒：${needsWaterCount} 块农田需要浇水。`
-          : '⏰ 提醒：宠物需要喂养。';
+          ? localizedText(
+            `⏰ 提醒：${needsWaterCount} 块农田需要浇水。`,
+            `⏰ 提醒：${needsWaterCount} 塊農田需要澆水。`,
+            `⏰ Reminder: ${needsWaterCount} farm plot(s) need watering.`
+          )
+          : localizedText('⏰ 提醒：宠物需要喂养。', '⏰ 提醒：寵物需要餵養。', '⏰ Reminder: your pet needs food.');
 
       showMessage(message);
       try {
@@ -7504,7 +7809,7 @@ if (typeof document !== 'undefined') {
       } catch (e) {}
       try {
         if ('Notification' in window && Notification.permission === 'granted') {
-          new Notification('Pomoland 提醒', { body: message });
+          new Notification(localizedText('Pomoland 提醒', 'Pomoland 提醒', 'Pomoland Reminder'), { body: message });
         }
       } catch (e) {}
     }
@@ -7542,8 +7847,102 @@ if (typeof document !== 'undefined') {
     }
 
     let toastTimer = null;
+    function translateToastText(rawText) {
+      const text = String(rawText ?? '');
+      if (language === 'zh-CN') return text;
+
+      const exactMap = {
+        '水滴不足': localizedText('水滴不足', '水滴不足', 'Not enough water.'),
+        '阳光不足': localizedText('阳光不足', '陽光不足', 'Not enough sunlight.'),
+        '作物还没成熟': localizedText('作物还没成熟', '作物還未成熟', 'Not ripe yet.'),
+        '作物已成熟，无需浇水，直接收获即可': localizedText('作物已成熟，无需浇水，直接收获即可', '作物已成熟，無需澆水，直接收穫即可', 'Crop is ripe—harvest it instead of watering.'),
+        '作物已成熟，无需照射，直接收获即可': localizedText('作物已成熟，无需照射，直接收获即可', '作物已成熟，無需照射，直接收穫即可', 'Crop is ripe—harvest it instead of using sunlight.'),
+        '浇水成功，作物生长时间减少 5 分钟': localizedText('浇水成功，作物生长时间减少 5 分钟', '澆水成功，作物生長時間減少 5 分鐘', 'Watered! Growth time -5 min.'),
+        '阳光照射成功，作物生长时间减少 10 分钟': localizedText('阳光照射成功，作物生长时间减少 10 分钟', '陽光照射成功，作物生長時間減少 10 分鐘', 'Sunlight boost! Growth time -10 min.'),
+        '已帮助浇水 +1': localizedText('已帮助浇水 +1', '已幫助澆水 +1', 'Helped water +1'),
+        '已尝试偷取果实': localizedText('已尝试偷取果实', '已嘗試偷取果實', 'Tried to steal a fruit.'),
+        '已赠送礼物': localizedText('已赠送礼物', '已贈送禮物', 'Gift sent.'),
+        '好友申请已发送': localizedText('好友申请已发送', '好友申請已發送', 'Friend request sent.'),
+        '已添加为好友': localizedText('已添加为好友', '已添加為好友', 'Friend request accepted.'),
+        '已拒绝': localizedText('已拒绝', '已拒絕', 'Request rejected.'),
+        '已退出登录': localizedText('已退出登录', '已退出登入', 'Logged out.'),
+        '昵称已更新': localizedText('昵称已更新', '暱稱已更新', 'Nickname updated.'),
+        '已清空本地缓存（云端存档不受影响）': localizedText('已清空本地缓存（云端存档不受影响）', '已清空本地快取（雲端存檔不受影響）', 'Local cache cleared (cloud save unchanged).')
+      };
+      if (exactMap[text]) return exactMap[text];
+
+      // Patterns
+      // e.g. "金币不足：需要 200，当前 50"
+      const coinMatch = text.match(/^金币不足：需要\s*(\d+)\s*，当前\s*(\d+)\s*$/);
+      if (coinMatch) {
+        const need = coinMatch[1];
+        const have = coinMatch[2];
+        return localizedText(
+          `金币不足：需要 ${need}，当前 ${have}`,
+          `金幣不足：需要 ${need}，當前 ${have}`,
+          `Not enough coins: need ${need}, you have ${have}.`
+        );
+      }
+
+      // e.g. "作物还没成熟，预计还需 12 分钟"
+      const growMatch = text.match(/^作物还没成熟，预计还需\s*(\d+)\s*分钟$/);
+      if (growMatch) {
+        const mins = growMatch[1];
+        return localizedText(
+          `作物还没成熟，预计还需 ${mins} 分钟`,
+          `作物還未成熟，預計還需 ${mins} 分鐘`,
+          `Not ripe yet—about ${mins} min left.`
+        );
+      }
+
+      // e.g. "金币不足200"
+      const coinShort = text.match(/^金币不足(\d+)$/);
+      if (coinShort) {
+        const need = coinShort[1];
+        return localizedText(
+          `金币不足${need}`,
+          `金幣不足${need}`,
+          `Not enough coins: need ${need}.`
+        );
+      }
+
+      // e.g. "升级成功！Pomoland 已升到 Lv.3"
+      const upgradeMatch = text.match(/^升级成功！Pomoland 已升到 Lv\.(\d+)$/);
+      if (upgradeMatch) {
+        const lv = upgradeMatch[1];
+        return localizedText(
+          `升级成功！Pomoland 已升到 Lv.${lv}`,
+          `升級成功！Pomoland 已升到 Lv.${lv}`,
+          `Upgrade complete! Pomoland is now Lv.${lv}.`
+        );
+      }
+
+      // e.g. "收获成功！获得2个番茄"
+      const harvestMatch = text.match(/^收获成功！获得(\d+)个(.+)$/);
+      if (harvestMatch) {
+        const count = harvestMatch[1];
+        const name = harvestMatch[2];
+        const enNameMap = {
+          '番茄': 'Tomato',
+          '草莓': 'Strawberry',
+          '胡萝卜': 'Carrot',
+          '蘋果': 'Apple',
+          '苹果': 'Apple',
+          '西瓜': 'Watermelon'
+        };
+        const enName = enNameMap[name] || name;
+        return localizedText(
+          `收获成功！获得${count}个${name}`,
+          `收穫成功！獲得${count}個${name}`,
+          `Harvested! Got ${count} ${enName}.`
+        );
+      }
+
+      return text;
+    }
+
     function showMessage(message) {
-      const text = String(message ?? '');
+      const text = translateToastText(message);
       if (elements.islandMessage) {
         elements.islandMessage.textContent = text;
         setTimeout(() => {
