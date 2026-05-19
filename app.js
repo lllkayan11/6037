@@ -52,6 +52,13 @@ const PomolandCore = (() => {
       checkIn: 'Check-in',
       friends: 'Friends',
       report: 'Report',
+      profileCenter: '个人中心',
+      logout: '退出登录',
+      profileTitle: '个人中心',
+      saveNickname: '保存昵称',
+      clearLocal: '清空本地缓存',
+      coachHide: '隐藏 Coach',
+      coachShow: '开启 Coach',
       goalLabel: '输入一个长期目标',
       goalPlaceholder: '例如：三个月准备雅思考试',
       aiButton: '帮你制定计划',
@@ -251,6 +258,13 @@ const PomolandCore = (() => {
       checkIn: 'Check-in',
       friends: 'Friends',
       report: 'Report',
+      profileCenter: '個人中心',
+      logout: '退出登入',
+      profileTitle: '個人中心',
+      saveNickname: '保存暱稱',
+      clearLocal: '清空本地快取',
+      coachHide: '隱藏 Coach',
+      coachShow: '開啟 Coach',
       goalLabel: '輸入一個長期目標',
       goalPlaceholder: '例如：三個月準備雅思考試',
       aiButton: '幫你制定計劃',
@@ -450,6 +464,13 @@ const PomolandCore = (() => {
       checkIn: 'Check-in',
       friends: 'Friends',
       report: 'Report',
+      profileCenter: 'Profile',
+      logout: 'Log out',
+      profileTitle: 'Profile',
+      saveNickname: 'Save nickname',
+      clearLocal: 'Clear local cache',
+      coachHide: 'Hide Coach',
+      coachShow: 'Show Coach',
       goalLabel: 'Enter a long-term goal',
       goalPlaceholder: 'Example: Prepare for IELTS in 3 months',
       aiButton: 'Plan My Day',
@@ -712,6 +733,8 @@ const PomolandCore = (() => {
       language: 'zh-CN',
       // whether the demo workspace has been opened (controls landing vs workspace visibility)
       workspaceOpen: false,
+      // whether Journey Coach UI is visible
+      journeyCoachEnabled: true,
       currentView: 'today',
       goal: COPY['zh-CN'].defaultGoal,
       tasks: [],
@@ -2949,6 +2972,7 @@ if (typeof document !== 'undefined') {
       closeProfile: document.querySelector('#closeProfile'),
       openProfileTopbar: document.querySelector('#openProfileTopbar'),
       openProfileSidebar: document.querySelector('#openProfileSidebar'),
+      toggleCoachBtn: document.querySelector('#toggleCoachBtn'),
       saveNicknameBtn: document.querySelector('#saveNicknameBtn'),
       logoutBtn: document.querySelector('#logoutBtn'),
       logoutSidebar: document.querySelector('#logoutSidebar'),
@@ -3460,7 +3484,7 @@ if (typeof document !== 'undefined') {
       if (!elements.profileBody) return;
       const auth = getAuth();
       if (!auth) {
-        elements.profileBody.innerHTML = `<div class="empty-state" style="padding:12px;"><strong>请先登录</strong></div>`;
+        elements.profileBody.innerHTML = `<div class="empty-state" style="padding:12px;"><strong>${localizedText('请先登录', '請先登入', 'Please log in first')}</strong></div>`;
         return;
       }
       const nickname = (meProfile && meProfile.nickname) ? meProfile.nickname : `番茄${auth.uid.slice(-4)}`;
@@ -3474,23 +3498,23 @@ if (typeof document !== 'undefined') {
       elements.profileBody.innerHTML = `
         <div style="display:grid;gap:14px;">
           <div style="background:var(--bg-warm);border:1px solid var(--line);border-radius:12px;padding:14px;">
-            <strong style="display:block;margin-bottom:10px;">基础信息</strong>
+            <strong style="display:block;margin-bottom:10px;">${localizedText('基础信息', '基礎資訊', 'Basic info')}</strong>
             <div style="display:grid;gap:10px;">
               <div><span style="color:var(--muted);font-size:13px;">UID</span><div style="font-weight:800;font-size:18px;margin-top:4px;">${escapeHtml(auth.uid)}</div></div>
               <div>
-                <span style="color:var(--muted);font-size:13px;">昵称（可修改）</span>
+                <span style="color:var(--muted);font-size:13px;">${localizedText('昵称（可修改）', '暱稱（可修改）', 'Nickname (editable)')}</span>
                 <input id="nicknameEdit" type="text" value="${escapeHtml(nickname)}" maxlength="12" style="width:100%;margin-top:6px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font-size:14px;outline:none;">
-                <div style="color:var(--muted);font-size:12px;margin-top:6px;">规则：2-12 个字符</div>
+                <div style="color:var(--muted);font-size:12px;margin-top:6px;">${localizedText('规则：2-12 个字符', '規則：2-12 個字符', 'Rule: 2–12 characters')}</div>
               </div>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                <div><span style="color:var(--muted);font-size:13px;">注册时间</span><div style="font-weight:700;margin-top:4px;">${escapeHtml(createdAt)}</div></div>
-                <div><span style="color:var(--muted);font-size:13px;">最近登录</span><div style="font-weight:700;margin-top:4px;">${escapeHtml(lastLoginAt)}</div></div>
+                <div><span style="color:var(--muted);font-size:13px;">${localizedText('注册时间', '註冊時間', 'Registered')}</span><div style="font-weight:700;margin-top:4px;">${escapeHtml(createdAt)}</div></div>
+                <div><span style="color:var(--muted);font-size:13px;">${localizedText('最近登录', '最近登入', 'Last login')}</span><div style="font-weight:700;margin-top:4px;">${escapeHtml(lastLoginAt)}</div></div>
               </div>
             </div>
           </div>
 
           <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;">
-            <strong style="display:block;margin-bottom:10px;">游戏数据</strong>
+            <strong style="display:block;margin-bottom:10px;">${localizedText('游戏数据', '遊戲數據', 'Game stats')}</strong>
             <div style="display:flex;gap:10px;flex-wrap:wrap;">
               <span>🏝️ Lv.${escapeHtml(islandLevel)}</span>
               <span>💰 ${escapeHtml(resources.coins ?? 0)}</span>
@@ -3498,22 +3522,22 @@ if (typeof document !== 'undefined') {
               <span>☀️ ${escapeHtml(resources.sunlight ?? 0)}</span>
               <span>🤝 ${escapeHtml(resources.chances ?? 0)}</span>
             </div>
-            <div style="margin-top:10px;color:var(--ink-700);font-size:13px;">背包果实：${escapeHtml(buildHarvestSummary())}</div>
+            <div style="margin-top:10px;color:var(--ink-700);font-size:13px;">${localizedText('背包果实：', '背包果實：', 'Harvest: ')}${escapeHtml(buildHarvestSummary())}</div>
           </div>
 
           <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;">
-            <strong style="display:block;margin-bottom:10px;">社交数据</strong>
+            <strong style="display:block;margin-bottom:10px;">${localizedText('社交数据', '社交數據', 'Social')}</strong>
             <div style="display:flex;gap:10px;flex-wrap:wrap;">
-              <span>👥 好友 ${friendsCount}</span>
-              <span>📩 待处理 ${incomingCount}</span>
-              <span>📤 已发送 ${outgoingCount}</span>
+              <span>👥 ${localizedText('好友', '好友', 'Friends')} ${friendsCount}</span>
+              <span>📩 ${localizedText('待处理', '待處理', 'Incoming')} ${incomingCount}</span>
+              <span>📤 ${localizedText('已发送', '已發送', 'Outgoing')} ${outgoingCount}</span>
             </div>
           </div>
 
           <div style="background:#fff;border:1px dashed var(--line-strong);border-radius:12px;padding:14px;">
-            <strong style="display:block;margin-bottom:8px;">隐私与安全</strong>
+            <strong style="display:block;margin-bottom:8px;">${localizedText('隐私与安全', '私隱與安全', 'Privacy & security')}</strong>
             <div style="color:var(--muted);font-size:13px;line-height:1.6;">
-              这里不提供找回密码功能；如需切换账号请点击「退出登录」。
+              ${localizedText('这里不提供找回密码功能；如需切换账号请点击「退出登录」。', '這裡不提供找回密碼功能；如需切換帳號請點擊「退出登入」。', 'Password recovery is not supported. Use “Log out” to switch accounts.')}
             </div>
           </div>
         </div>
@@ -4323,7 +4347,15 @@ if (typeof document !== 'undefined') {
         decoration: core.t(language, 'rewardDecoration')
       };
       renderAll();
+      updateCoachToggleButton();
       persistSession();
+    }
+
+    function updateCoachToggleButton() {
+      if (!elements.toggleCoachBtn) return;
+      const key = state.journeyCoachEnabled ? 'coachHide' : 'coachShow';
+      elements.toggleCoachBtn.dataset.i18n = key;
+      elements.toggleCoachBtn.textContent = core.t(language, key);
     }
 
     function openWorkspace() {
@@ -4360,6 +4392,7 @@ if (typeof document !== 'undefined') {
       renderFriends();
       renderReport();
       renderAgentIdle();
+      updateCoachToggleButton();
       // Update island garden UI
       updateIslandUI();
     }
@@ -4414,6 +4447,11 @@ if (typeof document !== 'undefined') {
 
     function renderJourneyGuide() {
       if (!elements.journeyGuide) return;
+      if (!state.journeyCoachEnabled) {
+        elements.journeyGuide.hidden = true;
+        return;
+      }
+      elements.journeyGuide.hidden = false;
       const journey = getJourneyState();
       elements.journeyGuide.innerHTML = `
         <div class="journey-guide-main">
@@ -4430,6 +4468,9 @@ if (typeof document !== 'undefined') {
               ${escapeHtml(action.label)}
             </button>
           `).join('')}
+          <button class="small-button ghost" type="button" id="closeCoachInline">
+            ${localizedText('隐藏 Coach', '隱藏 Coach', 'Hide Coach')}
+          </button>
         </div>
       `;
     }
@@ -4535,6 +4576,11 @@ if (typeof document !== 'undefined') {
 
     function renderCoachPanel() {
       if (!elements.coachPanel) return;
+      if (!state.journeyCoachEnabled) {
+        elements.coachPanel.hidden = true;
+        return;
+      }
+      elements.coachPanel.hidden = false;
       if (!state.tasks.length) {
         elements.coachPanel.innerHTML = `
           <div class="coach-panel-empty">
@@ -4754,8 +4800,8 @@ if (typeof document !== 'undefined') {
       if (!getAuth()) {
         elements.friendGrid.innerHTML = `
           <div class="empty-state">
-            <strong>请先登录</strong>
-            <span>登录后可通过 UID 添加真实好友并互动</span>
+            <strong>${localizedText('请先登录', '請先登入', 'Please log in first')}</strong>
+            <span>${localizedText('登录后可通过 UID 添加真实好友并互动', '登入後可透過 UID 添加真實好友並互動', 'After login, add real friends via UID and interact.')}</span>
           </div>
         `;
         return;
@@ -4764,8 +4810,8 @@ if (typeof document !== 'undefined') {
       if (!friendsCacheLoaded) {
         elements.friendGrid.innerHTML = `
           <div class="empty-state">
-            <strong>正在加载好友列表...</strong>
-            <span>如果你刚打开网站，这通常只需要 1 秒</span>
+            <strong>${localizedText('正在加载好友列表...', '正在載入好友列表...', 'Loading friends...')}</strong>
+            <span>${localizedText('如果你刚打开网站，这通常只需要 1 秒', '如果你剛打開網站，這通常只需要 1 秒', 'This usually takes about 1 second on first load.')}</span>
           </div>
         `;
         // lazy load once
@@ -4780,8 +4826,8 @@ if (typeof document !== 'undefined') {
       if (!friendsData.length) {
         elements.friendGrid.innerHTML = `
           <div class="empty-state">
-            <strong>还没有好友</strong>
-            <span>点击右上角「添加好友」，用 UID 搜索并发送申请</span>
+            <strong>${localizedText('还没有好友', '還沒有好友', 'No friends yet')}</strong>
+            <span>${localizedText('点击右上角「添加好友」，用 UID 搜索并发送申请', '點擊右上角「添加好友」，用 UID 搜索並發送申請', 'Click “Add friend” to search by UID and send a request.')}</span>
           </div>
         `;
         return;
@@ -5627,6 +5673,13 @@ if (typeof document !== 'undefined') {
 
       if (target.id === 'toggleAuthMode') {
         setAuthMode(authMode === 'login' ? 'register' : 'login');
+        return;
+      }
+
+      if (target.id === 'toggleCoachBtn' || target.id === 'closeCoachInline') {
+        state.journeyCoachEnabled = !state.journeyCoachEnabled;
+        renderAll();
+        persistSession();
         return;
       }
 
