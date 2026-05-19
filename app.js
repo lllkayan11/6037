@@ -3433,8 +3433,20 @@ if (typeof document !== 'undefined') {
       });
     }
 
-    bindDirectClick(elements.openProfileTopbar, () => openProfile());
-    bindDirectClick(elements.openProfileSidebar, () => openProfile());
+    bindDirectClick(elements.openProfileTopbar, () => {
+      showMessage(localizedText('正在打开个人中心...', '正在打開個人中心...', 'Opening profile...'));
+      Promise.resolve(openProfile()).catch((e) => {
+        console.warn('open profile failed', e);
+        showMessage(localizedText('打开失败，请稍后重试', '打開失敗，請稍後重試', 'Failed to open. Please try again.'));
+      });
+    });
+    bindDirectClick(elements.openProfileSidebar, () => {
+      showMessage(localizedText('正在打开个人中心...', '正在打開個人中心...', 'Opening profile...'));
+      Promise.resolve(openProfile()).catch((e) => {
+        console.warn('open profile failed', e);
+        showMessage(localizedText('打开失败，请稍后重试', '打開失敗，請稍後重試', 'Failed to open. Please try again.'));
+      });
+    });
     bindDirectClick(elements.closeProfile, () => closeProfile());
     bindDirectClick(elements.logoutBtn, () => logout());
     bindDirectClick(elements.logoutSidebar, () => logout());
@@ -3936,10 +3948,19 @@ if (typeof document !== 'undefined') {
 
     async function openProfile() {
       if (!elements.profileModal) return;
-      await refreshFriendsFromServer();
-      await loadMeProfile();
-      renderProfileModal();
+      // Open first (even if network requests fail), so users always get feedback.
       elements.profileModal.hidden = false;
+      if (elements.profileBody) {
+        elements.profileBody.innerHTML = `<div class="empty-state" style="padding:12px;"><strong>${escapeHtml(localizedText('加载中...', '載入中...', 'Loading...'))}</strong></div>`;
+      }
+      try {
+        await refreshFriendsFromServer();
+        await loadMeProfile();
+      } catch (error) {
+        console.warn('open profile load failed', error);
+      } finally {
+        renderProfileModal();
+      }
     }
 
     function closeProfile() {
