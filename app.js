@@ -3878,8 +3878,8 @@ if (typeof document !== 'undefined') {
       const order = ['tomato', 'strawberry', 'carrot', 'apple', 'watermelon'];
       const parts = order
         .filter((k) => Number(harvested[k] || 0) > 0)
-        .map((k) => `${FRUIT_LABELS[k] || k}×${harvested[k]}`);
-      return parts.length ? parts.join('、') : '暂无';
+        .map((k) => `${fruitDisplayLabel(k)}×${harvested[k]}`);
+      return parts.length ? parts.join('、') : localizedText('暂无', '暫無', 'None');
     }
 
     function renderProfileModal() {
