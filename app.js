@@ -4122,7 +4122,11 @@ if (typeof document !== 'undefined') {
 
       // logged in -> show landing OR workspace depending on state.workspaceOpen
       elements.authShell.hidden = true;
-      const shouldShowWorkspace = Boolean(state.workspaceOpen);
+      // UX: always show the marketing landing page by default, even if user previously
+      // entered the demo. Use URL param ?demo=1 to auto-enter workspace when needed.
+      const params = new URLSearchParams(window.location.search || '');
+      const shouldShowWorkspace = params.get('demo') === '1';
+      state.workspaceOpen = shouldShowWorkspace;
       elements.homeShell.hidden = shouldShowWorkspace;
       if (elements.workspace) elements.workspace.hidden = !shouldShowWorkspace;
     }
