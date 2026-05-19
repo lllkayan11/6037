@@ -710,6 +710,8 @@ const PomolandCore = (() => {
   function createInitialState() {
     return {
       language: 'zh-CN',
+      // whether the demo workspace has been opened (controls landing vs workspace visibility)
+      workspaceOpen: false,
       currentView: 'today',
       goal: COPY['zh-CN'].defaultGoal,
       tasks: [],
@@ -3512,13 +3514,19 @@ if (typeof document !== 'undefined') {
       }
 
       const auth = getAuth();
-      if (auth) {
-        elements.authShell.hidden = true;
-        elements.homeShell.hidden = false;
-      } else {
+      if (!auth) {
+        // not logged in -> only show auth
         elements.authShell.hidden = false;
         elements.homeShell.hidden = true;
+        if (elements.workspace) elements.workspace.hidden = true;
+        return;
       }
+
+      // logged in -> show landing OR workspace depending on state.workspaceOpen
+      elements.authShell.hidden = true;
+      const shouldShowWorkspace = Boolean(state.workspaceOpen);
+      elements.homeShell.hidden = shouldShowWorkspace;
+      if (elements.workspace) elements.workspace.hidden = !shouldShowWorkspace;
     }
 
     function getTaskActionLabel(task) {
@@ -4156,10 +4164,12 @@ if (typeof document !== 'undefined') {
     }
 
     function openWorkspace() {
+      state.workspaceOpen = true;
       elements.home.hidden = true;
       elements.workspace.hidden = false;
       switchView('today');
       window.scrollTo({ top: 0, behavior: 'smooth' });
+      persistSession();
     }
 
     function switchView(view) {
