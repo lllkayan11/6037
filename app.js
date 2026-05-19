@@ -3376,6 +3376,31 @@ if (typeof document !== 'undefined') {
       writeStorage(STORAGE_KEYS.authState, null);
     }
 
+    async function postApi(endpoint, data) {
+      const apiBaseUrl = resolveApiBaseUrl();
+      const response = await fetch(`${apiBaseUrl}${endpoint}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data || {})
+      });
+      const rawText = await response.text();
+      let payload = {};
+      if (rawText) {
+        try {
+          payload = JSON.parse(rawText);
+        } catch (error) {
+          if (!response.ok) throw new Error(`API call failed with status ${response.status}`);
+          throw new Error('API returned a non-JSON response.');
+        }
+      }
+      if (!response.ok) {
+        throw new Error(payload.error || `API call failed with status ${response.status}`);
+      }
+      return payload;
+    }
+
     async function fetchAuthedApi(endpoint, data) {
       const auth = getAuth();
       if (!auth) throw new Error('Not logged in');
@@ -5305,7 +5330,7 @@ if (typeof document !== 'undefined') {
         if (elements.authSubmitBtn) elements.authSubmitBtn.disabled = true;
         try {
           const endpoint = authMode === 'register' ? '/api/auth/register' : '/api/auth/login';
-          const response = await fetchApi(endpoint, { uid, password });
+          const response = await postApi(endpoint, { uid, password });
           setAuth({ uid: response.uid, token: response.token });
           // 拉取该账号的云端存档（如有），再恢复
           await restoreFromServerIfAny();
