@@ -3377,7 +3377,7 @@ if (typeof document !== 'undefined') {
     }
 
     async function postApi(endpoint, data) {
-      const apiBaseUrl = resolveApiBaseUrl();
+      const apiBaseUrl = core.resolveApiBaseUrl();
       const response = await fetch(`${apiBaseUrl}${endpoint}`, {
         method: 'POST',
         headers: {
@@ -3404,7 +3404,7 @@ if (typeof document !== 'undefined') {
     async function fetchAuthedApi(endpoint, data) {
       const auth = getAuth();
       if (!auth) throw new Error('Not logged in');
-      const apiBaseUrl = resolveApiBaseUrl();
+      const apiBaseUrl = core.resolveApiBaseUrl();
       const response = await fetch(`${apiBaseUrl}${endpoint}`, {
         method: 'POST',
         headers: {
@@ -3432,7 +3432,7 @@ if (typeof document !== 'undefined') {
     async function fetchAuthedGet(endpoint) {
       const auth = getAuth();
       if (!auth) throw new Error('Not logged in');
-      const apiBaseUrl = resolveApiBaseUrl();
+      const apiBaseUrl = core.resolveApiBaseUrl();
       const response = await fetch(`${apiBaseUrl}${endpoint}`, {
         method: 'GET',
         headers: {
