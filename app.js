@@ -3310,6 +3310,7 @@ if (typeof document !== 'undefined') {
     let cloudSaveTimer = null;
     let cloudSaveInFlight = false;
     let lastCloudSaveAt = 0;
+    let remoteStateUpdatedAt = 0;
 
     function buildCloudStatePayload() {
       return {
@@ -3328,8 +3329,34 @@ if (typeof document !== 'undefined') {
       if (cloudSaveInFlight) return;
       cloudSaveInFlight = true;
       try {
-        await fetchAuthedApi('/api/state', { state: buildCloudStatePayload() });
-        lastCloudSaveAt = Date.now();
+        const apiBaseUrl = core.resolveApiBaseUrl();
+        const response = await fetch(`${apiBaseUrl}/api/state`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${auth.token}`
+          },
+          body: JSON.stringify({ state: buildCloudStatePayload(), baseUpdatedAt: remoteStateUpdatedAt })
+        });
+        const raw = await response.text();
+        const payload = raw ? JSON.parse(raw) : {};
+        if (response.status === 409 && payload && payload.state) {
+          // Conflict: server has newer state (e.g. friend gifted you). Pull latest and refresh local.
+          if (payload.state.appState) writeStorage(STORAGE_KEYS.appState, payload.state.appState);
+          if (payload.state.timerState) writeStorage(STORAGE_KEYS.timerState, payload.state.timerState);
+          if (payload.state.rewardState) writeStorage(STORAGE_KEYS.rewardState, payload.state.rewardState);
+          if (payload.state.islandState) writeStorage(STORAGE_KEYS.islandState, payload.state.islandState);
+          remoteStateUpdatedAt = Number(payload.updatedAt || 0);
+          restoreSession();
+          restoreIslandState();
+          renderAll();
+          updateIslandUI();
+        } else if (!response.ok) {
+          throw new Error(payload.error || `API call failed with status ${response.status}`);
+        } else {
+          remoteStateUpdatedAt = Number(payload.updatedAt || remoteStateUpdatedAt || 0);
+          lastCloudSaveAt = Date.now();
+        }
       } catch (error) {
         console.warn('Cloud save failed', error);
       } finally {
@@ -3464,6 +3491,7 @@ if (typeof document !== 'undefined') {
         if (remote.timerState) writeStorage(STORAGE_KEYS.timerState, remote.timerState);
         if (remote.rewardState) writeStorage(STORAGE_KEYS.rewardState, remote.rewardState);
         if (remote.islandState) writeStorage(STORAGE_KEYS.islandState, remote.islandState);
+        remoteStateUpdatedAt = Number(response.updatedAt || 0);
         return true;
       } catch (error) {
         console.warn('Failed to restore from server', error);
@@ -4550,60 +4578,55 @@ if (typeof document !== 'undefined') {
 
     function renderFriends() {
       if (!elements.friendGrid) return;
-      const myFriends = (state.myFriends || []);
-      const friendsData = core.FRIENDS.filter(f => myFriends.includes(f.id));
-
-      if (friendsData.length === 0) {
+      if (!getAuth()) {
         elements.friendGrid.innerHTML = `
           <div class="empty-state">
-            <strong>${core.t(language, 'noFriends')}</strong>
-            <span>${core.t(language, 'addFriendBtn')}</span>
+            <strong>请先登录</strong>
+            <span>登录后可通过 UID 添加真实好友并互动</span>
+          </div>
+        `;
+        return;
+      }
+
+      const friendsData = Array.isArray(serverFriends) ? serverFriends : [];
+      if (!friendsData.length) {
+        elements.friendGrid.innerHTML = `
+          <div class="empty-state">
+            <strong>还没有好友</strong>
+            <span>点击右上角「添加好友」，用 UID 搜索并发送申请</span>
           </div>
         `;
         return;
       }
 
       elements.friendGrid.innerHTML = friendsData.map((friend) => {
-        const message = state.friendMessages[friend.id];
-        const visitDetails = core.getFriendVisitDetails(friend.id, language);
+        const uid = friend.uid;
+        const level = friend.island?.level ? `Lv.${friend.island.level}` : 'Lv.?';
         return `
           <article class="friend-card">
             <div class="friend-card-header">
-              <div class="friend-avatar">${friend.avatar || friend.name[0]}</div>
+              <div class="friend-avatar">${escapeHtml(String(uid).slice(-2))}</div>
               <div class="friend-info">
-                <h4>${escapeHtml(friend.name)}</h4>
-                <span>${visitDetails.focusMinutes}m · ${core.t(language, 'streak')} ${friend.streak}d</span>
+                <h4>UID ${escapeHtml(uid)}</h4>
+                <span>${escapeHtml(level)}</span>
               </div>
             </div>
             <div class="friend-stats">
               <div class="friend-stat">
-                <small>${core.t(language, 'statFocus')}</small>
-                <strong>${visitDetails.focusMinutes}m</strong>
+                <small>岛屿等级</small>
+                <strong>${escapeHtml(level)}</strong>
               </div>
               <div class="friend-stat">
-                <small>${core.t(language, 'statIsland')}</small>
-                <strong>Lv.${friend.islandLevel}</strong>
-              </div>
-              <div class="friend-stat">
-                <small>${core.t(language, 'streak')}</small>
-                <strong>${friend.streak}d</strong>
-              </div>
-              <div class="friend-stat">
-                <small>Status</small>
-                <strong style="color: var(--leaf-500)">Online</strong>
+                <small>状态</small>
+                <strong style="color: var(--leaf-500)">可参观</strong>
               </div>
             </div>
             <div class="friend-card-actions">
-              <button type="button" class="small-button" data-friend="${friend.id}" data-action="help">${core.t(language, 'help')}</button>
-              <button type="button" class="small-button secondary" data-friend="${friend.id}" data-action="visit">${core.t(language, 'visit')}</button>
-              <button type="button" class="small-button ghost" data-friend="${friend.id}" data-action="remove">Remove</button>
+              <button type="button" class="small-button secondary" data-friend-visit="${escapeHtml(uid)}">互动 / 参观</button>
             </div>
-            <span class="friend-message">${message ? (message[language] || message.en) : ''}</span>
           </article>
         `;
       }).join('');
-
-      renderSocialTabs();
     }
 
     function renderSocialTabs() {
@@ -5119,16 +5142,74 @@ if (typeof document !== 'undefined') {
       }
     }
 
-    function openVisitModal(friendId) {
+    const FRUIT_LABELS = {
+      tomato: '🍅 番茄',
+      strawberry: '🍓 草莓',
+      carrot: '🥕 胡萝卜',
+      apple: '🍎 苹果',
+      watermelon: '🍉 西瓜'
+    };
+
+    function getMyHarvestedOptions() {
+      const harvested = islandState?.inventory?.harvested || {};
+      const order = ['tomato', 'strawberry', 'carrot', 'apple', 'watermelon'];
+      return order
+        .filter((key) => Number(harvested[key] || 0) > 0)
+        .map((key) => ({ key, label: `${FRUIT_LABELS[key] || key} ×${harvested[key]}` }));
+    }
+
+    let currentVisitUid = null;
+    async function openVisitModal(friendUid) {
       if (!elements.visitModal) return;
-      const details = core.getFriendVisitDetails(friendId, language);
-      elements.visitName.textContent = details.name;
-      elements.visitIsland.className = `visit-island friend-${details.color}`;
-      elements.visitFocus.textContent = `${details.focusMinutes}m`;
-      elements.visitMood.textContent = details.mood;
-      elements.visitResources.innerHTML = details.resources.map((item) => `<span>${escapeHtml(item)}</span>`).join('');
-      elements.visitNote.textContent = details.note;
+      currentVisitUid = friendUid;
+      elements.visitName.textContent = friendUid;
+      elements.visitIsland.className = 'visit-island friend-sun';
+      elements.visitFocus.textContent = '加载中...';
+      elements.visitMood.textContent = '加载中...';
+      elements.visitResources.innerHTML = '';
+      elements.visitNote.textContent = '';
       elements.visitModal.hidden = false;
+
+      try {
+        const response = await fetchAuthedGet(`/api/friends/${friendUid}/island`);
+        const island = response?.island;
+        if (!island) {
+          elements.visitFocus.textContent = '暂无岛屿数据';
+          elements.visitMood.textContent = '对方还没有保存过进度';
+          return;
+        }
+        const plantedCount = (island.plots || []).filter(p => p.crop).length;
+        const petCount = (island.pets || []).length;
+        const decoCount = (island.decorations || []).length;
+        elements.visitFocus.textContent = `Lv.${island.level}`;
+        elements.visitMood.textContent = `农田${plantedCount}块 · 宠物${petCount}只 · 装饰${decoCount}个`;
+
+        const myGiftOptions = getMyHarvestedOptions();
+        const giftSelectHtml = myGiftOptions.length
+          ? `<select id="giftSelect" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;margin-top:10px;">
+              ${myGiftOptions.map(opt => `<option value="${opt.key}">${escapeHtml(opt.label)}</option>`).join('')}
+            </select>`
+          : `<div style="margin-top:10px;color:var(--muted);font-size:13px;">你的背包里没有可赠送的果实</div>`;
+
+        elements.visitResources.innerHTML = `
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 12px 0;">
+            <span>💰 ${island.resources?.coins ?? 0}</span>
+            <span>💧 ${island.resources?.water ?? 0}</span>
+            <span>☀️ ${island.resources?.sunlight ?? 0}</span>
+            <span>🤝 ${island.resources?.chances ?? 0}</span>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="small-button" type="button" data-visit-action="help">💧 帮助浇水</button>
+            <button class="small-button secondary" type="button" data-visit-action="steal">🍎 偷取果实</button>
+            <button class="small-button ghost" type="button" data-visit-action="gift">🎁 赠送礼物</button>
+          </div>
+          ${giftSelectHtml}
+        `;
+        elements.visitNote.textContent = '互动会消耗你自己的 🤝 游戏机会，并且会真实影响双方的云端存档。';
+      } catch (error) {
+        elements.visitFocus.textContent = '加载失败';
+        elements.visitMood.textContent = error.message || '无法读取好友岛屿';
+      }
     }
 
     function closeVisitModal() {
@@ -5144,107 +5225,133 @@ if (typeof document !== 'undefined') {
         .replace(/'/g, '&#039;');
     }
 
-    // Social module helper functions
-    function renderSearchUsers() {
-      if (!elements.searchResults) return;
-      const availableUsers = core.SOCIAL_DATA.availableUsers.filter(
-        user => !(state.myFriends || []).includes(user.id)
-      );
+    // ===== Friends: real system via backend =====
+    let serverFriends = [];
+    let serverIncomingRequests = [];
+    let serverOutgoingRequests = [];
+    let lastSearchResultUid = null;
 
-      if (availableUsers.length === 0) {
-        elements.searchResults.innerHTML = `
-          <div class="empty-state" style="padding:16px;">
-            <span>没有可添加的用户</span>
-          </div>
-        `;
+    async function refreshFriendsFromServer() {
+      if (!getAuth()) {
+        serverFriends = [];
+        serverIncomingRequests = [];
+        serverOutgoingRequests = [];
         return;
       }
-
-      elements.searchResults.innerHTML = availableUsers.slice(0, 5).map(user => `
-        <div class="search-result-item">
-          <div class="result-avatar">${user.avatar || user.name[0]}</div>
-          <div class="result-info">
-            <strong>${escapeHtml(user.name)}</strong>
-            <span>${escapeHtml(user.nickname)}</span>
-          </div>
-          <button class="small-button secondary" data-search-result="${user.id}">
-            ${core.t(language, 'addFriendBtn')}
-          </button>
-        </div>
-      `).join('');
+      try {
+        const [friendsResp, reqResp] = await Promise.all([
+          fetchAuthedGet('/api/friends'),
+          fetchAuthedGet('/api/friends/requests')
+        ]);
+        serverFriends = Array.isArray(friendsResp?.friends) ? friendsResp.friends : [];
+        serverIncomingRequests = Array.isArray(reqResp?.incoming) ? reqResp.incoming : [];
+        serverOutgoingRequests = Array.isArray(reqResp?.outgoing) ? reqResp.outgoing : [];
+      } catch (error) {
+        console.warn('refresh friends error', error);
+      }
     }
 
-    function renderSearchResults(searchTerm) {
+    function renderSearchUsers() {
       if (!elements.searchResults) return;
-      if (!searchTerm) {
+      elements.searchResults.innerHTML = `
+        <div class="empty-state" style="padding:16px;">
+          <strong>输入 8 位 UID 搜索好友</strong>
+          <span style="margin-top:6px;display:block;color:var(--muted);">例如：12345678</span>
+        </div>
+      `;
+    }
+
+    async function renderSearchResults(searchTerm) {
+      if (!elements.searchResults) return;
+      const uid = String(searchTerm || '').trim();
+      lastSearchResultUid = null;
+      if (!uid) {
         renderSearchUsers();
         return;
       }
-
-      const filteredUsers = core.SOCIAL_DATA.availableUsers.filter(user =>
-        !(state.myFriends || []).includes(user.id) &&
-        (user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-         user.nickname.toLowerCase().includes(searchTerm.toLowerCase()))
-      );
-
-      if (filteredUsers.length === 0) {
+      if (!/^\d{8}$/.test(uid)) {
         elements.searchResults.innerHTML = `
           <div class="empty-state" style="padding:16px;">
-            <strong>${core.t(language, 'searchNoResults')}</strong>
+            <strong>请输入 8 位数字 UID</strong>
           </div>
         `;
         return;
       }
-
-      elements.searchResults.innerHTML = filteredUsers.map(user => `
-        <div class="search-result-item">
-          <div class="result-avatar">${user.avatar || user.name[0]}</div>
-          <div class="result-info">
-            <strong>${escapeHtml(user.name)}</strong>
-            <span>${escapeHtml(user.nickname)}</span>
+      try {
+        const result = await fetchAuthedGet(`/api/users/${uid}`);
+        lastSearchResultUid = result.uid;
+        const alreadyFriend = serverFriends.some(f => f.uid === uid);
+        const isMe = getAuth()?.uid === uid;
+        elements.searchResults.innerHTML = `
+          <div class="search-result-item">
+            <div class="result-avatar">${escapeHtml(uid.slice(-2))}</div>
+            <div class="result-info">
+              <strong>UID ${escapeHtml(uid)}</strong>
+              <span style="color:var(--muted)">已注册用户</span>
+            </div>
+            <button class="small-button secondary" type="button" data-send-friend-request="${escapeHtml(uid)}" ${alreadyFriend || isMe ? 'disabled' : ''}>
+              ${isMe ? '这是你自己' : (alreadyFriend ? '已是好友' : '发送申请')}
+            </button>
           </div>
-          <button class="small-button secondary" data-search-result="${user.id}">
-            ${core.t(language, 'addFriendBtn')}
-          </button>
-        </div>
-      `).join('');
+        `;
+      } catch (error) {
+        elements.searchResults.innerHTML = `
+          <div class="empty-state" style="padding:16px;">
+            <strong>未找到该用户</strong>
+          </div>
+        `;
+      }
     }
 
     function renderPendingRequests() {
       if (!elements.requestsList) return;
-      const requests = (state.friendRequests || []).filter(r => r.to === 'current-user');
-
-      if (requests.length === 0) {
+      const incoming = serverIncomingRequests || [];
+      const outgoing = serverOutgoingRequests || [];
+      if (!incoming.length && !outgoing.length) {
         elements.requestsList.innerHTML = `
           <div class="empty-state" style="padding:12px;">
-            <span>没有待处理的好友请求</span>
+            <span>暂无好友申请</span>
           </div>
         `;
         return;
       }
-
-      elements.requestsList.innerHTML = requests.map(request => {
-        const user = core.SOCIAL_DATA.availableUsers.find(u => u.id === request.from) ||
-                   core.FRIENDS.find(f => f.id === request.from);
-        if (!user) return '';
-        return `
-          <div class="request-item">
-            <div class="request-item-avatar">${user.avatar || user.name[0]}</div>
-            <div class="request-item-info">
-              <strong>${escapeHtml(user.name)}</strong>
-              <span>请求添加你为好友</span>
-            </div>
-            <div class="request-item-actions">
-              <button class="small-button secondary" data-accept-request="${request.id}">
-                ${core.t(language, 'acceptRequest')}
-              </button>
-              <button class="small-button ghost" data-decline-request="${request.id}">
-                ${core.t(language, 'declineRequest')}
-              </button>
-            </div>
+      const incomingHtml = incoming.length
+        ? `
+          <div style="margin-bottom:12px;">
+            <strong style="display:block;margin:6px 0;">收到的申请</strong>
+            ${incoming.map(req => `
+              <div class="request-item">
+                <div class="request-item-avatar">${escapeHtml(String(req.fromUid).slice(-2))}</div>
+                <div class="request-item-info">
+                  <strong>UID ${escapeHtml(req.fromUid)}</strong>
+                  <span>请求添加你为好友</span>
+                </div>
+                <div class="request-item-actions">
+                  <button class="small-button secondary" type="button" data-accept-request="${req.id}">同意</button>
+                  <button class="small-button ghost" type="button" data-decline-request="${req.id}">拒绝</button>
+                </div>
+              </div>
+            `).join('')}
           </div>
-        `;
-      }).join('');
+        `
+        : '';
+      const outgoingHtml = outgoing.length
+        ? `
+          <div>
+            <strong style="display:block;margin:6px 0;">已发送的申请</strong>
+            ${outgoing.map(req => `
+              <div class="request-item">
+                <div class="request-item-avatar">${escapeHtml(String(req.toUid).slice(-2))}</div>
+                <div class="request-item-info">
+                  <strong>UID ${escapeHtml(req.toUid)}</strong>
+                  <span style="color:var(--muted)">等待对方同意</span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `
+        : '';
+      elements.requestsList.innerHTML = incomingHtml + outgoingHtml;
     }
 
     function renderChallengeInviteList() {
@@ -5527,19 +5634,39 @@ if (typeof document !== 'undefined') {
         persistSession();
       }
 
-      if (target.matches('[data-friend]')) {
-        if (target.dataset.action === 'help') {
-          currentFriendId = target.dataset.friend;
-          updateFriendPreview();
-          if (elements.friendInteractionModal) elements.friendInteractionModal.hidden = false;
-        } else {
-          state = core.performFriendAction(state, target.dataset.friend, target.dataset.action);
+      if (target.matches('[data-friend-visit]')) {
+        const friendUid = target.dataset.friendVisit;
+        await openVisitModal(friendUid);
+        return;
+      }
+
+      if (target.matches('[data-visit-action]')) {
+        const action = target.dataset.visitAction;
+        if (!currentVisitUid) return;
+        try {
+          if (action === 'gift') {
+            const select = document.querySelector('#giftSelect');
+            const itemType = select ? select.value : '';
+            await fetchAuthedApi(`/api/friends/${currentVisitUid}/interact`, { type: 'gift', itemType });
+            showMessage('已赠送礼物');
+          } else {
+            await fetchAuthedApi(`/api/friends/${currentVisitUid}/interact`, { type: action });
+            showMessage(action === 'help' ? '已帮助浇水 +1' : '已尝试偷取果实');
+          }
+          // 刷新自己的云端存档，避免自动保存覆盖他人对你的修改
+          await restoreFromServerIfAny();
+          restoreSession();
+          restoreIslandState();
+          renderAll();
+          updateIslandUI();
+          // 刷新好友岛屿展示
+          await openVisitModal(currentVisitUid);
+          await refreshFriendsFromServer();
+          renderFriends();
+        } catch (error) {
+          showMessage(error.message || '互动失败');
         }
-        if (target.dataset.action === 'visit') {
-          openVisitModal(target.dataset.friend);
-        }
-        renderAll();
-        persistSession();
+        return;
       }
 
       // Social module event handlers
@@ -5552,6 +5679,7 @@ if (typeof document !== 'undefined') {
       if (target.id === 'addFriendBtn') {
         if (elements.addFriendModal) {
           elements.addFriendModal.hidden = false;
+          await refreshFriendsFromServer();
           renderSearchUsers();
           renderPendingRequests();
         }
@@ -5565,42 +5693,49 @@ if (typeof document !== 'undefined') {
 
       if (target.id === 'searchFriendBtn') {
         const searchTerm = elements.friendSearchInput ? elements.friendSearchInput.value.trim() : '';
-        renderSearchResults(searchTerm);
+        await refreshFriendsFromServer();
+        await renderSearchResults(searchTerm);
       }
 
-      if (target.matches('[data-search-result]')) {
-        const userId = target.dataset.searchResult;
-        state = SocialModule.sendFriendRequest(state, userId);
-        state.lastMessage = {
-          'zh-CN': core.t(language, 'friendRequestSent'),
-          'zh-HK': core.t(language, 'friendRequestSent'),
-          en: core.t(language, 'friendRequestSent')
-        };
-        if (elements.addFriendModal) {
-          elements.addFriendModal.hidden = true;
+      if (target.matches('[data-send-friend-request]')) {
+        const toUid = target.dataset.sendFriendRequest;
+        try {
+          await fetchAuthedApi('/api/friends/request', { toUid });
+          showMessage('好友申请已发送');
+          await refreshFriendsFromServer();
+          renderPendingRequests();
+          await renderSearchResults(String(toUid));
+        } catch (error) {
+          showMessage(error.message || '发送好友申请失败');
         }
-        renderAll();
-        persistSession();
+        return;
       }
 
       if (target.matches('[data-accept-request]')) {
         const requestId = target.dataset.acceptRequest;
-        state = SocialModule.acceptFriendRequest(state, requestId);
-        state.lastMessage = {
-          'zh-CN': core.t(language, 'friendRequestAccepted'),
-          'zh-HK': core.t(language, 'friendRequestAccepted'),
-          en: core.t(language, 'friendRequestAccepted')
-        };
-        renderPendingRequests();
-        renderAll();
-        persistSession();
+        try {
+          await fetchAuthedApi(`/api/friends/requests/${requestId}/accept`, {});
+          showMessage('已添加为好友');
+          await refreshFriendsFromServer();
+          renderPendingRequests();
+          renderFriends();
+        } catch (error) {
+          showMessage(error.message || '处理失败');
+        }
+        return;
       }
 
       if (target.matches('[data-decline-request]')) {
         const requestId = target.dataset.declineRequest;
-        state = SocialModule.declineFriendRequest(state, requestId);
-        renderPendingRequests();
-        persistSession();
+        try {
+          await fetchAuthedApi(`/api/friends/requests/${requestId}/reject`, {});
+          showMessage('已拒绝');
+          await refreshFriendsFromServer();
+          renderPendingRequests();
+        } catch (error) {
+          showMessage(error.message || '处理失败');
+        }
+        return;
       }
 
       if (target.id === 'createChallengeBtn') {
