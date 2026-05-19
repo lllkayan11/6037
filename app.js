@@ -4,6 +4,12 @@ const PomolandCore = (() => {
   const COPY = {
     'zh-CN': {
       languageName: '简体中文',
+      authWelcome: '欢迎回来',
+      authLead: '使用 8 位数字 UID + 密码登录（或注册新账号）。',
+      uidLabel: 'UID（8 位数字）',
+      uidPlaceholder: '例如：12345678',
+      passwordLabel: '密码',
+      passwordPlaceholder: '至少 4 位',
       heroTitle: '把专注变成自己的番茄岛',
       heroLead: 'AI 帮你拆解目标，Focus Mode 帮你进入番茄钟，每一次完成都会变成 Bonus，继续建设 Pomoland。',
       launchDemo: 'Launch Demo',
@@ -59,6 +65,16 @@ const PomolandCore = (() => {
       clearLocal: '清空本地缓存',
       coachHide: '隐藏 Coach',
       coachShow: '开启 Coach',
+      friendSearchPlaceholder: '输入 8 位 UID（例如：12345678）',
+      customDurationTitle: '自定义专注时间',
+      customDurationHint: '拖动滑块或输入分钟数，做一个更适合自己的番茄钟。',
+      applyCustomDuration: '应用自定义时长',
+      focusSceneTitle: '让番茄陪你一起长大',
+      focusSceneMessage: '开始专注后，番茄会随着倒计时慢慢成熟。坚持完成，会收获超可爱的奖励时刻。',
+      bonusPlusWater: '+水滴',
+      bonusPlusCoins: '+金币',
+      bonusPlusSunlight: '+阳光',
+      visitMoodSample: '新码头刚建好，适合参观',
       goalLabel: '输入一个长期目标',
       goalPlaceholder: '例如：三个月准备雅思考试',
       aiButton: '帮你制定计划',
@@ -176,6 +192,9 @@ const PomolandCore = (() => {
       decorLamp: '路灯',
       decorBench: '长椅',
       decorFountain: '喷泉',
+      decorStatue: '雕像',
+      decorPond: '池塘',
+      decorBridge: '小桥',
       buyBtn: '购买',
       petCat: '猫咪',
       petDog: '小狗',
@@ -303,6 +322,12 @@ const PomolandCore = (() => {
     },
     'zh-HK': {
       languageName: '繁體中文',
+      authWelcome: '歡迎回來',
+      authLead: '使用 8 位數字 UID + 密碼登入（或註冊新帳號）。',
+      uidLabel: 'UID（8 位數字）',
+      uidPlaceholder: '例如：12345678',
+      passwordLabel: '密碼',
+      passwordPlaceholder: '至少 4 位',
       heroTitle: '把專注變成自己的番茄島',
       heroLead: 'AI 幫你拆解目標，Focus Mode 幫你進入番茄鐘，每一次完成都會變成 Bonus，繼續建設 Pomoland。',
       launchDemo: 'Launch Demo',
@@ -358,6 +383,16 @@ const PomolandCore = (() => {
       clearLocal: '清空本地快取',
       coachHide: '隱藏 Coach',
       coachShow: '開啟 Coach',
+      friendSearchPlaceholder: '輸入 8 位 UID（例如：12345678）',
+      customDurationTitle: '自訂專注時間',
+      customDurationHint: '拖動滑桿或輸入分鐘數，做一個更適合自己的番茄鐘。',
+      applyCustomDuration: '套用自訂時長',
+      focusSceneTitle: '讓番茄陪你一起長大',
+      focusSceneMessage: '開始專注後，番茄會隨著倒計時慢慢成熟。堅持完成，會收穫超可愛的獎勵時刻。',
+      bonusPlusWater: '+水滴',
+      bonusPlusCoins: '+金幣',
+      bonusPlusSunlight: '+陽光',
+      visitMoodSample: '新碼頭剛建好，適合參觀',
       goalLabel: '輸入一個長期目標',
       goalPlaceholder: '例如：三個月準備雅思考試',
       aiButton: '幫你制定計劃',
@@ -475,6 +510,9 @@ const PomolandCore = (() => {
       decorLamp: '路燈',
       decorBench: '長椅',
       decorFountain: '噴泉',
+      decorStatue: '雕像',
+      decorPond: '池塘',
+      decorBridge: '小橋',
       buyBtn: '購買',
       petCat: '貓咪',
       petDog: '小狗',
@@ -602,6 +640,12 @@ const PomolandCore = (() => {
     },
     en: {
       languageName: 'English',
+      authWelcome: 'Welcome back',
+      authLead: 'Log in with an 8-digit UID + password (or register a new account).',
+      uidLabel: 'UID (8 digits)',
+      uidPlaceholder: 'e.g. 12345678',
+      passwordLabel: 'Password',
+      passwordPlaceholder: 'At least 4 characters',
       heroTitle: 'Turn focus into your own island',
       heroLead: 'AI breaks big goals into daily tasks, Focus Mode protects deep work, and every completed session drops a Bonus for building Pomoland.',
       launchDemo: 'Launch Demo',
@@ -657,6 +701,16 @@ const PomolandCore = (() => {
       clearLocal: 'Clear local cache',
       coachHide: 'Hide Coach',
       coachShow: 'Show Coach',
+      friendSearchPlaceholder: 'Enter an 8-digit UID (e.g. 12345678)',
+      customDurationTitle: 'Custom focus time',
+      customDurationHint: 'Drag the slider or type minutes to create your own Pomodoro.',
+      applyCustomDuration: 'Apply custom duration',
+      focusSceneTitle: 'Grow with your tomato',
+      focusSceneMessage: 'Once you start focusing, your tomato grows with the timer. Finish it to unlock a cute reward moment.',
+      bonusPlusWater: '+Water',
+      bonusPlusCoins: '+Coins',
+      bonusPlusSunlight: '+Sunlight',
+      visitMoodSample: 'A new dock is ready—perfect for a visit',
       goalLabel: 'Enter a long-term goal',
       goalPlaceholder: 'Example: Prepare for IELTS in 3 months',
       aiButton: 'Plan My Day',
@@ -774,6 +828,9 @@ const PomolandCore = (() => {
       decorLamp: 'Street lamp',
       decorBench: 'Bench',
       decorFountain: 'Fountain',
+      decorStatue: 'Statue',
+      decorPond: 'Pond',
+      decorBridge: 'Bridge',
       buyBtn: 'Buy',
       petCat: 'Cat',
       petDog: 'Dog',
@@ -3411,7 +3468,9 @@ if (typeof document !== 'undefined') {
 
     function getDecorationDirectionLabel(flipped) {
       const safeFlip = normalizeDecorationFlip(flipped);
-      return safeFlip ? '左右翻转' : '默认方向';
+      return safeFlip
+        ? localizedText('左右翻转', '左右翻轉', 'Flipped')
+        : localizedText('默认方向', '預設方向', 'Default');
     }
 
     function getDecorationVisualMarkup(type, info, className = '', flipped = 0) {
@@ -3696,10 +3755,20 @@ if (typeof document !== 'undefined') {
 
     function setAuthMode(mode) {
       authMode = mode === 'register' ? 'register' : 'login';
-      if (elements.authTitle) elements.authTitle.textContent = authMode === 'register' ? '注册' : '登录';
-      if (elements.authSubmitBtn) elements.authSubmitBtn.textContent = authMode === 'register' ? '注册并进入' : '登录并进入';
+      if (elements.authTitle) {
+        elements.authTitle.textContent = authMode === 'register'
+          ? localizedText('注册', '註冊', 'Register')
+          : localizedText('登录', '登入', 'Log in');
+      }
+      if (elements.authSubmitBtn) {
+        elements.authSubmitBtn.textContent = authMode === 'register'
+          ? localizedText('注册并进入', '註冊並進入', 'Register & enter')
+          : localizedText('登录并进入', '登入並進入', 'Log in & enter');
+      }
       if (elements.toggleAuthMode) {
-        elements.toggleAuthMode.textContent = authMode === 'register' ? '已有账号？登录' : '没有账号？注册';
+        elements.toggleAuthMode.textContent = authMode === 'register'
+          ? localizedText('已有账号？登录', '已有帳號？登入', 'Already have an account? Log in')
+          : localizedText('没有账号？注册', '沒有帳號？註冊', 'No account? Register');
       }
       setAuthError('');
     }
@@ -4627,6 +4696,8 @@ if (typeof document !== 'undefined') {
       };
       renderAll();
       updateCoachToggleButton();
+      // Update auth UI texts (login/register) according to the current language
+      setAuthMode(authMode);
       persistSession();
     }
 
@@ -5128,16 +5199,16 @@ if (typeof document !== 'undefined') {
             </div>
             <div class="friend-stats">
               <div class="friend-stat">
-                <small>岛屿等级</small>
+                <small>${escapeHtml(localizedText('岛屿等级', '島嶼等級', 'Island level'))}</small>
                 <strong>${escapeHtml(level)}</strong>
               </div>
               <div class="friend-stat">
-                <small>状态</small>
-                <strong style="color: var(--leaf-500)">可参观</strong>
+                <small>${escapeHtml(localizedText('状态', '狀態', 'Status'))}</small>
+                <strong style="color: var(--leaf-500)">${escapeHtml(localizedText('可参观', '可參觀', 'Available'))}</strong>
               </div>
             </div>
             <div class="friend-card-actions">
-              <button type="button" class="small-button secondary" data-friend-visit="${escapeHtml(uid)}">互动 / 参观</button>
+              <button type="button" class="small-button secondary" data-friend-visit="${escapeHtml(uid)}">${escapeHtml(localizedText('互动 / 参观', '互動 / 參觀', 'Interact / visit'))}</button>
             </div>
           </article>
         `;
@@ -5657,20 +5728,23 @@ if (typeof document !== 'undefined') {
       }
     }
 
-    const FRUIT_LABELS = {
-      tomato: '🍅 番茄',
-      strawberry: '🍓 草莓',
-      carrot: '🥕 胡萝卜',
-      apple: '🍎 苹果',
-      watermelon: '🍉 西瓜'
-    };
+    function fruitDisplayLabel(key) {
+      const map = {
+        tomato: `🍅 ${core.t(language, 'fruitTomato')}`,
+        strawberry: `🍓 ${core.t(language, 'fruitStrawberry')}`,
+        carrot: `🥕 ${core.t(language, 'fruitCarrot')}`,
+        apple: `🍎 ${core.t(language, 'fruitApple')}`,
+        watermelon: `🍉 ${core.t(language, 'fruitWatermelon')}`
+      };
+      return map[key] || key;
+    }
 
     function getMyHarvestedOptions() {
       const harvested = islandState?.inventory?.harvested || {};
       const order = ['tomato', 'strawberry', 'carrot', 'apple', 'watermelon'];
       return order
         .filter((key) => Number(harvested[key] || 0) > 0)
-        .map((key) => ({ key, label: `${FRUIT_LABELS[key] || key} ×${harvested[key]}` }));
+        .map((key) => ({ key, label: `${fruitDisplayLabel(key)} ×${harvested[key]}` }));
     }
 
     let currentVisitUid = null;
@@ -5679,8 +5753,8 @@ if (typeof document !== 'undefined') {
       currentVisitUid = friendUid;
       elements.visitName.textContent = friendUid;
       elements.visitIsland.className = 'visit-island friend-sun';
-      elements.visitFocus.textContent = '加载中...';
-      elements.visitMood.textContent = '加载中...';
+      elements.visitFocus.textContent = localizedText('加载中...', '載入中...', 'Loading...');
+      elements.visitMood.textContent = localizedText('加载中...', '載入中...', 'Loading...');
       elements.visitResources.innerHTML = '';
       elements.visitNote.textContent = '';
       elements.visitModal.hidden = false;
@@ -5694,22 +5768,26 @@ if (typeof document !== 'undefined') {
         }
         const island = response?.island;
         if (!island) {
-          elements.visitFocus.textContent = '暂无岛屿数据';
-          elements.visitMood.textContent = '对方还没有保存过进度';
+          elements.visitFocus.textContent = localizedText('暂无岛屿数据', '暫無島嶼數據', 'No island data');
+          elements.visitMood.textContent = localizedText('对方还没有保存过进度', '對方還沒有保存過進度', 'They have not saved any progress yet.');
           return;
         }
         const plantedCount = (island.plots || []).filter(p => p.crop).length;
         const petCount = (island.pets || []).length;
         const decoCount = (island.decorations || []).length;
         elements.visitFocus.textContent = `Lv.${island.level}`;
-        elements.visitMood.textContent = `农田${plantedCount}块 · 宠物${petCount}只 · 装饰${decoCount}个`;
+        elements.visitMood.textContent = localizedText(
+          `农田${plantedCount}块 · 宠物${petCount}只 · 装饰${decoCount}个`,
+          `農田${plantedCount}塊 · 寵物${petCount}隻 · 裝飾${decoCount}個`,
+          `Farm ${plantedCount} · Pets ${petCount} · Decor ${decoCount}`
+        );
 
         const myGiftOptions = getMyHarvestedOptions();
         const giftSelectHtml = myGiftOptions.length
           ? `<select id="giftSelect" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;margin-top:10px;">
               ${myGiftOptions.map(opt => `<option value="${opt.key}">${escapeHtml(opt.label)}</option>`).join('')}
             </select>`
-          : `<div style="margin-top:10px;color:var(--muted);font-size:13px;">你的背包里没有可赠送的果实</div>`;
+          : `<div style="margin-top:10px;color:var(--muted);font-size:13px;">${escapeHtml(localizedText('你的背包里没有可赠送的果实', '你的背包裡沒有可贈送的果實', 'You have no fruit to gift.'))}</div>`;
 
         elements.visitResources.innerHTML = `
           <div style="display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 12px 0;">
@@ -5719,15 +5797,19 @@ if (typeof document !== 'undefined') {
             <span>🤝 ${island.resources?.chances ?? 0}</span>
           </div>
           <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <button class="small-button" type="button" data-visit-action="help">💧 帮助浇水</button>
-            <button class="small-button secondary" type="button" data-visit-action="steal">🍎 偷取果实</button>
-            <button class="small-button ghost" type="button" data-visit-action="gift">🎁 赠送礼物</button>
+            <button class="small-button" type="button" data-visit-action="help">💧 ${escapeHtml(localizedText('帮助浇水', '幫助澆水', 'Help water'))}</button>
+            <button class="small-button secondary" type="button" data-visit-action="steal">🍎 ${escapeHtml(localizedText('偷取果实', '偷取果實', 'Steal fruit'))}</button>
+            <button class="small-button ghost" type="button" data-visit-action="gift">🎁 ${escapeHtml(localizedText('赠送礼物', '贈送禮物', 'Gift'))}</button>
           </div>
           ${giftSelectHtml}
         `;
-        elements.visitNote.textContent = '互动会消耗你自己的 🤝 游戏机会，并且会真实影响双方的云端存档。';
+        elements.visitNote.textContent = localizedText(
+          '互动会消耗你自己的 🤝 游戏机会，并且会真实影响双方的云端存档。',
+          '互動會消耗你自己的 🤝 遊戲機會，並且會真實影響雙方的雲端存檔。',
+          'Interactions consume your 🤝 chances and will update both cloud saves for real.'
+        );
       } catch (error) {
-        elements.visitFocus.textContent = '加载失败';
+        elements.visitFocus.textContent = localizedText('加载失败', '載入失敗', 'Load failed');
         elements.visitMood.textContent = error.message || '无法读取好友岛屿';
       }
     }
@@ -5785,8 +5867,8 @@ if (typeof document !== 'undefined') {
       if (!elements.searchResults) return;
       elements.searchResults.innerHTML = `
         <div class="empty-state" style="padding:16px;">
-          <strong>输入 8 位 UID 搜索好友</strong>
-          <span style="margin-top:6px;display:block;color:var(--muted);">例如：12345678</span>
+          <strong>${escapeHtml(localizedText('输入 8 位 UID 搜索好友', '輸入 8 位 UID 搜索好友', 'Search friends by 8-digit UID'))}</strong>
+          <span style="margin-top:6px;display:block;color:var(--muted);">${escapeHtml(localizedText('例如：12345678', '例如：12345678', 'e.g. 12345678'))}</span>
         </div>
       `;
     }
@@ -5802,7 +5884,7 @@ if (typeof document !== 'undefined') {
       if (!/^\d{8}$/.test(uid)) {
         elements.searchResults.innerHTML = `
           <div class="empty-state" style="padding:16px;">
-            <strong>请输入 8 位数字 UID</strong>
+            <strong>${escapeHtml(localizedText('请输入 8 位数字 UID', '請輸入 8 位數字 UID', 'Please enter an 8-digit UID'))}</strong>
           </div>
         `;
         return;
@@ -5813,8 +5895,8 @@ if (typeof document !== 'undefined') {
         const alreadyFriend = serverFriends.some(f => f.uid === uid);
         const isMe = getAuth()?.uid === uid;
         const nicknameLine = result.nickname
-          ? `<span style="color:var(--ink-700)">昵称：${escapeHtml(result.nickname)}</span>`
-          : `<span style="color:var(--muted)">暂未设置昵称</span>`;
+          ? `<span style="color:var(--ink-700)">${escapeHtml(localizedText('昵称：', '暱稱：', 'Nickname: '))}${escapeHtml(result.nickname)}</span>`
+          : `<span style="color:var(--muted)">${escapeHtml(localizedText('暂未设置昵称', '暫未設定暱稱', 'No nickname yet'))}</span>`;
         elements.searchResults.innerHTML = `
           <div class="search-result-item">
             <div class="result-avatar">${escapeHtml(uid.slice(-2))}</div>
@@ -5823,14 +5905,14 @@ if (typeof document !== 'undefined') {
               ${nicknameLine}
             </div>
             <button class="small-button secondary" type="button" data-send-friend-request="${escapeHtml(uid)}" ${alreadyFriend || isMe ? 'disabled' : ''}>
-              ${isMe ? '这是你自己' : (alreadyFriend ? '已是好友' : '发送申请')}
+              ${isMe ? escapeHtml(localizedText('这是你自己', '這是你自己', "That's you")) : (alreadyFriend ? escapeHtml(localizedText('已是好友', '已是好友', 'Already friends')) : escapeHtml(localizedText('发送申请', '發送申請', 'Send request')))}
             </button>
           </div>
         `;
       } catch (error) {
         elements.searchResults.innerHTML = `
           <div class="empty-state" style="padding:16px;">
-            <strong>未找到该用户</strong>
+            <strong>${escapeHtml(localizedText('未找到该用户', '未找到該用戶', 'User not found'))}</strong>
           </div>
         `;
       }
@@ -5843,7 +5925,7 @@ if (typeof document !== 'undefined') {
       if (!incoming.length && !outgoing.length) {
         elements.requestsList.innerHTML = `
           <div class="empty-state" style="padding:12px;">
-            <span>暂无好友申请</span>
+            <span>${escapeHtml(localizedText('暂无好友申请', '暫無好友申請', 'No friend requests'))}</span>
           </div>
         `;
         return;
@@ -5851,17 +5933,17 @@ if (typeof document !== 'undefined') {
       const incomingHtml = incoming.length
         ? `
           <div style="margin-bottom:12px;">
-            <strong style="display:block;margin:6px 0;">收到的申请</strong>
+            <strong style="display:block;margin:6px 0;">${escapeHtml(localizedText('收到的申请', '收到的申請', 'Incoming'))}</strong>
             ${incoming.map(req => `
               <div class="request-item">
                 <div class="request-item-avatar">${escapeHtml(String(req.fromUid).slice(-2))}</div>
                 <div class="request-item-info">
                   <strong>UID ${escapeHtml(req.fromUid)}</strong>
-                  <span>请求添加你为好友</span>
+                  <span>${escapeHtml(localizedText('请求添加你为好友', '請求添加你為好友', 'Wants to add you'))}</span>
                 </div>
                 <div class="request-item-actions">
-                  <button class="small-button secondary" type="button" data-accept-request="${req.id}">同意</button>
-                  <button class="small-button ghost" type="button" data-decline-request="${req.id}">拒绝</button>
+                  <button class="small-button secondary" type="button" data-accept-request="${req.id}">${escapeHtml(localizedText('同意', '同意', 'Accept'))}</button>
+                  <button class="small-button ghost" type="button" data-decline-request="${req.id}">${escapeHtml(localizedText('拒绝', '拒絕', 'Decline'))}</button>
                 </div>
               </div>
             `).join('')}
@@ -5871,13 +5953,13 @@ if (typeof document !== 'undefined') {
       const outgoingHtml = outgoing.length
         ? `
           <div>
-            <strong style="display:block;margin:6px 0;">已发送的申请</strong>
+            <strong style="display:block;margin:6px 0;">${escapeHtml(localizedText('已发送的申请', '已發送的申請', 'Outgoing'))}</strong>
             ${outgoing.map(req => `
               <div class="request-item">
                 <div class="request-item-avatar">${escapeHtml(String(req.toUid).slice(-2))}</div>
                 <div class="request-item-info">
                   <strong>UID ${escapeHtml(req.toUid)}</strong>
-                  <span style="color:var(--muted)">等待对方同意</span>
+                  <span style="color:var(--muted)">${escapeHtml(localizedText('等待对方同意', '等待對方同意', 'Waiting for approval'))}</span>
                 </div>
               </div>
             `).join('')}
@@ -6776,11 +6858,62 @@ if (typeof document !== 'undefined') {
     }
 
     function getConditionLabel(key, target) {
-      if (key === 'plantCount') return `累计种植 ${target} 次`;
-      if (key === 'harvestCount') return `累计收获 ${target} 次`;
-      if (key === 'decorationCount') return `放置装饰 ${target} 个`;
-      if (key === 'friendHelpCount') return `帮助好友 ${target} 次`;
+      if (key === 'plantCount') return localizedText(`累计种植 ${target} 次`, `累計種植 ${target} 次`, `Plant ${target} times total`);
+      if (key === 'harvestCount') return localizedText(`累计收获 ${target} 次`, `累計收穫 ${target} 次`, `Harvest ${target} times total`);
+      if (key === 'decorationCount') return localizedText(`放置装饰 ${target} 个`, `放置裝飾 ${target} 個`, `Place ${target} decoration(s)`);
+      if (key === 'friendHelpCount') return localizedText(`帮助好友 ${target} 次`, `幫助好友 ${target} 次`, `Help friends ${target} time(s)`);
       return `${key} ${target}`;
+    }
+
+    function translateUpgradeRewardItem(itemText) {
+      const text = String(itemText || '');
+      // resources
+      let m = text.match(/^💰\s*(\d+)\s*金币$/);
+      if (m) return localizedText(`💰 ${m[1]} 金币`, `💰 ${m[1]} 金幣`, `💰 ${m[1]} coins`);
+      m = text.match(/^💧\s*(\d+)\s*水滴$/);
+      if (m) return localizedText(`💧 ${m[1]} 水滴`, `💧 ${m[1]} 水滴`, `💧 ${m[1]} water`);
+      m = text.match(/^☀️\s*(\d+)\s*阳光$/);
+      if (m) return localizedText(`☀️ ${m[1]} 阳光`, `☀️ ${m[1]} 陽光`, `☀️ ${m[1]} sunlight`);
+
+      // seeds: "🍓 草莓种子 x2"
+      m = text.match(/^(🍅|🍓|🥕|🍎|🍉)\s*([^\s]+)种子\s*x(\d+)$/);
+      if (m) {
+        const icon = m[1];
+        const amount = m[3];
+        const nameMap = {
+          '🍅': core.t(language, 'seedTomato'),
+          '🍓': core.t(language, 'seedStrawberry'),
+          '🥕': core.t(language, 'seedCarrot'),
+          '🍎': core.t(language, 'seedApple'),
+          '🍉': core.t(language, 'seedWatermelon')
+        };
+        const seedName = nameMap[icon] || `${m[2]} seed`;
+        return `${icon} ${seedName} x${amount}`;
+      }
+
+      // unlock previews
+      m = text.match(/^农田扩展到\s*(\d+)\s*格$/);
+      if (m) return localizedText(`农田扩展到 ${m[1]} 格`, `農田擴展到 ${m[1]} 格`, `Farm expands to ${m[1]} plots`);
+      m = text.match(/^解锁第\s*(\d+)\s*块农田$/);
+      if (m) return localizedText(`解锁第 ${m[1]} 块农田`, `解鎖第 ${m[1]} 塊農田`, `Unlock farm plot #${m[1]}`);
+      m = text.match(/^解锁第\s*(\d+)\s*个装饰位$/);
+      if (m) return localizedText(`解锁第 ${m[1]} 个装饰位`, `解鎖第 ${m[1]} 個裝飾位`, `Unlock decoration slot #${m[1]}`);
+      m = text.match(/^解锁(.+)种子$/);
+      if (m) {
+        const cropMap = {
+          '番茄': core.t(language, 'fruitTomato'),
+          '草莓': core.t(language, 'fruitStrawberry'),
+          '胡萝卜': core.t(language, 'fruitCarrot'),
+          '苹果': core.t(language, 'fruitApple'),
+          '西瓜': core.t(language, 'fruitWatermelon')
+        };
+        const crop = cropMap[m[1]] || m[1];
+        return localizedText(`解锁${crop}种子`, `解鎖${crop}種子`, `Unlock ${crop} seeds`);
+      }
+      if (text === '升级为成熟岛屿外观') return localizedText('升级为成熟岛屿外观', '升級為成熟島嶼外觀', 'Unlock mature island look');
+      if (text === '升级奖励资源包') return localizedText('升级奖励资源包', '升級獎勵資源包', 'Upgrade reward bundle');
+
+      return text;
     }
 
     function getPlotUnlockLevel(index) {
@@ -6837,20 +6970,42 @@ if (typeof document !== 'undefined') {
         elements.dailyTaskProgress.textContent = `${completedCount}/${tasks.length}`;
       }
       if (!elements.dailyTaskList) return;
+
+      const dailyTextMap = {
+        'plant-twice': {
+          title: localizedText('种植 2 次作物', '種植 2 次作物', 'Plant 2 crops'),
+          desc: localizedText('今天先让岛屿开始运转。', '今天先讓島嶼開始運轉。', 'Get your island running today.')
+        },
+        'harvest-once': {
+          title: localizedText('收获 1 次成熟作物', '收穫 1 次成熟作物', 'Harvest 1 ripe crop'),
+          desc: localizedText('亲手完成一次完整种植循环。', '親手完成一次完整種植循環。', 'Complete a full plant→grow→harvest loop.')
+        },
+        'social-once': {
+          title: localizedText('完成 1 次好友互动', '完成 1 次好友互動', 'Do 1 friend interaction'),
+          desc: localizedText('帮助好友或赠送礼物都算完成。', '幫助好友或贈送禮物都算完成。', 'Help water, steal, or gift.')
+        }
+      };
+      const rewardLabel = localizedText('奖励：', '獎勵：', 'Rewards: ');
+      const claimText = localizedText('领取', '領取', 'Claim');
+      const claimedText = localizedText('已领取', '已領取', 'Claimed');
+
       elements.dailyTaskList.innerHTML = tasks.map((task) => {
         const progress = Math.min(100, Math.round((Number(task.progress || 0) / Number(task.target || 1)) * 100));
         const isComplete = Number(task.progress || 0) >= Number(task.target || 0);
+        const mapped = dailyTextMap[task.id];
+        const title = mapped ? mapped.title : task.title;
+        const desc = mapped ? mapped.desc : task.description;
         return `
           <article class="system-item ${isComplete ? 'is-complete' : ''} ${task.claimed ? 'is-claimed' : ''}">
             <div class="system-item-top">
-              <span class="system-item-title">${escapeHtml(task.title)}</span>
+              <span class="system-item-title">${escapeHtml(title)}</span>
               <span class="gift-chip">${task.progress}/${task.target}</span>
             </div>
-            <div class="system-item-meta">${escapeHtml(task.description)}</div>
+            <div class="system-item-meta">${escapeHtml(desc)}</div>
             <div class="system-progress"><div class="system-progress-fill" style="width:${progress}%"></div></div>
             <div class="system-action-row">
-              <span class="system-reward">奖励：${task.rewards?.coins ? `💰${task.rewards.coins} ` : ''}${task.rewards?.water ? `💧${task.rewards.water} ` : ''}${task.rewards?.sunlight ? `☀️${task.rewards.sunlight} ` : ''}+${task.rewards?.xp || 0} XP</span>
-              <button class="system-small-btn" type="button" data-claim-task="${task.id}" ${(!isComplete || task.claimed) ? 'disabled' : ''}>${task.claimed ? '已领取' : '领取'}</button>
+              <span class="system-reward">${escapeHtml(rewardLabel)}${task.rewards?.coins ? `💰${task.rewards.coins} ` : ''}${task.rewards?.water ? `💧${task.rewards.water} ` : ''}${task.rewards?.sunlight ? `☀️${task.rewards.sunlight} ` : ''}+${task.rewards?.xp || 0} XP</span>
+              <button class="system-small-btn" type="button" data-claim-task="${task.id}" ${(!isComplete || task.claimed) ? 'disabled' : ''}>${escapeHtml(task.claimed ? claimedText : claimText)}</button>
             </div>
           </article>
         `;
@@ -6861,27 +7016,57 @@ if (typeof document !== 'undefined') {
       const orders = islandState.orderBoard?.orders || [];
       const pendingCount = orders.filter((order) => !order.claimed).length;
       if (elements.orderBoardStatus) {
-        elements.orderBoardStatus.textContent = pendingCount ? `${pendingCount} 单进行中` : '已清空';
+        elements.orderBoardStatus.textContent = pendingCount
+          ? localizedText(`${pendingCount} 单进行中`, `${pendingCount} 單進行中`, `${pendingCount} active`)
+          : localizedText('已清空', '已清空', 'Cleared');
       }
       if (!elements.orderBoardList) return;
+
+      const orderTextMap = {
+        'starter-order': {
+          title: localizedText('新鲜沙拉订单', '新鮮沙拉訂單', 'Fresh salad order'),
+          desc: localizedText('提交 1 个番茄和 1 个胡萝卜', '提交 1 個番茄和 1 個胡蘿蔔', 'Submit 1 tomato and 1 carrot')
+        },
+        'sweet-order': {
+          title: localizedText('甜点拼盘订单', '甜點拼盤訂單', 'Dessert platter order'),
+          desc: localizedText('提交 2 个草莓，等级不足时会保留到解锁后再完成', '提交 2 個草莓，等級不足時會保留到解鎖後再完成', 'Submit 2 strawberries (kept until you unlock them)')
+        }
+      };
+      const cropNameKeyMap = {
+        tomato: 'fruitTomato',
+        strawberry: 'fruitStrawberry',
+        carrot: 'fruitCarrot',
+        apple: 'fruitApple',
+        watermelon: 'fruitWatermelon'
+      };
+      const rewardLabel = localizedText('奖励：', '獎勵：', 'Rewards: ');
+      const badgeDone = localizedText('完成', '完成', 'Done');
+      const badgeOrder = localizedText('订单', '訂單', 'Order');
+      const submitText = localizedText('提交', '提交', 'Submit');
+      const doneText = localizedText('已完成', '已完成', 'Done');
+
       elements.orderBoardList.innerHTML = orders.map((order) => {
         const canClaim = Object.entries(order.needs || {}).every(([cropType, amount]) => Number(islandState.inventory.harvested[cropType] || 0) >= Number(amount));
         const requirementText = Object.entries(order.needs || {}).map(([cropType, amount]) => {
           const crop = IslandGardenModule.CROP_TYPES[cropType];
+          const cropName = core.t(language, cropNameKeyMap[cropType] || 'fruitTomato') || crop.name;
           const current = Number(islandState.inventory.harvested[cropType] || 0);
-          return `${crop.icon} ${crop.name} ${current}/${amount}`;
+          return `${crop.icon} ${cropName} ${current}/${amount}`;
         }).join(' · ');
+        const mapped = orderTextMap[order.id];
+        const title = mapped ? mapped.title : order.title;
+        const desc = mapped ? mapped.desc : order.description;
         return `
           <article class="system-item ${canClaim ? 'is-complete' : ''} ${order.claimed ? 'is-claimed' : ''}">
             <div class="system-item-top">
-              <span class="system-item-title">${escapeHtml(order.title)}</span>
-              <span class="gift-chip">${order.claimed ? '完成' : '订单'}</span>
+              <span class="system-item-title">${escapeHtml(title)}</span>
+              <span class="gift-chip">${escapeHtml(order.claimed ? badgeDone : badgeOrder)}</span>
             </div>
-            <div class="system-item-meta">${escapeHtml(order.description)}</div>
+            <div class="system-item-meta">${escapeHtml(desc)}</div>
             <div class="system-item-meta">${escapeHtml(requirementText)}</div>
             <div class="system-action-row">
-              <span class="system-reward">奖励：💰${order.rewards?.coins || 0} ${order.rewards?.water ? `· 💧${order.rewards.water}` : ''} +${order.rewards?.xp || 0} XP</span>
-              <button class="system-small-btn" type="button" data-claim-order="${order.id}" ${(!canClaim || order.claimed) ? 'disabled' : ''}>${order.claimed ? '已完成' : '提交'}</button>
+              <span class="system-reward">${escapeHtml(rewardLabel)}💰${order.rewards?.coins || 0} ${order.rewards?.water ? `· 💧${order.rewards.water}` : ''} +${order.rewards?.xp || 0} XP</span>
+              <button class="system-small-btn" type="button" data-claim-order="${order.id}" ${(!canClaim || order.claimed) ? 'disabled' : ''}>${escapeHtml(order.claimed ? doneText : submitText)}</button>
             </div>
           </article>
         `;
@@ -6911,19 +7096,19 @@ if (typeof document !== 'undefined') {
 
     const GUIDE_STEPS = [
       {
-        title: '先种下第一块地',
-        body: '选择右侧的“种植”工具，再点击农田地块。每次种植都会推进每日任务，也会让岛屿开始积累成长节奏。',
-        note: '提示：从番茄或胡萝卜开始最容易快速看到成果。'
+        title: localizedText('先种下第一块地', '先種下第一塊地', 'Plant your first plot'),
+        body: localizedText('选择右侧的“种植”工具，再点击农田地块。每次种植都会推进每日任务，也会让岛屿开始积累成长节奏。', '選擇右側的「種植」工具，再點擊農田地塊。每次種植都會推進每日任務，也會讓島嶼開始累積成長節奏。', 'Select “Plant”, then click a farm plot. Planting advances daily tasks and starts your growth loop.'),
+        note: localizedText('提示：从番茄或胡萝卜开始最容易快速看到成果。', '提示：從番茄或胡蘿蔔開始最容易快速看到成果。', 'Tip: tomato or carrot is the quickest to see results.')
       },
       {
-        title: '通过建设推动升级',
-        body: '浇水、阳光照射、收获和装饰都会积累 Island XP。达到经验和条件后，再手动点击“升级岛屿”完成扩张。',
-        note: '提示：升级不仅涨等级，还会解锁新地块、装饰位和更高级种子。'
+        title: localizedText('通过建设推动升级', '透過建設推動升級', 'Build to upgrade'),
+        body: localizedText('浇水、阳光照射、收获和装饰都会积累 Island XP。达到经验和条件后，再手动点击“升级岛屿”完成扩张。', '澆水、陽光照射、收穫和裝飾都會累積 Island XP。達到經驗和條件後，再手動點擊「升級島嶼」完成擴張。', 'Watering, sunlight, harvesting, and decorating all grant Island XP. When requirements are met, click “Upgrade island”.'),
+        note: localizedText('提示：升级不仅涨等级，还会解锁新地块、装饰位和更高级种子。', '提示：升級不僅漲等級，還會解鎖新地塊、裝飾位和更高級種子。', 'Tip: upgrades unlock more plots, decoration slots, and better seeds.')
       },
       {
-        title: '每天回来完成循环',
-        body: '每日任务、岛屿订单、宠物加成和好友互动会形成一条完整成长线。先把今天的任务做完，再决定下一步扩建方向。',
-        note: '提示：订单能消耗收获物，好友互动和宠物状态会影响经营收益。'
+        title: localizedText('每天回来完成循环', '每天回來完成循環', 'Come back daily'),
+        body: localizedText('每日任务、岛屿订单、宠物加成和好友互动会形成一条完整成长线。先把今天的任务做完，再决定下一步扩建方向。', '每日任務、島嶼訂單、寵物加成和好友互動會形成一條完整成長線。先把今天的任務做完，再決定下一步擴建方向。', 'Daily tasks, orders, pet bonuses, and friend interactions form a growth loop. Finish today’s tasks, then decide your next build.'),
+        note: localizedText('提示：订单能消耗收获物，好友互动和宠物状态会影响经营收益。', '提示：訂單能消耗收穫物，好友互動和寵物狀態會影響經營收益。', 'Tip: orders consume harvest items; friend and pet status affect rewards.')
       }
     ];
 
@@ -6931,7 +7116,11 @@ if (typeof document !== 'undefined') {
       const step = GUIDE_STEPS[stepIndex] || GUIDE_STEPS[0];
       currentGuideStep = stepIndex;
       if (elements.islandGuideLead) {
-        elements.islandGuideLead.textContent = `第 ${stepIndex + 1} 步，共 ${GUIDE_STEPS.length} 步。`;
+        elements.islandGuideLead.textContent = localizedText(
+          `第 ${stepIndex + 1} 步，共 ${GUIDE_STEPS.length} 步。`,
+          `第 ${stepIndex + 1} 步，共 ${GUIDE_STEPS.length} 步。`,
+          `Step ${stepIndex + 1} of ${GUIDE_STEPS.length}`
+        );
       }
       if (elements.islandGuideCard) {
         elements.islandGuideCard.innerHTML = `
@@ -6941,7 +7130,9 @@ if (typeof document !== 'undefined') {
         `;
       }
       if (elements.nextIslandGuide) {
-        elements.nextIslandGuide.textContent = stepIndex === GUIDE_STEPS.length - 1 ? '开始建设' : '下一步';
+        elements.nextIslandGuide.textContent = stepIndex === GUIDE_STEPS.length - 1
+          ? localizedText('开始建设', '開始建設', 'Start building')
+          : localizedText('下一步', '下一步', 'Next');
       }
       document.querySelectorAll('.guide-dot').forEach((dot, index) => {
         dot.classList.toggle('active', index === stepIndex);
@@ -6976,13 +7167,24 @@ if (typeof document !== 'undefined') {
       selectedDecorationSlot = slotIndex;
       const info = IslandGardenModule.DECORATION_TYPES[decoration.type];
       const flipped = normalizeDecorationFlip(decoration.flipped ?? decoration.rotation);
+      const decorationNameMap = {
+        fence: core.t(language, 'decorFence'),
+        fountain: core.t(language, 'decorFountain'),
+        bench: core.t(language, 'decorBench'),
+        lamp: core.t(language, 'decorLamp'),
+        flower: core.t(language, 'decorFlower'),
+        statue: core.t(language, 'decorStatue'),
+        pond: core.t(language, 'decorPond'),
+        bridge: core.t(language, 'decorBridge')
+      };
+      const decorationName = decorationNameMap[decoration.type] || info?.name || decoration.type;
       if (elements.decorationManageCurrent) {
         elements.decorationManageCurrent.innerHTML = `
           <div class="decoration-current-card">
             <div class="decoration-current-icon">${getDecorationVisualMarkup(decoration.type, info, 'decoration-current-visual', flipped)}</div>
-            <div class="decoration-current-name">${escapeHtml(info?.name || decoration.type)}</div>
-            <div class="decoration-direction-meta">当前方向：${escapeHtml(getDecorationDirectionLabel(flipped))}</div>
-            <div class="decoration-current-meta">点击“去商店替换”后，新的装饰会直接覆盖当前槽位，不需要先手动清空。</div>
+            <div class="decoration-current-name">${escapeHtml(decorationName)}</div>
+            <div class="decoration-direction-meta">${escapeHtml(localizedText('当前方向：', '當前方向：', 'Direction: '))}${escapeHtml(getDecorationDirectionLabel(flipped))}</div>
+            <div class="decoration-current-meta">${escapeHtml(localizedText('点击“去商店替换”后，新的装饰会直接覆盖当前槽位，不需要先手动清空。', '點擊「去商店替換」後，新的裝飾會直接覆蓋當前槽位，不需要先手動清空。', 'When you choose “Replace in shop”, the new decoration will overwrite this slot directly.'))}</div>
           </div>
         `;
       }
@@ -7007,11 +7209,23 @@ if (typeof document !== 'undefined') {
       const isReady = IslandGardenModule.canUpgradeIsland(islandState);
 
       if (!rule) {
-        if (elements.upgradeTitle) elements.upgradeTitle.textContent = `Lv.${currentLevel} · 已达到最高等级`;
-        if (elements.upgradeHint) elements.upgradeHint.textContent = '你的 Pomoland 已经成长为完整岛屿，可以继续经营与收集资源。';
+        if (elements.upgradeTitle) {
+          elements.upgradeTitle.textContent = localizedText(
+            `Lv.${currentLevel} · 已达到最高等级`,
+            `Lv.${currentLevel} · 已達到最高等級`,
+            `Lv.${currentLevel} · Max level reached`
+          );
+        }
+        if (elements.upgradeHint) {
+          elements.upgradeHint.textContent = localizedText(
+            '你的 Pomoland 已经成长为完整岛屿，可以继续经营与收集资源。',
+            '你的 Pomoland 已經成長為完整島嶼，可以繼續經營與收集資源。',
+            'Your Pomoland is fully grown. Keep managing and collecting resources!'
+          );
+        }
         if (elements.islandXpText) elements.islandXpText.textContent = 'MAX';
         if (elements.upgradeRequirementList) {
-          elements.upgradeRequirementList.innerHTML = '<span class="upgrade-chip is-met">已解锁全部等级内容</span>';
+          elements.upgradeRequirementList.innerHTML = `<span class="upgrade-chip is-met">${escapeHtml(localizedText('已解锁全部等级内容', '已解鎖全部等級內容', 'All levels unlocked'))}</span>`;
         }
         if (elements.upgradeRewardPreview) {
         elements.upgradeRewardPreview.innerHTML = `<span class="reward-chip">${escapeHtml(localizedText('继续专注可获得更多经营资源', '繼續專注可獲得更多經營資源', 'Keep focusing to earn more building resources.'))}</span>`;
@@ -7049,7 +7263,7 @@ if (typeof document !== 'undefined') {
       }
       if (elements.upgradeRewardPreview) {
         elements.upgradeRewardPreview.innerHTML = IslandGardenModule.getUpgradeRewards(rule)
-          .map((item) => `<span class="reward-chip">${escapeHtml(item)}</span>`)
+          .map((item) => `<span class="reward-chip">${escapeHtml(translateUpgradeRewardItem(item))}</span>`)
           .join('');
       }
       if (elements.upgradeIslandBtn) {
@@ -7086,7 +7300,7 @@ if (typeof document !== 'undefined') {
         elements.islandUpgradeSummary.innerHTML = `<div class="upgrade-modal-list">${summaryItems.map((item) => `<div class="upgrade-modal-item">${escapeHtml(item)}</div>`).join('')}</div>`;
       }
       if (elements.islandUpgradeRewards) {
-        elements.islandUpgradeRewards.innerHTML = `<div class="upgrade-modal-list">${(result.rewards || []).map((item) => `<div class="upgrade-modal-item">${escapeHtml(item)}</div>`).join('')}</div>`;
+        elements.islandUpgradeRewards.innerHTML = `<div class="upgrade-modal-list">${(result.rewards || []).map((item) => `<div class="upgrade-modal-item">${escapeHtml(translateUpgradeRewardItem(item))}</div>`).join('')}</div>`;
       }
       if (elements.islandUpgradePanel) {
         elements.islandUpgradePanel.classList.add('is-celebrating');
@@ -7317,11 +7531,27 @@ if (typeof document !== 'undefined') {
       const petToShow = activePet || islandState.pets.find(p => p.unlocked);
       if (!petToShow) return;
       const petType = IslandGardenModule.PET_TYPES[petToShow.type];
-      const petEffect = IslandGardenModule.getActivePetEffect(islandState);
       const petHappiness = document.querySelector('#petHappiness');
       const petHunger = document.querySelector('#petHunger');
       const petIcon = document.querySelector('#petIcon');
       const petName = document.querySelector('#petName');
+
+      const petNameMap = {
+        rabbit: localizedText('小兔子', '小兔子', 'Rabbit'),
+        cat: localizedText('猫咪', '貓咪', 'Cat'),
+        dog: localizedText('小狗', '小狗', 'Dog'),
+        bird: localizedText('小鸟', '小鳥', 'Bird')
+      };
+      const petEffectMap = {
+        rabbit: localizedText('作物生长速度 +12%', '作物生長速度 +12%', 'Crop growth +12%'),
+        cat: localizedText('收获金币 +20%', '收穫金幣 +20%', 'Harvest coins +20%'),
+        dog: localizedText('好友互动额外 +10 金币', '好友互動額外 +10 金幣', 'Friend interactions +10 coins'),
+        bird: localizedText('完成订单额外 +8 XP', '完成訂單額外 +8 XP', 'Orders +8 XP')
+      };
+      const hoursSinceFed = (Date.now() - petToShow.lastFedAt) / (60 * 60 * 1000);
+      const feedIntervalHours = petType.feedInterval / (60 * 60 * 1000);
+      const hungry = hoursSinceFed > feedIntervalHours;
+      const needsCare = (petToShow.happiness || 0) < 35 || hungry;
 
 
       // Update pet sprite and name
@@ -7329,10 +7559,12 @@ if (typeof document !== 'undefined') {
         petIcon.textContent = petType.icon;
       }
       if (petName) {
-        petName.textContent = petToShow.name;
+        petName.textContent = petNameMap[petToShow.type] || petToShow.name;
       }
       if (elements.petBonusLabel) {
-        elements.petBonusLabel.textContent = petEffect.label || core.t(language, 'petBonusLocked');
+        elements.petBonusLabel.textContent = needsCare
+          ? localizedText('需要照料后才会提供加成', '需要照料後才會提供加成', 'Needs care to activate bonuses')
+          : (petEffectMap[petToShow.type] || core.t(language, 'petBonusLocked'));
       }
 
       // Update happiness bar
@@ -7342,9 +7574,7 @@ if (typeof document !== 'undefined') {
 
       // Update hunger bar
       if (petHunger) {
-        const hoursSinceFed = (Date.now() - petToShow.lastFedAt) / (60 * 60 * 1000);
-        const feedInterval = petType.feedInterval / (60 * 60 * 1000);
-        const hungerPercent = Math.min(100, (hoursSinceFed / feedInterval) * 100);
+        const hungerPercent = Math.min(100, (hoursSinceFed / feedIntervalHours) * 100);
         petHunger.style.width = `${hungerPercent}%`;
       }
 
@@ -7867,7 +8097,15 @@ if (typeof document !== 'undefined') {
         '已拒绝': localizedText('已拒绝', '已拒絕', 'Request rejected.'),
         '已退出登录': localizedText('已退出登录', '已退出登入', 'Logged out.'),
         '昵称已更新': localizedText('昵称已更新', '暱稱已更新', 'Nickname updated.'),
-        '已清空本地缓存（云端存档不受影响）': localizedText('已清空本地缓存（云端存档不受影响）', '已清空本地快取（雲端存檔不受影響）', 'Local cache cleared (cloud save unchanged).')
+        '已清空本地缓存（云端存档不受影响）': localizedText('已清空本地缓存（云端存档不受影响）', '已清空本地快取（雲端存檔不受影響）', 'Local cache cleared (cloud save unchanged).'),
+        '已切换为左右翻转': localizedText('已切换为左右翻转', '已切換為左右翻轉', 'Switched to flipped direction.'),
+        '已恢复默认方向': localizedText('已恢复默认方向', '已恢復預設方向', 'Restored default direction.'),
+        '该装饰位尚未解锁': localizedText('该装饰位尚未解锁', '該裝飾位尚未解鎖', 'This decoration slot is locked.'),
+        '当前装饰位已满，升级岛屿可解锁更多位置': localizedText('当前装饰位已满，升级岛屿可解锁更多位置', '當前裝飾位已滿，升級島嶼可解鎖更多位置', 'Decoration slots are full. Upgrade the island to unlock more.'),
+        '该装饰位没有可移除的装饰': localizedText('该装饰位没有可移除的装饰', '該裝飾位沒有可移除的裝飾', 'Nothing to remove in this slot.'),
+        '已更新装饰位置': localizedText('已更新装饰位置', '已更新裝飾位置', 'Decoration position updated.'),
+        '找不到订单': localizedText('找不到订单', '找不到訂單', 'Order not found.'),
+        '该订单已完成': localizedText('该订单已完成', '該訂單已完成', 'This order is already completed.')
       };
       if (exactMap[text]) return exactMap[text];
 
@@ -7914,6 +8152,28 @@ if (typeof document !== 'undefined') {
           `升级成功！Pomoland 已升到 Lv.${lv}`,
           `升級成功！Pomoland 已升到 Lv.${lv}`,
           `Upgrade complete! Pomoland is now Lv.${lv}.`
+        );
+      }
+
+      // e.g. "当前等级只能使用前 4 块农田"
+      const plotLimit = text.match(/^当前等级只能使用前\s*(\d+)\s*块农田$/);
+      if (plotLimit) {
+        const n = plotLimit[1];
+        return localizedText(
+          `当前等级只能使用前 ${n} 块农田`,
+          `當前等級只能使用前 ${n} 塊農田`,
+          `At your current level, you can only use the first ${n} plot(s).`
+        );
+      }
+
+      // e.g. "订单完成：新鲜沙拉订单"
+      const orderDone = text.match(/^订单完成：(.*)$/);
+      if (orderDone) {
+        const title = orderDone[1];
+        return localizedText(
+          `订单完成：${title}`,
+          `訂單完成：${title}`,
+          `Order completed: ${title}`
         );
       }
 

@@ -10,15 +10,15 @@
   <div class="auth-shell" id="authShell">
     <div class="auth-form-container">
       <div class="auth-form">
-        <p class="eyebrow">Welcome</p>
+        <p class="eyebrow" data-i18n="authWelcome">Welcome</p>
         <h2 id="authTitle">登录</h2>
-        <p style="color: var(--muted); margin-bottom: 24px;">使用 8 位数字 UID + 密码登录（或注册新账号）。</p>
+        <p style="color: var(--muted); margin-bottom: 24px;" data-i18n="authLead">使用 8 位数字 UID + 密码登录（或注册新账号）。</p>
 
-        <label for="uidInput" style="display:block; margin-bottom: 8px; font-weight: bold; color: var(--muted);">UID（8 位数字）</label>
-        <input type="text" id="uidInput" inputmode="numeric" maxlength="8" placeholder="例如：12345678" style="width: 100%; padding: 14px; border: 1px solid var(--line); border-radius: 8px; margin-bottom: 16px; font-size: 16px; outline: none;" />
+        <label for="uidInput" style="display:block; margin-bottom: 8px; font-weight: bold; color: var(--muted);" data-i18n="uidLabel">UID（8 位数字）</label>
+        <input type="text" id="uidInput" inputmode="numeric" maxlength="8" data-i18n-placeholder="uidPlaceholder" placeholder="例如：12345678" style="width: 100%; padding: 14px; border: 1px solid var(--line); border-radius: 8px; margin-bottom: 16px; font-size: 16px; outline: none;" />
 
-        <label for="passwordInput" style="display:block; margin-bottom: 8px; font-weight: bold; color: var(--muted);">密码</label>
-        <input type="password" id="passwordInput" placeholder="至少 4 位" style="width: 100%; padding: 14px; border: 1px solid var(--line); border-radius: 8px; margin-bottom: 12px; font-size: 16px; outline: none;" />
+        <label for="passwordInput" style="display:block; margin-bottom: 8px; font-weight: bold; color: var(--muted);" data-i18n="passwordLabel">密码</label>
+        <input type="password" id="passwordInput" data-i18n-placeholder="passwordPlaceholder" placeholder="至少 4 位" style="width: 100%; padding: 14px; border: 1px solid var(--line); border-radius: 8px; margin-bottom: 12px; font-size: 16px; outline: none;" />
 
         <div id="authError" style="color:#c62828; font-size: 13px; min-height: 18px; margin-bottom: 16px;"></div>
 
@@ -264,8 +264,8 @@
               <div class="custom-duration-card">
                 <div class="custom-duration-copy">
                   <span class="custom-duration-badge" id="customDurationBadge">Timer Studio</span>
-                  <strong id="customDurationTitle">自定义专注时间</strong>
-                  <p id="customDurationHint">拖动滑块或输入分钟数，做一个更适合自己的番茄钟。</p>
+                  <strong id="customDurationTitle" data-i18n="customDurationTitle">自定义专注时间</strong>
+                  <p id="customDurationHint" data-i18n="customDurationHint">拖动滑块或输入分钟数，做一个更适合自己的番茄钟。</p>
                 </div>
                 <div class="custom-duration-controls">
                   <input type="range" id="customDurationRange" min="5" max="120" step="5" value="25" />
@@ -275,7 +275,7 @@
                     <span id="customDurationUnit">min</span>
                     <button class="duration-stepper" type="button" id="increaseCustomDuration" aria-label="Increase duration">+</button>
                   </div>
-                  <button class="small-button secondary" type="button" id="applyCustomDuration">应用自定义时长</button>
+                  <button class="small-button secondary" type="button" id="applyCustomDuration" data-i18n="applyCustomDuration">应用自定义时长</button>
                 </div>
               </div>
             </div>
@@ -295,8 +295,8 @@
           <div class="focus-side-visual" id="focusScene" aria-label="Focus island animation">
             <div class="focus-scene-copy">
               <p class="eyebrow" id="focusSceneEyebrow">Tomato Mood</p>
-              <h3 id="focusSceneTitle">让番茄陪你一起长大</h3>
-              <p id="focusSceneMessage">开始专注后，番茄会随着倒计时慢慢成熟。坚持完成，会收获超可爱的奖励时刻。</p>
+              <h3 id="focusSceneTitle" data-i18n="focusSceneTitle">让番茄陪你一起长大</h3>
+              <p id="focusSceneMessage" data-i18n="focusSceneMessage">开始专注后，番茄会随着倒计时慢慢成熟。坚持完成，会收获超可爱的奖励时刻。</p>
             </div>
             <div class="mini-island" id="miniIsland">
               <div class="mini-sun"></div>
@@ -320,9 +320,9 @@
                 <span></span>
               </div>
               <div class="mini-reward-bursts">
-                <span>+水滴</span>
-                <span>+金币</span>
-                <span>+阳光</span>
+                <span data-i18n="bonusPlusWater">+水滴</span>
+                <span data-i18n="bonusPlusCoins">+金币</span>
+                <span data-i18n="bonusPlusSunlight">+阳光</span>
               </div>
             </div>
           </div>
@@ -782,7 +782,7 @@
         </article>
         <article>
           <span data-i18n="visitMoodLabel">岛屿状态</span>
-          <strong id="visitMood">新码头刚建好，适合参观</strong>
+          <strong id="visitMood" data-i18n="visitMoodSample">新码头刚建好，适合参观</strong>
         </article>
       </div>
       <div class="visit-resources">
@@ -801,7 +801,7 @@
       <p class="eyebrow" data-i18n="addFriendTitle">添加好友</p>
       <h2 data-i18n="searchFriend">搜索好友</h2>
       <div class="search-box">
-        <input type="text" id="friendSearchInput" placeholder="输入好友昵称或ID" />
+        <input type="text" id="friendSearchInput" data-i18n-placeholder="friendSearchPlaceholder" placeholder="输入好友昵称或ID" />
         <button class="secondary-button" type="button" id="searchFriendBtn" data-i18n="searchBtn">搜索</button>
       </div>
       <div class="search-results" id="searchResults"></div>

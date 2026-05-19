@@ -625,25 +625,69 @@ app.post('/api/generate-tasks', async (req, res) => {
       return res.status(503).json({ error: 'DeepSeek API key is not configured on the server.' });
     }
 
-    // Prompt for DeepSeek API
-    const prompt = `你是一个可爱且充满同情心的‘虚拟宠物导师’。你的目标是把用户的大目标拆解成‘微行动’。
-请将用户的大目标 "${goal}" 拆解成 4 个具体、可执行的“微行动”任务。每个任务都应包含 taskName (有趣的名字), duration (分钟), goldReward (金币数)。
+    const targetLanguageLabel = language === 'en'
+      ? 'English'
+      : (language === 'zh-HK' ? '繁體中文（香港）' : '简体中文');
+
+    const systemPrompt = language === 'en'
+      ? `You are a cute and empathetic "virtual pet coach". Your job is to break the user's long-term goal into small, doable micro-actions.
+Return ONLY valid JSON (no markdown, no extra text). JSON must contain: { "tasks": [...], "encouragement": "..." }.`
+      : (language === 'zh-HK'
+        ? `你是一個可愛且充滿同理心的「虛擬寵物導師」。你的目標是把用戶的大目標拆解成「微行動」。
+請只返回有效 JSON（不要 markdown、不要額外文字）。JSON 必須包含：{ "tasks": [...], "encouragement": "..." }。`
+        : `你是一个可爱且充满同情心的“虚拟宠物导师”。你的目标是把用户的大目标拆解成“微行动”。
+请只返回有效 JSON（不要 markdown、不要额外文字）。JSON 必须包含：{ "tasks": [...], "encouragement": "..." }。`);
+
+    // Prompt for DeepSeek API (language-aware)
+    const prompt = language === 'en'
+      ? `Break the user's goal "${goal}" into 4 concrete, doable micro-action tasks.
+Each task must include: taskName (fun name), duration (minutes, integer), goldReward (coins, integer).
+Also include one short encouragement sentence from the pet coach as "encouragement".
+IMPORTANT: taskName and encouragement must be written in ${targetLanguageLabel}.
+Return JSON only. Example:
+{
+  "tasks": [
+    { "taskName": "Warm-up micro step", "duration": 30, "goldReward": 10 },
+    { "taskName": "Practice sprint", "duration": 45, "goldReward": 15 },
+    { "taskName": "Deep focus block", "duration": 60, "goldReward": 20 },
+    { "taskName": "Recharge", "duration": 15, "goldReward": 5 }
+  ],
+  "encouragement": "You’ve got this—one step at a time!"
+}`
+      : (language === 'zh-HK'
+        ? `請將用戶的大目標「${goal}」拆解成 4 個具體、可執行的「微行動」任務。
+每個任務都要包含：taskName（有趣的名字）、duration（分鐘，整數）、goldReward（金幣數，整數）。
+另外請提供一句寵物導師給用戶的鼓勵話語 encouragement。
+重要：taskName 和 encouragement 必須使用 ${targetLanguageLabel} 書寫；JSON 的 key 保持英文不變。
+請以純 JSON 格式返回，例如：
+{
+  "tasks": [
+    { "taskName": "學習計劃第一步", "duration": 30, "goldReward": 10 },
+    { "taskName": "資料整理", "duration": 45, "goldReward": 15 },
+    { "taskName": "專注衝刺", "duration": 60, "goldReward": 20 },
+    { "taskName": "休息放鬆", "duration": 15, "goldReward": 5 }
+  ],
+  "encouragement": "你太棒了！一步步來，Pomoland 會因你的努力而更繁榮！"
+}`
+        : `请将用户的大目标 "${goal}" 拆解成 4 个具体、可执行的“微行动”任务。
+每个任务都应包含 taskName（有趣的名字）、duration（分钟，整数）、goldReward（金币数，整数）。
 此外，请提供一句宠物导师给用户的鼓励话语 encouragement。
+重要：taskName 和 encouragement 必须使用 ${targetLanguageLabel} 书写；JSON 的 key 保持英文不变。
 请以纯 JSON 格式返回，例如：
 {
   "tasks": [
     { "taskName": "学习计划第一步", "duration": 30, "goldReward": 10 },
-    { "taskName": "资料收集", "duration": 45, "goldReward": 15 },
-    { "taskName": "初步思考", "duration": 60, "goldReward": 20 },
+    { "taskName": "资料整理", "duration": 45, "goldReward": 15 },
+    { "taskName": "专注冲刺", "duration": 60, "goldReward": 20 },
     { "taskName": "休息放松", "duration": 15, "goldReward": 5 }
   ],
   "encouragement": "你太棒了！一步步来，Pomoland 会因你的努力而更加繁荣！"
-}`;
+}`);
 
     const chatCompletion = await openai.chat.completions.create({
       model: 'deepseek-chat', // 使用 deepseek-chat 模型
       messages: [
-        { role: 'system', content: '你是一个可爱且充满同情心的‘虚拟宠物导师’。你的目标是把用户的大目标拆解成‘微行动’。请以纯 JSON 格式返回结果，包含 tasks 数组和 encouragement 字符串。' },
+        { role: 'system', content: systemPrompt },
         { role: 'user', content: prompt }
       ],
       response_format: { type: "json_object" }, // Request JSON output
@@ -680,13 +724,29 @@ app.post('/api/get-planning-steps', async (req, res) => {
 
     // Simulate planning steps for now, as the current app.js doesn't fetch them from AI
     // If needed, a similar prompt can be created for Gemini API
-    const planningSteps = [
-      { id: 'analyze', text: 'Analyzing the goal and timeline...' },
-      { id: 'research', text: 'Researching preparation materials and skill areas...' },
-      { id: 'breakdown', text: 'Breaking the goal into executable daily tasks...' },
-      { id: 'duration', text: 'Estimating focus duration for each task...' },
-      { id: 'schedule', text: 'Generating today\'s Focus plan...' }
-    ];
+    const planningSteps = language === 'en'
+      ? [
+        { id: 'analyze', text: 'Analyzing the goal and timeline...' },
+        { id: 'research', text: 'Researching preparation materials and skill areas...' },
+        { id: 'breakdown', text: 'Breaking the goal into executable daily tasks...' },
+        { id: 'duration', text: 'Estimating focus duration for each task...' },
+        { id: 'schedule', text: 'Generating today\'s Focus plan...' }
+      ]
+      : (language === 'zh-HK'
+        ? [
+          { id: 'analyze', text: '正在分析目標與時間安排...' },
+          { id: 'research', text: '正在查找相關資料與能力模組...' },
+          { id: 'breakdown', text: '正在拆解成可執行的每日任務...' },
+          { id: 'duration', text: '正在估算每個任務的專注時長...' },
+          { id: 'schedule', text: '正在生成今日 Focus 計劃...' }
+        ]
+        : [
+          { id: 'analyze', text: '正在分析目标和剩余时间...' },
+          { id: 'research', text: '正在查询资料和能力模块...' },
+          { id: 'breakdown', text: '正在拆解可执行的每日任务...' },
+          { id: 'duration', text: '正在估算每个任务的专注时长...' },
+          { id: 'schedule', text: '正在生成今日 Focus 计划...' }
+        ]);
 
     res.json(planningSteps);
   } catch (error) {
