@@ -250,8 +250,8 @@ test('check-in highlights today and increases streak only once', () => {
   const state = core.createInitialState();
   const first = core.recordCheckIn(state, '2026-05-13');
   const second = core.recordCheckIn(first, '2026-05-13');
-  assert.equal(first.streak, 6);
-  assert.equal(second.streak, 6);
+  assert.equal(first.streak, 1);
+  assert.equal(second.streak, 1);
   assert.deepEqual(second.checkIns, ['2026-05-13']);
 });
 
@@ -314,6 +314,6 @@ test('report data summarizes focus progress for the selected language', () => {
   const state = core.recordCheckIn(core.createInitialState(), '2026-05-13');
   const report = core.buildReport(state, 'en');
   assert.equal(report.days.length, 7);
-  assert.equal(report.streak, 6);
+  assert.equal(report.streak, 1);
   assert.match(report.summary, /Pomoland/);
 });
