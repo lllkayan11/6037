@@ -1087,7 +1087,7 @@ const PomolandCore = (() => {
       cropStage: 1,
       islandHydration: 0,
       petMood: 'sleepy',
-      streak: 5,
+      streak: 0,
       streakProtection: 1,
       streakShieldActive: false,
       coachStats: {
@@ -2003,7 +2003,7 @@ const SocialModule = (() => {
         id: 'current-user',
         name: '我',
         focusMinutes: state.totalFocusMinutes || 70,
-        streak: state.streak || 5,
+        streak: state.streak ?? 0,
         islandLevel: state.islandLevel || 1,
         isCurrentUser: true,
         trend: 'up'
@@ -4610,7 +4610,7 @@ if (typeof document !== 'undefined') {
       if (!state.tasks.length) {
         return {
           title: localizedText('第一步：让 AI 帮你拆任务', '第一步：讓 AI 幫你拆任務', 'Step 1: Let AI break down your goal'),
-          description: localizedText('从一个长期目标开始，生成今天的 to-do list，再进入专注模式。', '從一個長期目標開始，生成今天的 to-do list，再進入專注模式。', 'Start with one long-term goal, generate today’s to-do list, and then move into focus mode.'),
+          description: localizedText('从一个长期目标开始，生成今天的 to-do list，再进入专注模式。完成一次 Focus Mode 后领取奖励，即自动完成今日打卡。', '從一個長期目標開始，生成今天的 to-do list，再進入專注模式。完成一次 Focus Mode 後領取獎勵，即自動完成今日打卡。', 'Start with one long-term goal, generate today’s to-do list, and move into focus mode. Completing one Focus Mode and claiming the bonus checks you in automatically for today.'),
           chips: [
             localizedText('Journey 01', 'Journey 01', 'Journey 01'),
             localizedText('AI Task Planning', 'AI Task Planning', 'AI Task Planning')
@@ -4649,7 +4649,7 @@ if (typeof document !== 'undefined') {
       if (state.focusCompleted) {
         return {
           title: localizedText('第四步：领取 Bonus 并推进今日闭环', '第四步：領取 Bonus 並推進今日閉環', 'Step 4: Claim the bonus and move the journey forward'),
-          description: localizedText('奖励已经准备好。你可以先去打卡，再建设岛屿，或者直接开启下一项任务。', '獎勵已經準備好。你可以先去打卡，再建設島嶼，或者直接開啟下一項任務。', 'Your reward is ready. Check in first, build your island, or jump to the next task.'),
+          description: localizedText('奖励已经准备好。点击下方任意「领完去…」按钮即可领取奖励，同时今天的打卡会自动完成。', '獎勵已經準備好。點擊下方任意「領完去…」按鈕即可領取獎勵，同時今天的打卡會自動完成。', 'Your reward is ready. Clicking any of the "Claim and…" buttons below will claim the bonus and automatically check you in for today.'),
           chips: [
             localizedText('Journey 04', 'Journey 04', 'Journey 04'),
             localizedText('Bonus Ready', 'Bonus Ready', 'Bonus Ready')
