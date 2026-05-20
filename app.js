@@ -3774,7 +3774,7 @@ if (typeof document !== 'undefined') {
           if (payload.state.rewardState) writeStorage(STORAGE_KEYS.rewardState, payload.state.rewardState);
           if (payload.state.islandState) writeStorage(STORAGE_KEYS.islandState, payload.state.islandState);
           remoteStateUpdatedAt = Number(payload.updatedAt || 0);
-          restoreSession();
+          restoreSession(false);
           restoreIslandState();
           renderAll();
           updateIslandUI();
@@ -4097,7 +4097,7 @@ if (typeof document !== 'undefined') {
       }
     }
 
-    function restoreSession() {
+    function restoreSession(bootstrap = false) {
       state = mergeState(readStorage(STORAGE_KEYS.appState));
       language = state.language || language;
       timerState = core.syncTimerState(readStorage(STORAGE_KEYS.timerState) || core.createTimerState(selectedDuration));
@@ -4109,12 +4109,17 @@ if (typeof document !== 'undefined') {
         delete rewardReady.seeds;
       }
 
-      // Navigation rule:
+      // Navigation rule (bootstrap only):
       // - Always show the marketing landing page on first load/refresh.
       // - "Launch Demo" -> show login (if not logged in) -> after login show workspace.
       // - Logout -> back to marketing landing page.
-      state.workspaceOpen = false;
-      showHome();
+      //
+      // IMPORTANT: restoreSession() is also used as an internal "state refresh" after
+      // cloud sync / friend interactions. In those cases we must NOT jump back to home.
+      if (bootstrap) {
+        state.workspaceOpen = false;
+        showHome();
+      }
     }
 
     function showHome() {
@@ -6149,7 +6154,7 @@ if (typeof document !== 'undefined') {
           await restoreFromServerIfAny();
           await loadMeProfile();
           await refreshFriendsFromServer();
-          restoreSession();
+          restoreSession(false);
           restoreIslandState();
           renderAll();
           updateIslandUI();
@@ -6406,7 +6411,7 @@ if (typeof document !== 'undefined') {
           }
           // 刷新自己的云端存档，避免自动保存覆盖他人对你的修改
           await restoreFromServerIfAny();
-          restoreSession();
+          restoreSession(false);
           restoreIslandState();
           renderAll();
           updateIslandUI();
@@ -6862,7 +6867,7 @@ if (typeof document !== 'undefined') {
     });
 
     setAuthMode('login');
-    restoreSession();
+    restoreSession(true);
     // If already logged in, prefer restoring the latest cloud state.
     if (getAuth()) {
       window.setTimeout(async () => {
@@ -6870,7 +6875,7 @@ if (typeof document !== 'undefined') {
         await refreshFriendsFromServer();
         const restored = await restoreFromServerIfAny();
         if (restored) {
-          restoreSession();
+          restoreSession(false);
           restoreIslandState();
           renderAll();
           updateIslandUI();
