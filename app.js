@@ -3996,9 +3996,7 @@ if (typeof document !== 'undefined') {
       serverOutgoingRequests = [];
       friendsCacheLoaded = false;
       remoteStateUpdatedAt = 0;
-      elements.authShell.hidden = false;
-      elements.homeShell.hidden = true;
-      if (elements.workspace) elements.workspace.hidden = true;
+      showHome();
       closeProfile();
       showMessage('已退出登录');
     }
@@ -4111,24 +4109,39 @@ if (typeof document !== 'undefined') {
         delete rewardReady.seeds;
       }
 
-      const auth = getAuth();
-      if (!auth) {
-        // not logged in -> only show auth
-        elements.authShell.hidden = false;
-        elements.homeShell.hidden = true;
-        if (elements.workspace) elements.workspace.hidden = true;
-        return;
-      }
+      // Navigation rule:
+      // - Always show the marketing landing page on first load/refresh.
+      // - "Launch Demo" -> show login (if not logged in) -> after login show workspace.
+      // - Logout -> back to marketing landing page.
+      state.workspaceOpen = false;
+      showHome();
+    }
 
-      // logged in -> show landing OR workspace depending on state.workspaceOpen
-      elements.authShell.hidden = true;
-      // UX: always show the marketing landing page by default, even if user previously
-      // entered the demo. Use URL param ?demo=1 to auto-enter workspace when needed.
-      const params = new URLSearchParams(window.location.search || '');
-      const shouldShowWorkspace = params.get('demo') === '1';
-      state.workspaceOpen = shouldShowWorkspace;
-      elements.homeShell.hidden = shouldShowWorkspace;
-      if (elements.workspace) elements.workspace.hidden = !shouldShowWorkspace;
+    function showHome() {
+      state.workspaceOpen = false;
+      if (elements.homeShell) elements.homeShell.hidden = false;
+      if (elements.authShell) elements.authShell.hidden = true;
+      if (elements.workspace) elements.workspace.hidden = true;
+    }
+
+    function showAuth() {
+      state.workspaceOpen = false;
+      if (elements.homeShell) elements.homeShell.hidden = true;
+      if (elements.authShell) elements.authShell.hidden = false;
+      if (elements.workspace) elements.workspace.hidden = true;
+      setAuthError('');
+      // keep current authMode (login/register) so the UI matches
+      setAuthMode(authMode);
+    }
+
+    function showWorkspace() {
+      state.workspaceOpen = true;
+      if (elements.homeShell) elements.homeShell.hidden = true;
+      if (elements.authShell) elements.authShell.hidden = true;
+      if (elements.workspace) elements.workspace.hidden = false;
+      switchView('today');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      persistSession();
     }
 
     function getTaskActionLabel(task) {
@@ -4776,12 +4789,12 @@ if (typeof document !== 'undefined') {
     }
 
     function openWorkspace() {
-      state.workspaceOpen = true;
-      elements.home.hidden = true;
-      elements.workspace.hidden = false;
-      switchView('today');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      persistSession();
+      // "Launch Demo" entry
+      if (getAuth()) {
+        showWorkspace();
+      } else {
+        showAuth();
+      }
     }
 
     function switchView(view) {
@@ -6140,6 +6153,7 @@ if (typeof document !== 'undefined') {
           restoreIslandState();
           renderAll();
           updateIslandUI();
+          showWorkspace();
         } catch (error) {
           setAuthError(error.message || '登录/注册失败');
         } finally {
