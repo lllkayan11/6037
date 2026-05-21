@@ -82,6 +82,8 @@ const PomolandCore = (() => {
       agentIdle: '点击按钮后，Pomoland Agent 会展示规划过程。',
       agentTitle: 'Pomoland Agent 正在执行',
       agentComplete: '规划完成，已生成今日 Focus 任务。',
+      agentSynthesizing: 'AI 正在生成今日计划...',
+      encouragementLabel: 'AI 的鼓励语',
       agentStepAnalyze: '正在分析目标和剩余时间...',
       agentStepResearch: '正在查询备考资料和能力模块...',
       agentStepBreakdown: '正在拆解可执行的每日任务...',
@@ -400,6 +402,8 @@ const PomolandCore = (() => {
       agentIdle: '點擊按鈕後，Pomoland Agent 會展示規劃過程。',
       agentTitle: 'Pomoland Agent 正在執行',
       agentComplete: '規劃完成，已生成今日 Focus 任務。',
+      agentSynthesizing: 'AI 正在生成今日計劃...',
+      encouragementLabel: 'AI 的鼓勵語',
       agentStepAnalyze: '正在分析目標和剩餘時間...',
       agentStepResearch: '正在查詢備考資料和能力模組...',
       agentStepBreakdown: '正在拆解可執行的每日任務...',
@@ -718,6 +722,8 @@ const PomolandCore = (() => {
       agentIdle: 'Click the button to watch Pomoland Agent plan step by step.',
       agentTitle: 'Pomoland Agent is working',
       agentComplete: 'Planning complete. Today\'s Focus tasks are ready.',
+      agentSynthesizing: 'AI is composing today\'s plan...',
+      encouragementLabel: 'From your AI companion',
       agentStepAnalyze: 'Analyzing the goal and timeline...',
       agentStepResearch: 'Researching preparation materials and skill areas...',
       agentStepBreakdown: 'Breaking the goal into executable daily tasks...',
@@ -3261,6 +3267,7 @@ if (typeof document !== 'undefined') {
       goalInput: document.querySelector('#goalInput'),
       generatePlanButton: document.querySelector('#generatePlan'),
       agentProgress: document.querySelector('#agentProgress'),
+      agentEncouragement: document.querySelector('#agentEncouragement'),
       taskList: document.querySelector('#taskList'),
       coachPanel: document.querySelector('#coachPanel'),
       selectedTask: document.querySelector('#selectedTask'),
@@ -5085,18 +5092,22 @@ if (typeof document !== 'undefined') {
       `;
     }
 
-    function renderAgentSteps(steps, currentIndex, isComplete) {
+    function renderAgentSteps(steps, currentIndex, isComplete, headerText) {
       if (!elements.agentProgress) return;
       elements.agentProgress.dataset.running = isComplete ? 'false' : 'true';
+      const defaultHeader = isComplete
+        ? core.t(language, 'agentComplete')
+        : (steps[currentIndex] ? steps[currentIndex].text : '');
+      const header = headerText || defaultHeader;
       elements.agentProgress.innerHTML = `
         <div class="agent-progress-header">
           <strong>${core.t(language, 'agentTitle')}</strong>
-          <span>${isComplete ? core.t(language, 'agentComplete') : steps[currentIndex].text}</span>
+          <span>${header}</span>
         </div>
         <div class="agent-step-list">
           ${steps.map((step, index) => {
-            const status = isComplete || index < currentIndex ? 'is-done' : index === currentIndex ? 'is-current' : '';
-            return `<div class="agent-step ${status}"><span></span><p>${escapeHtml(step.text)}</p></div>`;
+            const status = isComplete || index < currentIndex ? 'is-done' : index === currentIndex ? 'is-active' : '';
+            return `<div class="agent-step ${status}"><span class="step-dot"></span><p>${escapeHtml(step.text)}</p></div>`;
           }).join('')}
         </div>
       `;
@@ -5481,6 +5492,10 @@ if (typeof document !== 'undefined') {
       state.tasks = [];
       renderTasks(); // Render empty tasks immediately
       if (elements.generatePlanButton) elements.generatePlanButton.disabled = true;
+      if (elements.agentEncouragement) {
+        elements.agentEncouragement.hidden = true;
+        elements.agentEncouragement.innerHTML = '';
+      }
 
       elements.agentProgress.dataset.running = 'true';
       elements.agentProgress.innerHTML = `
@@ -5500,6 +5515,9 @@ if (typeof document !== 'undefined') {
           if (index < planningSteps.length) {
             window.setTimeout(advance, 620);
           } else {
+            // 5 步动画跑完，进入等待 API 返回的过渡状态：steps 全部置为 done，header 显示合成中
+            renderAgentSteps(planningSteps, planningSteps.length, false, core.t(language, 'agentSynthesizing'));
+            elements.agentProgress.dataset.running = 'true';
             // All planning steps rendered, now generate tasks
             core.generateTasks(goal, language)
               .then(response => { // 接收新的响应对象
@@ -5507,14 +5525,16 @@ if (typeof document !== 'undefined') {
                 state.coachStats.shown += response.tasks.length ? 1 : 0;
                 state.coachAcceptedTaskId = null;
                 editingTaskId = null;
-                // 显示鼓励语
-                elements.agentProgress.innerHTML = `
-                  <div class="agent-progress-header">
-                    <strong>${core.t(language, 'agentTitle')}</strong>
-                    <span>${response.encouragement}</span>
-                  </div>
-                `;
-                renderAgentSteps(planningSteps, planningSteps.length - 1, true); // Mark last step complete
+                // steps 标记为全部完成
+                renderAgentSteps(planningSteps, planningSteps.length - 1, true);
+                // 鼓励语写入独立区域，常驻显示
+                if (elements.agentEncouragement && response.encouragement) {
+                  elements.agentEncouragement.innerHTML = `
+                    <span class="agent-encouragement-label">${escapeHtml(core.t(language, 'encouragementLabel'))}</span>
+                    <span class="agent-encouragement-text">${escapeHtml(response.encouragement)}</span>
+                  `;
+                  elements.agentEncouragement.hidden = false;
+                }
                 renderTasks();
                 if (elements.generatePlanButton) elements.generatePlanButton.disabled = false;
               })
@@ -5527,6 +5547,10 @@ if (typeof document !== 'undefined') {
                     <span>Error: ${error.message || 'Failed to generate tasks.'}</span>
                   </div>
                 `;
+                if (elements.agentEncouragement) {
+                  elements.agentEncouragement.hidden = true;
+                  elements.agentEncouragement.innerHTML = '';
+                }
                 if (elements.generatePlanButton) elements.generatePlanButton.disabled = false;
               });
           }
@@ -5542,6 +5566,10 @@ if (typeof document !== 'undefined') {
             <span>Error: ${error.message || 'Failed to get planning steps.'}</span>
           </div>
         `;
+        if (elements.agentEncouragement) {
+          elements.agentEncouragement.hidden = true;
+          elements.agentEncouragement.innerHTML = '';
+        }
         if (elements.generatePlanButton) elements.generatePlanButton.disabled = false;
       }
     }

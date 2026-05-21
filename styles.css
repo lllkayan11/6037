@@ -1167,6 +1167,33 @@ a {
   border-color: var(--leaf-700);
 }
 
+.agent-encouragement {
+  margin-top: 12px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, rgba(255, 209, 102, 0.18), rgba(255, 175, 132, 0.16));
+  border: 1px solid rgba(255, 175, 132, 0.45);
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--ink-700);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.agent-encouragement[hidden] {
+  display: none;
+}
+.agent-encouragement .agent-encouragement-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--sun-700);
+  text-transform: uppercase;
+}
+.agent-encouragement .agent-encouragement-text {
+  white-space: pre-wrap;
+}
+
 @keyframes pulse {
   0%, 100% { transform: scale(1); }
   50%      { transform: scale(1.25); }
